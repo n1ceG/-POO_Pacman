@@ -1,6 +1,6 @@
 # Pac-Man - preparación para la fase B
 
-Estructura preparada con asistencia de IA a pedido de Juan el 22/10/2026. Los archivos Java contienen únicamente el paquete, la declaración del tipo y las herencias. La implementación será desarrollada por Juan y su grupo.
+Estructura preparada con asistencia de IA a pedido de Juan el 22/10/2026. Se replicó el formato de `Partida.java`, preparado por Juan: paquetes, imports, atributos, firmas de métodos y cuerpos vacíos o retornos provisionales. La lógica será desarrollada por Juan y su grupo.
 
 ## Alcance y fuentes
 
@@ -44,11 +44,13 @@ src/
 
 `modelo` contiene el negocio; `controlador`, su coordinación; `extra`, posiciones y enumeraciones; y `test`, la futura prueba del controlador. Se normalizó el nombre previo `controller` a `controlador`, como en el ejemplo.
 
-`Personaje` y `Punto` son abstractas. `PacMan` y `Fantasma` extienden `Personaje`; `PuntoComun` y `SuperPunto` extienden `Punto`. Las tres enumeraciones están vacías para que sus valores también los escriba Juan. El archivo StarUML contiene tanto clases como enumeraciones con esos nombres: se preparó un único `enum` Java por nombre.
+`Personaje` y `Punto` son abstractas. `PacMan` y `Fantasma` extienden `Personaje`; `PuntoComun` y `SuperPunto` extienden `Punto`. Las tres enumeraciones incluyen los valores declarados en el StarUML. El archivo contiene tanto clases como enumeraciones con esos nombres: se preparó un único `enum` Java por nombre.
+
+Los atributos y las firmas del resto de las clases siguen `StarUML/DiagramaClasesTPO_1.mdj`, convirtiendo `bool` a `boolean`. Se mantuvo intacto el archivo `Partida.java` de Juan. No se agregaron constructores ni atributos derivados de asociaciones que no estuvieran declarados como atributos en el modelo. `Punto.valor()` es abstracto; sus implementaciones y los demás métodos con retorno usan `0`, `false` o `null` únicamente para compilar. Incluso los getters quedan pendientes de implementar. Los métodos `void` y el `main` de `TestControlador` están vacíos.
 
 Las clases de `views` se definirán si hacen falta para transportar datos. No se anticiparon clases de interfaz gráfica ni conversiones a views. Se preservaron los diagramas, los requerimientos y el ejemplo docente.
 
-## Compilar y, más adelante, ejecutar
+## Compilar y ejecutar el esqueleto
 
 Desde una terminal PowerShell abierta en esta carpeta, con `javac` disponible:
 
@@ -57,7 +59,7 @@ $fuentesTpo = @(Get-ChildItem -LiteralPath .\src -Recurse -Filter *.java | ForEa
 javac --release 17 -encoding UTF-8 -d bin $fuentesTpo
 ```
 
-El esqueleto compila, pero **todavía no se puede ejecutar**: no incluye atributos, constructores explícitos, métodos ni `main`. `TestControlador` no implementa verificaciones todavía. Cuando escriban su método `main`, podrán ejecutarlo con **Run** en VS Code o con:
+El esqueleto compila. `TestControlador` incluye un `main` vacío: ejecutarlo termina sin mostrar resultados ni verificar comportamientos. Para desarrollar las pruebas, completar ese método y ejecutarlo con **Run** en VS Code o con:
 
 ```powershell
 java -cp bin test.TestControlador
