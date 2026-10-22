@@ -5,9 +5,9 @@ import extra.Posicion;
 
 public abstract class Personaje {
 
-    private Posicion posicion;
-    private Posicion posicionInicial;
-    private Direccion direccion;
+    protected Posicion posicion;
+    protected Posicion posicionInicial;
+    protected Direccion direccion;
 
     public Posicion calcularProximaPosicion(
         Direccion direccion,
