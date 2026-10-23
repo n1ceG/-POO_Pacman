@@ -4,5 +4,5 @@ public class PuntoComun extends Punto {
 
     @Override
     public int valor()
-    { return 0; }
+    { return 10; }
 }

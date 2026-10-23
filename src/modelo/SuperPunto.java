@@ -4,5 +4,5 @@ public class SuperPunto extends Punto {
 
     @Override
     public int valor()
-    { return 0; }
+    { return 50; }
 }
