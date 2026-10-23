@@ -17,20 +17,12 @@ public abstract class Personaje {
         int x = this.posicion.getPosicion()[0];
         int y = this.posicion.getPosicion()[1];
         if(null != direccion)switch (direccion) {
-            case ARRIBA:
-                y-=1;
-                break;
-            case ABAJO:
-                y+=1;
-                break;
-            case IZQUIERDA:
-                x-=1;
-                break;
-            case DERECHA:
-                x+=1;
-                break;
-            default:
-                break;
+            case ARRIBA -> y-=1;
+            case ABAJO -> y+=1;
+            case IZQUIERDA -> x-=1;
+            case DERECHA -> x+=1;
+            default -> {
+            }
         }
         Posicion proximaPosicion = new Posicion(x,y);
         return proximaPosicion;
