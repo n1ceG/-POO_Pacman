@@ -32,4 +32,16 @@ public class Celda {
     public Punto retirarPunto()
     { return null; }
 
+    public Posicion getPosicion(){
+        return this.posicion;
+    }
+
+    public Punto tipoPunto(){
+        return this.punto;
+    }
+
+    public boolean esPared(){
+        return this.pared;
+    }
+
 }
