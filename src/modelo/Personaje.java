@@ -9,29 +9,43 @@ public abstract class Personaje {
     protected Posicion posicionInicial;
     protected Direccion direccion;
 
-    public Posicion calcularProximaPosicion(
-        Direccion direccion,
+    public Posicion calcularProximaPosicion
+    (
         Laberinto laberinto
     )
     {
-        return null;
+        int x = this.posicion.getPosicion()[0];
+        int y = this.posicion.getPosicion()[1];
+        if(null != direccion)switch (direccion) {
+            case ARRIBA:
+                y-=1;
+                break;
+            case ABAJO:
+                y+=1;
+                break;
+            case IZQUIERDA:
+                x-=1;
+                break;
+            case DERECHA:
+                x+=1;
+                break;
+            default:
+                break;
+        }
+        Posicion proximaPosicion = new Posicion(x,y);
+        return proximaPosicion;
     }
 
-    public void mover(
+    public abstract void mover(
         Direccion direccion,
         Laberinto laberinto
-    )
-    {}
+    );
 
-    public void volverAlInicio()
-    {}
+    public abstract void volverAlInicio();
 
-    public Posicion getPosicion()
-    { return null; }
+    public abstract Posicion getPosicion();
 
-    public Direccion getDireccion()
-    { return null; }
+    public abstract Direccion getDireccion();
 
-    protected Posicion getPosicionInicial()
-    { return null; }
+    protected abstract Posicion getPosicionInicial();
 }
