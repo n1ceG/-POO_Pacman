@@ -16,7 +16,7 @@ public abstract class Personaje {
     {
         int x = this.posicion.getPosicion()[0];
         int y = this.posicion.getPosicion()[1];
-        if(null != direccion)switch (direccion) {
+        if(direccion != null) switch (direccion) {
             case ARRIBA -> y-=1;
             case ABAJO -> y+=1;
             case IZQUIERDA -> x-=1;
