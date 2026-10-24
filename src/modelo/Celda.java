@@ -8,6 +8,9 @@ public class Celda {
     private boolean pared;
     private Punto punto;
 
+    public Celda() {
+    }
+
     public Celda
     (
         boolean esPared, 
@@ -15,22 +18,32 @@ public class Celda {
         int x, 
         int y
     ){
+        this(
+            esPared,
+            esPared ? null : (esSuperPunto ? new SuperPunto() : new PuntoComun()),
+            x,
+            y
+        );
+    }
+
+    public Celda
+    (
+        boolean esPared,
+        Punto punto,
+        int x,
+        int y
+    ){
         this.posicion = new Posicion(x, y);
-        if(esPared)
-        {
-            this.pared = true;
-            this.punto = null;
-        }
-        else
-        {
-            this.pared = false;
-            if(esSuperPunto) this.punto = new SuperPunto();
-            else this.punto = new PuntoComun();
-        }
+        this.pared = esPared;
+        this.punto = esPared ? null : punto;
     }
 
     public Punto retirarPunto()
-    { return null; }
+    {
+        Punto puntoRetirado = this.punto;
+        this.punto = null;
+        return puntoRetirado;
+    }
 
     public Posicion getPosicion(){
         return this.posicion;
@@ -42,6 +55,10 @@ public class Celda {
 
     public boolean esPared(){
         return this.pared;
+    }
+
+    public boolean tienePunto(){
+        return this.punto != null;
     }
 
 }
