@@ -14,18 +14,17 @@ public abstract class Personaje {
         Laberinto laberinto
     )
     {
-        int x = this.posicion.getPosicion()[0];
-        int y = this.posicion.getPosicion()[1];
+        int fila = this.posicion.fila;
+        int columna = this.posicion.columna;
         if(direccion != null) switch (direccion) {
-            case ARRIBA -> y-=1;
-            case ABAJO -> y+=1;
-            case IZQUIERDA -> x-=1;
-            case DERECHA -> x+=1;
+            case ARRIBA -> fila -= 1;
+            case ABAJO -> fila +=1;
+            case IZQUIERDA -> columna-=1;
+            case DERECHA -> columna+=1;
             default -> {
             }
         }
-        Posicion proximaPosicion = new Posicion(x,y);
-        return proximaPosicion;
+        return new Posicion(fila, columna);
     }
 
     public abstract void mover(
