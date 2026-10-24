@@ -9,8 +9,14 @@ public abstract class Personaje {
     protected Posicion posicionInicial;
     protected Direccion direccion;
 
+    protected Personaje(Posicion posicionInicial){
+        this.posicionInicial = new Posicion(posicionInicial.fila, posicionInicial.columna);
+        this.posicion = new Posicion(posicionInicial.fila, posicionInicial.columna);
+    }
+    
     public Posicion calcularProximaPosicion
     (
+        Direccion direccion,
         Laberinto laberinto
     )
     {
@@ -24,7 +30,11 @@ public abstract class Personaje {
             default -> {
             }
         }
-        return new Posicion(fila, columna);
+        Posicion candidata = new Posicion(fila, columna);
+        if (laberinto.esTransitable(candidata)) {
+            return candidata;
+        }
+        return new Posicion(this.posicion.fila, this.posicion.columna);
     }
 
     public abstract void mover(
@@ -34,9 +44,17 @@ public abstract class Personaje {
 
     public abstract void volverAlInicio();
 
-    public abstract Posicion getPosicion();
+    public Posicion getPosicion(){
+        return new Posicion(posicion.fila, posicion.columna);
+    }
 
-    public abstract Direccion getDireccion();
+    public Direccion getDireccion(){
+        return direccion;
+    }
 
-    protected abstract Posicion getPosicionInicial();
+    protected Posicion getPosicionInicial(){
+        return new Posicion(posicionInicial.fila, posicionInicial.columna);
+    }
+
+
 }
