@@ -14,6 +14,7 @@ public class Partida {
     private PacMan pacMan;
 
     private static final Posicion INICIO_PACMAN = new Posicion(13, 7);
+    private static final int VIDAS_INICIALES = 3;
 
     public Partida()
     {
@@ -24,6 +25,8 @@ public class Partida {
     {
         this.laberinto = laberinto;
         this.pacMan = new PacMan(inicioPacMan);
+        this.vidas = VIDAS_INICIALES;
+        this.puntaje = 0;
         this.estado = EstadoPartida.EN_CURSO;
     }
 
@@ -70,5 +73,20 @@ public class Partida {
     public Posicion getPosicionPacMan()
     {
         return pacMan.getPosicion();
+    }
+
+    public int getVidas()
+    {
+        return vidas;
+    }
+
+    public int getPuntaje()
+    {
+        return puntaje;
+    }
+
+    public EstadoPartida getEstado()
+    {
+        return estado;
     }
 }

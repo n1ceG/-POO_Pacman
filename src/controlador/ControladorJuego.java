@@ -1,6 +1,7 @@
 package controlador;
 
 import extra.Direccion;
+import extra.EstadoPartida;
 import extra.Posicion;
 import modelo.Partida;
 
@@ -31,6 +32,21 @@ public class ControladorJuego {
     public Posicion getPosicionPacMan()
     {
         return partida.getPosicionPacMan();
+    }
+
+    public int getVidas()
+    {
+        return partida.getVidas();
+    }
+
+    public int getPuntaje()
+    {
+        return partida.getPuntaje();
+    }
+
+    public EstadoPartida getEstado()
+    {
+        return partida.getEstado();
     }
 
     public void pausar()
