@@ -34,6 +34,9 @@ public class Partida {
             return;
         }
         pacMan.mover(pacMan.getDireccion(), laberinto);
+        Celda celdaActual = laberinto.obtenerCelda(pacMan.getPosicion());
+        Punto puntoRetirado = celdaActual.retirarPunto();
+        consumir(puntoRetirado);
     }
     
     public List<Fantasma> detectarColision(
@@ -45,7 +48,11 @@ public class Partida {
     }
 
     public void consumir(Punto punto)
-    {}
+    {
+        if (punto != null) {
+            this.puntaje += punto.valor();
+        }
+    }
 
     public void resolverColision(Fantasma fantasma)
     {}
@@ -70,5 +77,10 @@ public class Partida {
     public Posicion getPosicionPacMan()
     {
         return pacMan.getPosicion();
+    }
+
+    public int getPuntaje()
+    {
+        return this.puntaje;
     }
 }
