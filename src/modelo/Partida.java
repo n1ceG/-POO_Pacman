@@ -37,6 +37,10 @@ public class Partida {
         Celda celdaActual = laberinto.obtenerCelda(pacMan.getPosicion());
         Punto puntoRetirado = celdaActual.retirarPunto();
         consumir(puntoRetirado);
+
+        if (comprobarVictoria()) {
+            this.estado = EstadoPartida.VICTORIA;
+        }
     }
     
     public List<Fantasma> detectarColision(
@@ -58,7 +62,9 @@ public class Partida {
     {}
 
     public boolean comprobarVictoria()
-    { return false; }
+    { 
+        return !laberinto.quedanPuntos();
+    }
 
     public void perderVida()
     {}
@@ -82,5 +88,10 @@ public class Partida {
     public int getPuntaje()
     {
         return this.puntaje;
+    }
+
+    public EstadoPartida getEstado()
+    {
+        return this.estado;
     }
 }

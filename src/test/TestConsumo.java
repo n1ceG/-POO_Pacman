@@ -4,6 +4,7 @@ import extra.Direccion;
 import extra.Posicion;
 import modelo.Laberinto;
 import modelo.Partida;
+import extra.EstadoPartida;
 
 public class TestConsumo {
 
@@ -12,6 +13,7 @@ public class TestConsumo {
         Laberinto laberinto = new Laberinto(new String[] {
             "####",
             "# .#",
+            "#.##",
             "####"
         });
 
@@ -61,6 +63,7 @@ public class TestConsumo {
         Laberinto laberintoSuper = new Laberinto(new String[] {
             "####",
             "# o#",
+            "#.##",
             "####"
         });
 
@@ -110,6 +113,22 @@ public class TestConsumo {
         );
 
         System.out.println("[OK] El superpunto suma 50 y desaparece.");
+
+        if (partida.getEstado() != EstadoPartida.EN_CURSO) {
+            throw new AssertionError(
+                "La prueba del punto comun debe mantener la partida EN_CURSO"
+            );
+        }
+
+        if (partidaSuper.getEstado() != EstadoPartida.EN_CURSO) {
+            throw new AssertionError(
+                "La prueba del superpunto debe mantener la partida EN_CURSO"
+            );
+        }
+
+        System.out.println(
+            "[OK] Las pruebas de consumo mantienen la partida EN_CURSO"
+        );
     }
     
 }
