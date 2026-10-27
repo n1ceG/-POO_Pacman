@@ -3,6 +3,9 @@ package modelo;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.Posicion;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Fantasma extends Personaje {
 
@@ -12,6 +15,7 @@ public class Fantasma extends Personaje {
     public Fantasma(Posicion posicionInicial)
     {
         super(posicionInicial);
+        this.estado = EstadoFantasma.PERSIGUIENDO;
     }
 
     @Override
@@ -28,14 +32,75 @@ public class Fantasma extends Personaje {
 
     public Direccion elegirDireccion(
         Laberinto laberinto,
-        Posicion objetivo
+        Posicion posicionPacman
     )
     {
+        if(this.estado == EstadoFantasma.ASUSTADO){
+            // Fantasma Asustado
+            List<Direccion> direcciones = laberinto.direccionesDisponibles(posicion);
+            if(direcciones.isEmpty()){
+                return null;
+            }
+            Random random = new Random();
+            int proxima = random.nextInt(direcciones.size());
+            return direcciones.get(proxima);
+            // Fantasma Asustado
+        }
+        
+        else{
+            // Fantasma NO Asustado
+            List<Posicion> caminoMasCorto = new ArrayList<>();
+            
+            if(this.estado==EstadoFantasma.PERSIGUIENDO){
+                caminoMasCorto = laberinto.caminoMasCorto(posicion, posicionPacman);
+            }
+            if(this.estado==EstadoFantasma.REGRESANDO){
+                caminoMasCorto = laberinto.caminoMasCorto(posicion, posicionInicial);
+            }
+            
+            if(caminoMasCorto.isEmpty()){
+                return null; 
+            }
+            if(caminoMasCorto.size()==1){ 
+                return null; 
+            }
+            int siguienteX = caminoMasCorto.get(1).fila;
+            int siguienteY = caminoMasCorto.get(1).columna;
+            
+            int actualX = this.posicion.fila;
+            int actualY = this.posicion.columna;
+            
+            int diferenciaFila = siguienteX-actualX;
+            int diferenciaColumna = siguienteY-actualY;
+            
+            if (diferenciaFila == -1) {
+                return Direccion.ARRIBA;
+            }
+            if (diferenciaFila == 1) {
+                return Direccion.ABAJO;
+            }
+            if (diferenciaColumna == -1) {
+                return Direccion.IZQUIERDA;
+            }
+            if (diferenciaColumna == 1) {
+                return Direccion.DERECHA;
+            }
+            
+            // Fantasma NO Asustado
+        }
         return null;
+        // Actualmente, Fantasma se mueve de manera totalmente aleatoria. 
+        // Podríamos buscar la forma de que se mueva de manera coherente, buscando el camino más lejano a Pacman.
     }
-
+    
+    
+    
     public void asustar(double duracion)
-    {}
+    {
+        if(this.estado==EstadoFantasma.REGRESANDO){return;}
+        this.estado = EstadoFantasma.ASUSTADO;
+        tiempoSustoRestante = duracion;
+    }
 
     public void serComido()
     {}
@@ -44,5 +109,7 @@ public class Fantasma extends Personaje {
     {}
 
     public EstadoFantasma getEstado()
-    { return null; }
+    { 
+        return this.estado; 
+    }
 }

@@ -12,6 +12,7 @@ public class Partida {
     private EstadoPartida estado;
     private Laberinto laberinto;
     private PacMan pacMan;
+    private Fantasma[] fantasmas;
 
     private static final Posicion INICIO_PACMAN = new Posicion(13, 7);
     private static final int VIDAS_INICIALES = 3;
@@ -23,11 +24,17 @@ public class Partida {
 
     public Partida(Laberinto laberinto, Posicion inicioPacMan)
     {
-        this.laberinto = laberinto;
-        this.pacMan = new PacMan(inicioPacMan);
         this.vidas = VIDAS_INICIALES;
         this.puntaje = 0;
         this.estado = EstadoPartida.EN_CURSO;
+        this.laberinto = laberinto;
+        this.pacMan = new PacMan(inicioPacMan);
+        this.fantasmas = new Fantasma[4];
+        
+        Posicion centro = laberinto.centro();
+        for(int i = 0; i<4; i++){
+            fantasmas[i] = new Fantasma(centro);
+        }
     }
 
 
@@ -37,10 +44,13 @@ public class Partida {
             return;
         }
         pacMan.mover(pacMan.getDireccion(), laberinto);
-        consumirPuntoDeCeldaActual();
+        for(Fantasma f:fantasmas){
+            
+            f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
+        }
     }
-
-    private void consumirPuntoDeCeldaActual()
+  
+   private void consumirPuntoDeCeldaActual()
     {
         Celda celda = laberinto.obtenerCelda(pacMan.getPosicion());
         if (celda == null) {
@@ -48,7 +58,7 @@ public class Partida {
         }
 
         consumir(celda.retirarPunto());
-    }
+     
     
     public List<Fantasma> detectarColision(
         Posicion proximoPacman, 
