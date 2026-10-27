@@ -66,3 +66,8 @@ java -cp bin test.TestControlador
 ```
 
 Los archivos de `bin` se regeneran al compilar y no se versionan. Esta estructura no representa la fase B terminada.
+
+## Revisión B02 — 27/10/2026
+
+El código avanzó respecto del esqueleto descrito arriba. Consultar [contratos y auditoría de B02](docs/B02-contratos.md) y [verificación actual](docs/B02-verificacion.txt). El documento distingue implementaciones existentes, propuestas y decisiones pendientes de aceptación del grupo. La compilación fue exitosa; TestControlador conserva una expectativa antigua incompatible con el inicio hacia DERECHA.
+
