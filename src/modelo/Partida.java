@@ -15,6 +15,7 @@ public class Partida {
     private Fantasma[] fantasmas;
 
     private static final Posicion INICIO_PACMAN = new Posicion(13, 7);
+    private static final int VIDAS_INICIALES = 3;
 
     public Partida()
     {
@@ -23,7 +24,7 @@ public class Partida {
 
     public Partida(Laberinto laberinto, Posicion inicioPacMan)
     {
-        this.vidas = 3;
+        this.vidas = VIDAS_INICIALES;
         this.puntaje = 0;
         this.estado = EstadoPartida.EN_CURSO;
         this.laberinto = laberinto;
@@ -83,5 +84,20 @@ public class Partida {
     public Posicion getPosicionPacMan()
     {
         return pacMan.getPosicion();
+    }
+
+    public int getVidas()
+    {
+        return vidas;
+    }
+
+    public int getPuntaje()
+    {
+        return puntaje;
+    }
+
+    public EstadoPartida getEstado()
+    {
+        return estado;
     }
 }
