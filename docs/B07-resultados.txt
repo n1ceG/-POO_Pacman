@@ -1,0 +1,154 @@
+Pruebas B07 - 27/10/2026
+Compilacion: JDK 26.0.2, --release 17 -encoding UTF-8
+Ejecucion: test.TestB07
+Codigo de salida: 0
+
+-- Inicio de los cuatro fantasmas --
+[OK] Partida en curso | esperado: EN_CURSO | obtenido: EN_CURSO
+[OK] Cantidad de fantasmas | esperado: 4 | obtenido: 4
+[OK] Fantasma 0 en el centro | esperado: (7,7) | obtenido: (7,7)
+[OK] Fantasma 0 persigue | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Fantasma 1 en el centro | esperado: (7,7) | obtenido: (7,7)
+[OK] Fantasma 1 persigue | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Objetos distintos: 1 y 0 | esperado: true | obtenido: true
+[OK] Fantasma 2 en el centro | esperado: (7,7) | obtenido: (7,7)
+[OK] Fantasma 2 persigue | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Objetos distintos: 2 y 0 | esperado: true | obtenido: true
+[OK] Objetos distintos: 2 y 1 | esperado: true | obtenido: true
+[OK] Fantasma 3 en el centro | esperado: (7,7) | obtenido: (7,7)
+[OK] Fantasma 3 persigue | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Objetos distintos: 3 y 0 | esperado: true | obtenido: true
+[OK] Objetos distintos: 3 y 1 | esperado: true | obtenido: true
+[OK] Objetos distintos: 3 y 2 | esperado: true | obtenido: true
+
+-- Movimiento de los cuatro mediante el controlador --
+[OK] Cuatro fantasmas en el mapa pequeno | esperado: 4 | obtenido: 4
+[OK] Centro del mapa pequeno: fantasma 0 | esperado: (2,3) | obtenido: (2,3)
+[OK] Centro del mapa pequeno: fantasma 1 | esperado: (2,3) | obtenido: (2,3)
+[OK] Centro del mapa pequeno: fantasma 2 | esperado: (2,3) | obtenido: (2,3)
+[OK] Centro del mapa pequeno: fantasma 3 | esperado: (2,3) | obtenido: (2,3)
+[OK] Pac-Man subio | esperado: (1,5) | obtenido: (1,5)
+[OK] Tick 1: fantasma 0 | esperado: (2,4) | obtenido: (2,4)
+[OK] Tick 1: fantasma 1 | esperado: (2,4) | obtenido: (2,4)
+[OK] Tick 1: fantasma 2 | esperado: (2,4) | obtenido: (2,4)
+[OK] Tick 1: fantasma 3 | esperado: (2,4) | obtenido: (2,4)
+[OK] Tick 2: fantasma 0 avanza solo una celda | esperado: (2,5) | obtenido: (2,5)
+[OK] Sigue persiguiendo: 0 | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Tick 2: fantasma 1 avanza solo una celda | esperado: (2,5) | obtenido: (2,5)
+[OK] Sigue persiguiendo: 1 | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Tick 2: fantasma 2 avanza solo una celda | esperado: (2,5) | obtenido: (2,5)
+[OK] Sigue persiguiendo: 2 | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Tick 2: fantasma 3 avanza solo una celda | esperado: (2,5) | obtenido: (2,5)
+[OK] Sigue persiguiendo: 3 | esperado: PERSIGUIENDO | obtenido: PERSIGUIENDO
+[OK] Pac-Man en su nueva posicion | esperado: (1,1) | obtenido: (1,1)
+[OK] Cuatro fantasmas al cambiar el objetivo | esperado: 4 | obtenido: 4
+[OK] Fantasma 0 persigue la posicion actual | esperado: (1,2) | obtenido: (1,2)
+[OK] Fantasma 1 persigue la posicion actual | esperado: (1,2) | obtenido: (1,2)
+[OK] Fantasma 2 persigue la posicion actual | esperado: (1,2) | obtenido: (1,2)
+[OK] Fantasma 3 persigue la posicion actual | esperado: (1,2) | obtenido: (1,2)
+
+-- Cuatro direcciones --
+[OK] Elegir ARRIBA | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Elegir no mueve al fantasma | esperado: (2,2) | obtenido: (2,2)
+[OK] Mover ARRIBA | esperado: (1,2) | obtenido: (1,2)
+[OK] Elegir ABAJO | esperado: ABAJO | obtenido: ABAJO
+[OK] Elegir no mueve al fantasma | esperado: (2,2) | obtenido: (2,2)
+[OK] Mover ABAJO | esperado: (3,2) | obtenido: (3,2)
+[OK] Elegir IZQUIERDA | esperado: IZQUIERDA | obtenido: IZQUIERDA
+[OK] Elegir no mueve al fantasma | esperado: (2,2) | obtenido: (2,2)
+[OK] Mover IZQUIERDA | esperado: (2,1) | obtenido: (2,1)
+[OK] Elegir DERECHA | esperado: DERECHA | obtenido: DERECHA
+[OK] Elegir no mueve al fantasma | esperado: (2,2) | obtenido: (2,2)
+[OK] Mover DERECHA | esperado: (2,3) | obtenido: (2,3)
+
+-- Pasillo con curvas --
+[OK] Paso 1 | esperado: (1,2) | obtenido: (1,2)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 2 | esperado: (1,3) | obtenido: (1,3)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 3 | esperado: (2,3) | obtenido: (2,3)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 4 | esperado: (3,3) | obtenido: (3,3)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 5 | esperado: (3,4) | obtenido: (3,4)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 6 | esperado: (3,5) | obtenido: (3,5)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+
+-- Paredes y bordes --
+[OK] Pared hacia ARRIBA | esperado: (1,1) | obtenido: (1,1)
+[OK] Pared hacia ABAJO | esperado: (1,1) | obtenido: (1,1)
+[OK] Pared hacia IZQUIERDA | esperado: (1,1) | obtenido: (1,1)
+[OK] Pared hacia DERECHA | esperado: (1,1) | obtenido: (1,1)
+[OK] Borde superior | esperado: (0,0) | obtenido: (0,0)
+[OK] Borde izquierdo | esperado: (0,0) | obtenido: (0,0)
+[OK] Borde inferior | esperado: (1,1) | obtenido: (1,1)
+[OK] Borde derecho | esperado: (1,1) | obtenido: (1,1)
+
+-- Cruce con rutas de diferente longitud --
+[OK] Elige el camino corto | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Paso 1 | esperado: (2,3) | obtenido: (2,3)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 2 | esperado: (1,3) | obtenido: (1,3)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 3 | esperado: (1,4) | obtenido: (1,4)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+[OK] Paso 4 | esperado: (1,5) | obtenido: (1,5)
+[OK] Avanzo exactamente una celda | esperado: 1 | obtenido: 1
+[OK] No entro en una pared | esperado: true | obtenido: true
+
+-- Salida de callejon --
+[OK] Entro al extremo cerrado | esperado: (1,1) | obtenido: (1,1)
+[OK] Invierte el movimiento para salir | esperado: DERECHA | obtenido: DERECHA
+[OK] Salio del callejon | esperado: (1,2) | obtenido: (1,2)
+
+-- Empates entre caminos minimos --
+[OK] Empate hacia (1,1), intento 1 | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Empate hacia (1,1), intento 2 | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Empate hacia (1,1), intento 3 | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Empate hacia (1,3), intento 1 | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Empate hacia (1,3), intento 2 | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Empate hacia (1,3), intento 3 | esperado: ARRIBA | obtenido: ARRIBA
+[OK] Empate hacia (3,1), intento 1 | esperado: ABAJO | obtenido: ABAJO
+[OK] Empate hacia (3,1), intento 2 | esperado: ABAJO | obtenido: ABAJO
+[OK] Empate hacia (3,1), intento 3 | esperado: ABAJO | obtenido: ABAJO
+[OK] Empate hacia (3,3), intento 1 | esperado: ABAJO | obtenido: ABAJO
+[OK] Empate hacia (3,3), intento 2 | esperado: ABAJO | obtenido: ABAJO
+[OK] Empate hacia (3,3), intento 3 | esperado: ABAJO | obtenido: ABAJO
+[OK] Empate hacia (1,3), intento 1 | esperado: IZQUIERDA | obtenido: IZQUIERDA
+[OK] Empate hacia (1,3), intento 2 | esperado: IZQUIERDA | obtenido: IZQUIERDA
+[OK] Empate hacia (1,3), intento 3 | esperado: IZQUIERDA | obtenido: IZQUIERDA
+
+-- Sin camino y objetivo alcanzado --
+[OK] Destino inaccesible devuelve null | esperado: null | obtenido: null
+[OK] Sin camino permanece quieto | esperado: (1,1) | obtenido: (1,1)
+[OK] En el objetivo devuelve null | esperado: null | obtenido: null
+[OK] En el objetivo permanece quieto | esperado: (1,1) | obtenido: (1,1)
+
+-- No avanzar fuera de EN_CURSO --
+[OK] Conserva cuatro fantasmas en PAUSADA | esperado: 4 | obtenido: 4
+[OK] PAUSADA: fantasma 0 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] PAUSADA: fantasma 1 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] PAUSADA: fantasma 2 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] PAUSADA: fantasma 3 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] Conserva cuatro fantasmas en VICTORIA | esperado: 4 | obtenido: 4
+[OK] VICTORIA: fantasma 0 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] VICTORIA: fantasma 1 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] VICTORIA: fantasma 2 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] VICTORIA: fantasma 3 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] Conserva cuatro fantasmas en DERROTA | esperado: 4 | obtenido: 4
+[OK] DERROTA: fantasma 0 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] DERROTA: fantasma 1 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] DERROTA: fantasma 2 no avanza | esperado: (2,3) | obtenido: (2,3)
+[OK] DERROTA: fantasma 3 no avanza | esperado: (2,3) | obtenido: (2,3)
+
+B07: 128/128 comprobaciones OK
