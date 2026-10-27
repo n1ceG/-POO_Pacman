@@ -30,10 +30,10 @@ public class TestControlador {
         probarDireccion(Direccion.IZQUIERDA, 3, 4);
         probarDireccion(Direccion.DERECHA, 3, 6);
 
-        System.out.println("\n-- Sin dirección elegida --");
+        System.out.println("\n-- Direccion inicial hacia la derecha --");
         ControladorJuego controlador = new ControladorJuego();
         controlador.actualizar(1);
-        verificar("Sin tecla, PacMan no se mueve", 13, 7, controlador);
+        verificar("Sin tecla, PacMan avanza a la derecha", 13, 8, controlador);
 
         System.out.println("\n-- Pared --");
         controlador = new ControladorJuego();
