@@ -5,9 +5,11 @@ import extra.Posicion;
 
 public class PacMan extends Personaje {
 
+
     public PacMan(Posicion posicionInicial)
     {
         super(posicionInicial);
+        this.direccion = Direccion.DERECHA;
     }
 
     public void elegirDireccion(Direccion direccion)
