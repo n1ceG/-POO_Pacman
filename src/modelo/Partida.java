@@ -47,6 +47,9 @@ public class Partida {
         Celda celdaActual = laberinto.obtenerCelda(pacMan.getPosicion());
         Punto puntoRetirado = celdaActual.retirarPunto();
         consumir(puntoRetirado);
+
+        if (comprobarVictoria()) {
+            this.estado = EstadoPartida.VICTORIA;
         for(Fantasma f:fantasmas){
             
             f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
@@ -72,7 +75,9 @@ public class Partida {
     {}
 
     public boolean comprobarVictoria()
-    { return false; }
+    { 
+        return !laberinto.quedanPuntos();
+    }
 
     public void perderVida()
     {}
