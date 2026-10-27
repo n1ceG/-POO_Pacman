@@ -1,0 +1,24 @@
+B02 — Verificación del 27/10/2026
+Base: commit 771ad2e, rama develop.
+Se revisó src completo; no se modificó código Java.
+JDK: C:/Program Files/Java/jdk-26.0.2/bin (invocación directa).
+Compilación: javac --release 17 -encoding UTF-8 -d <carpeta temporal> <todos los .java de src>
+Resultado de compilación: código 0.
+
+TestControlador: 15/16 comprobaciones OK.
+Única falla: «Sin tecla, PacMan no se mueve».
+Esperado por prueba antigua: (13,7). Obtenido: (13,8).
+El resultado obtenido coincide con la dirección DERECHA confirmada por Juan.
+La expectativa del test requiere actualización; B02 no cambia código.
+
+TestB07: 128/128 comprobaciones OK, código 0.
+Estas pruebas no validan colisiones, vidas, susto completo ni pausa/reanudación real.
+
+Archivos previos sin versionar preservados y excluidos del commit de B02:
+docs/B07-pruebas.md
+docs/B07-resultados.txt
+src/test/TestB07.java
+La prueba B07 ejecutada depende de ese archivo local; no se afirma que este commit lo incluya.
+
+Incidencia de entorno: invocar javac por el acceso de Oracle en PATH quedó sin responder.
+La compilación y ejecuciones verificadas usaron los ejecutables del JDK directamente.

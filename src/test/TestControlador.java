@@ -10,6 +10,7 @@ package test;
 
 import controlador.ControladorJuego;
 import extra.Direccion;
+import extra.EstadoPartida;
 import extra.Posicion;
 import modelo.Laberinto;
 import modelo.Partida;
@@ -81,6 +82,29 @@ public class TestControlador {
         controlador.actualizar(1);
         verificar("Giro ARRIBA hacia camino (12,7), gira", 12, 7, controlador);
 
+        System.out.println("\n-- N02: Inicialización de la partida (R8) --");
+        controlador = new ControladorJuego();
+        verificar("Partida nueva tiene 3 vidas", controlador.getVidas() == 3);
+        verificar("Partida nueva tiene 0 puntos", controlador.getPuntaje() == 0);
+        verificar("Partida nueva está EN_CURSO",
+            controlador.getEstado() == EstadoPartida.EN_CURSO);
+
+        controlador = new ControladorJuego(
+            new Partida(Laberinto.crearDefault(), new Posicion(3, 5))
+        );
+        verificar("Constructor con laberinto también inicia 3/0/EN_CURSO",
+            controlador.getVidas() == 3 &&
+            controlador.getPuntaje() == 0 &&
+            controlador.getEstado() == EstadoPartida.EN_CURSO);
+
+        ControladorJuego otro = new ControladorJuego();
+        controlador.moverPacMan(Direccion.DERECHA);
+        controlador.actualizar(1);
+        verificar("Partidas distintas no comparten valores",
+            otro.getVidas() == 3 &&
+            otro.getPuntaje() == 0 &&
+            otro.getEstado() == EstadoPartida.EN_CURSO);
+
         System.out.println("\nResultado: " + aprobadas + "/" + pruebas + " pruebas OK");
     }
 
@@ -96,6 +120,15 @@ public class TestControlador {
         controlador.moverPacMan(direccion);
         controlador.actualizar(1);
         verificar(direccion + " desde (3,5)", filaEsperada, columnaEsperada, controlador);
+    }
+
+    private static void verificar(String descripcion, boolean ok)
+    {
+        pruebas++;
+        if (ok) {
+            aprobadas++;
+        }
+        System.out.println((ok ? "[OK]    " : "[FALLA] ") + descripcion);
     }
 
     private static void verificar(
