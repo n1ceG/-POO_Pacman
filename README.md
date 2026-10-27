@@ -71,3 +71,8 @@ Los archivos de `bin` se regeneran al compilar y no se versionan. Esta estructur
 
 El código avanzó respecto del esqueleto descrito arriba. Consultar [contratos y auditoría de B02](docs/B02-contratos.md) y [verificación actual](docs/B02-verificacion.txt). El documento distingue implementaciones existentes, propuestas y decisiones pendientes de aceptación del grupo. La compilación fue exitosa; TestControlador conserva una expectativa antigua incompatible con el inicio hacia DERECHA.
 
+
+
+## Checklist interactivo del TPO
+
+Abrir [estado-tpo.html](docs/estado-tpo.html) para revisar y marcar los contratos de B02 por clase y comportamiento. Incluye relaciones entre objetos y exportacion/importacion de las marcas. Consultar [uso, fuentes y recuperacion](docs/estado-tpo-uso.md). Las marcas iniciales provienen de una lectura del codigo del 27/10/2026 y no equivalen a tarjetas aprobadas.
