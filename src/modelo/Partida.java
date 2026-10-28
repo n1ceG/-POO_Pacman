@@ -44,21 +44,12 @@ public class Partida {
             return;
         }
         pacMan.mover(pacMan.getDireccion(), laberinto);
-        for(Fantasma f:fantasmas){
-            
-            f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
-        }
-    }
-  
-   private void consumirPuntoDeCeldaActual()
-    {
         Celda celda = laberinto.obtenerCelda(pacMan.getPosicion());
-        if (celda == null) {
-            return;
+        if (celda != null) {
+            consumir(celda.retirarPunto());
         }
-
-        consumir(celda.retirarPunto());
-     
+        
+    }
     
     public List<Fantasma> detectarColision(
         Posicion proximoPacman, 
