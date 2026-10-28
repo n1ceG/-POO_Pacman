@@ -76,7 +76,7 @@ public class Partida {
         }
         this.puntaje += punto.valor();
     }
-    }
+    
 
     public void resolverColision(Fantasma fantasma)
     {}
