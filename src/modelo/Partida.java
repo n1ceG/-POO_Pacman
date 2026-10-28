@@ -44,6 +44,12 @@ public class Partida {
             return;
         }
         pacMan.mover(pacMan.getDireccion(), laberinto);
+        Celda celdaActual = laberinto.obtenerCelda(pacMan.getPosicion());
+        Punto puntoRetirado = celdaActual.retirarPunto();
+        consumir(puntoRetirado);
+
+        if (comprobarVictoria()) {
+            this.estado = EstadoPartida.VICTORIA;
         for(Fantasma f:fantasmas){
             
             f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
@@ -59,13 +65,19 @@ public class Partida {
     }
 
     public void consumir(Punto punto)
-    {}
+    {
+        if (punto != null) {
+            this.puntaje += punto.valor();
+        }
+    }
 
     public void resolverColision(Fantasma fantasma)
     {}
 
     public boolean comprobarVictoria()
-    { return false; }
+    { 
+        return !laberinto.quedanPuntos();
+    }
 
     public void perderVida()
     {}
@@ -83,21 +95,21 @@ public class Partida {
 
     public Posicion getPosicionPacMan()
     {
-        return pacMan.getPosicion();
+        return this.pacMan.getPosicion();
     }
 
     public int getVidas()
     {
-        return vidas;
+        return this.vidas;
     }
 
     public int getPuntaje()
     {
-        return puntaje;
+        return this.puntaje;
     }
 
     public EstadoPartida getEstado()
     {
-        return estado;
+        return this.estado;
     }
 }
