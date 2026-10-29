@@ -56,9 +56,11 @@ public class Partida {
 
         if (comprobarVictoria()) {
             this.estado = EstadoPartida.VICTORIA;
+            return;
         }
         for(Fantasma f:fantasmas){
             f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
+            f.actualizarEstado(0);
         }
         
     }
