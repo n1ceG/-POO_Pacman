@@ -105,7 +105,135 @@ public class TestControlador {
             otro.getPuntaje() == 0 &&
             otro.getEstado() == EstadoPartida.EN_CURSO);
 
+        System.out.println("\n=== B06: Consumo de puntos y puntaje (R3) ===");
+        probarConsumoPuntoComun();
+        probarConsumoSuperPunto();
+        probarAcumulacionPuntos();
+        probarConsumirNulo();
+
         System.out.println("\nResultado: " + aprobadas + "/" + pruebas + " pruebas OK");
+
+        if (aprobadas != pruebas) {
+            throw new AssertionError(
+                "Fallaron " + (pruebas - aprobadas) + " de " + pruebas + " pruebas"
+            );
+        }
+    }
+
+    private static void probarConsumoPuntoComun()
+    {
+        System.out.println("\n-- Punto común --");
+        Laberinto mapa = new Laberinto(new String[] {
+            "####",
+            "# .#",
+            "####"
+        });
+        ControladorJuego controlador = new ControladorJuego(
+            new Partida(mapa, new Posicion(1, 1))
+        );
+
+        controlador.moverPacMan(Direccion.DERECHA);
+        controlador.actualizar(1);
+
+        verificar("Punto común suma 10", controlador.getPuntaje() == 10);
+        verificar(
+            "El punto común queda retirado",
+            !mapa.obtenerCelda(new Posicion(1, 2)).tienePunto()
+        );
+
+        controlador.actualizar(1);
+        verificar(
+            "Quedarse en la celda no vuelve a sumar",
+            controlador.getPuntaje() == 10
+        );
+
+        controlador.moverPacMan(Direccion.IZQUIERDA);
+        controlador.actualizar(1);
+        controlador.moverPacMan(Direccion.DERECHA);
+        controlador.actualizar(1);
+        verificar(
+            "Volver a la celda no vuelve a sumar",
+            controlador.getPuntaje() == 10
+        );
+    }
+
+    private static void probarConsumoSuperPunto()
+    {
+        System.out.println("\n-- Superpunto --");
+        Laberinto mapa = new Laberinto(new String[] {
+            "####",
+            "# o#",
+            "####"
+        });
+        ControladorJuego controlador = new ControladorJuego(
+            new Partida(mapa, new Posicion(1, 1))
+        );
+
+        controlador.moverPacMan(Direccion.DERECHA);
+        controlador.actualizar(1);
+
+        verificar("Superpunto suma 50", controlador.getPuntaje() == 50);
+        verificar(
+            "El superpunto queda retirado",
+            !mapa.obtenerCelda(new Posicion(1, 2)).tienePunto()
+        );
+
+        controlador.actualizar(1);
+        verificar(
+            "Quedarse en el superpunto no vuelve a sumar",
+            controlador.getPuntaje() == 50
+        );
+
+        controlador.moverPacMan(Direccion.IZQUIERDA);
+        controlador.actualizar(1);
+        controlador.moverPacMan(Direccion.DERECHA);
+        controlador.actualizar(1);
+        verificar(
+            "Volver al superpunto no vuelve a sumar",
+            controlador.getPuntaje() == 50
+        );
+    }
+
+    private static void probarAcumulacionPuntos()
+    {
+        System.out.println("\n-- Acumulación de puntos --");
+        Laberinto mapa = new Laberinto(new String[] {
+            "#####",
+            "# .o#",
+            "#####"
+        });
+        ControladorJuego controlador = new ControladorJuego(
+            new Partida(mapa, new Posicion(1, 1))
+        );
+
+        controlador.moverPacMan(Direccion.DERECHA);
+        controlador.actualizar(1);
+        verificar("El primer punto suma 10", controlador.getPuntaje() == 10);
+
+        controlador.actualizar(1);
+        verificar(
+            "Punto común + superpunto acumulan 60",
+            controlador.getPuntaje() == 60
+        );
+    }
+
+    private static void probarConsumirNulo()
+    {
+        System.out.println("\n-- Consumir nulo --");
+        Partida partida = new Partida(
+            new Laberinto(new String[] {
+                "###",
+                "# #",
+                "###"
+            }),
+            new Posicion(1, 1)
+        );
+
+        partida.consumir(null);
+        verificar(
+            "consumir(null) no modifica el puntaje",
+            partida.getPuntaje() == 0
+        );
     }
 
     private static void probarDireccion(

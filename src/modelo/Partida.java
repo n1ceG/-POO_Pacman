@@ -45,10 +45,13 @@ public class Partida {
         if (estado != EstadoPartida.EN_CURSO) {
             return;
         }
+      
         pacMan.mover(pacMan.getDireccion(), laberinto);
-        Celda celdaActual = laberinto.obtenerCelda(pacMan.getPosicion());
-        Punto puntoRetirado = celdaActual.retirarPunto();
-        consumir(puntoRetirado);
+      
+        Celda celda = laberinto.obtenerCelda(pacMan.getPosicion());
+        if (celda != null) {
+            consumir(celda.retirarPunto());
+        }
 
         if (comprobarVictoria()) {
             this.estado = EstadoPartida.VICTORIA;
@@ -56,6 +59,7 @@ public class Partida {
         for(Fantasma f:fantasmas){
             f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
         }
+        
     }
     
     public List<Fantasma> detectarColision(
@@ -68,10 +72,12 @@ public class Partida {
 
     public void consumir(Punto punto)
     {
-        if (punto != null) {
-            this.puntaje += punto.valor();
+        if (punto == null) {
+            return;
         }
+        this.puntaje += punto.valor();
     }
+    
 
     public void resolverColision(Fantasma fantasma)
     {}
