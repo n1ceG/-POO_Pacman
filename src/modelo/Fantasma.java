@@ -28,6 +28,8 @@ public class Fantasma extends Personaje {
     public void volverAlInicio()
     {
         this.posicion = getPosicionInicial();
+        this.estado = EstadoFantasma.PERSIGUIENDO;
+        this.tiempoSustoRestante = 0;
     }
 
     public Direccion elegirDireccion(
