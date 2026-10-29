@@ -216,6 +216,13 @@ public class TestN15 {
 
     private static void contactoMixto()
     {
+        for (int indiceAsustado = 0; indiceAsustado < 2; indiceAsustado++) {
+            contactoMixto(indiceAsustado);
+        }
+    }
+
+    private static void contactoMixto(int indiceAsustado)
+    {
         Posicion centro = new Posicion(2, 2);
         FantasmaFijo[] fantasmas = {
             contacto(centro, 1, 1, Direccion.DERECHA),
@@ -226,14 +233,13 @@ public class TestN15 {
         Partida partida = partida(sala5x5(), 2, 2, fantasmas);
         fijarVidas(partida, 3);
 
-        fantasmas(partida)[0].asustar(10);
+        fantasmas(partida)[indiceAsustado].asustar(10);
 
         partida.elegirDireccionPacman(Direccion.ARRIBA);
         partida.actualizar(1);
 
-        // El orden del arreglo decide si el premio del asustado se cobra
-        // antes o despues de la vida perdida. El contrato de N15 exige que
-        // no se descuenten varias vidas; el puntaje no se fija aqui.
+        verificar("Cobra al asustado independientemente del orden", 200,
+            partida.getPuntaje());
         verificar("Contacto mixto descuenta una sola vida", 2,
             partida.getVidas());
         verificar("Estado", EstadoPartida.EN_CURSO, partida.getEstado());

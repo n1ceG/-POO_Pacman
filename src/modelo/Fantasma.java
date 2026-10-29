@@ -120,7 +120,8 @@ public class Fantasma extends Personaje {
         if(this.estado == EstadoFantasma.ASUSTADO){
             this.tiempoSustoRestante -= tiempoTranscurrido;
             
-            if(tiempoSustoRestante <= 0){   // Si se venció el tiempo restante.
+            // Tolerancia para el redondeo al descontar fracciones como 1/24.
+            if(tiempoSustoRestante <= 1e-9){
                 tiempoSustoRestante = 0;
                 this.estado = EstadoFantasma.PERSIGUIENDO;
             }

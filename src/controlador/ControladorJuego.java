@@ -40,6 +40,11 @@ public class ControladorJuego {
         return this.partida.getVidas();
     }
 
+    public char[][] getMapa()
+    {
+        return this.partida.getMapa();
+    }
+
     public int getPuntaje()
     {
         return this.partida.getPuntaje();

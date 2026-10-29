@@ -76,3 +76,53 @@ El código avanzó respecto del esqueleto descrito arriba. Consultar [contratos 
 ## Checklist interactivo del TPO
 
 Abrir [estado-tpo.html](docs/estado-tpo.html) para revisar y marcar los contratos de B02 por clase y comportamiento. Incluye relaciones entre objetos y exportacion/importacion de las marcas. Consultar [uso, fuentes y recuperacion](docs/estado-tpo-uso.md). Las marcas iniciales provienen de una lectura del codigo del 27/10/2026 y no equivalen a tarjetas aprobadas.
+
+## Juego por consola — 29/10/2026
+
+Implementación de consola y pruebas preparadas con asistencia de IA a pedido de Juan.
+Esta sección describe el estado actual; las secciones anteriores sobre el esqueleto son históricas.
+
+Desde PowerShell, ubicado en `TPO-Pacman`, con un JDK 17 o superior:
+
+```powershell
+$fuentesTpo = @(Get-ChildItem -LiteralPath .\src -Recurse -Filter *.java | ForEach-Object FullName)
+javac --release 17 -encoding UTF-8 -d bin $fuentesTpo
+if ($LASTEXITCODE -eq 0) { java -cp bin consola.JuegoConsola }
+```
+
+También se puede ejecutar el `main` de `src/consola/JuegoConsola.java` desde VS Code.
+Usar la terminal para ingresar comandos.
+
+| Entrada (seguida de Enter) | Acción |
+| --- | --- |
+| W / A / S / D | Elegir arriba / izquierda / abajo / derecha y avanzar un tick. |
+| Enter solo | Avanzar un tick manteniendo la dirección. |
+| P | Pausar o reanudar, sin avanzar. |
+| N | Nueva partida solo tras victoria o derrota. |
+| Q | Salir. |
+
+Se acepta mayúscula o minúscula. Los comandos inválidos, la pausa y los estados finales no avanzan ticks ni cambian dirección. El fin de entrada cierra el juego.
+
+Cada tick representa `1.0 / 24.0` segundos simulados y mueve cada personaje como máximo una celda. No se ejecutan automáticamente 24 ticks por segundo real: se espera un comando por tick. Pensar o escribir no consume tiempo del juego. El susto conserva 10 segundos al consumir un superpunto y vence después de 240 ticks posteriores; se tolera el error mínimo de redondeo de `double`.
+
+La consola muestra `C` (PacMan), `F` (perseguidor), `f` (asustado), `r` (regresando), `#` (pared), `.` (punto) y `o` (superpunto). Si varios personajes se superponen, el tablero muestra un solo símbolo; debajo figuran los cuatro fantasmas con posición y estado. Antes de dibujar cada estado se limpia la pantalla mediante secuencias ANSI. Ejecutar en una terminal compatible, como la terminal integrada de VS Code o Windows Terminal.
+
+`JuegoConsola` lee y presenta; `ControladorJuego` delega; `Partida` conserva las reglas. `getMapa()` devuelve una matriz nueva de símbolos sin exponer celdas mutables. En una colisión mixta se cobran todos los asustados tocados y después se pierde una sola vida, independientemente del orden de los fantasmas. Se mantienen las prioridades previas de superpunto antes de contacto y victoria antes de muerte.
+
+Pruebas de la copia del mapa y los 240 ticks:
+
+```powershell
+java -cp bin test.TestConsola
+java -cp bin test.TestN15
+```
+
+Para ejecutar todas las pruebas después de compilar:
+
+```powershell
+Get-ChildItem .\src\test -Filter *.java | ForEach-Object {
+    java -cp bin ("test." + $_.BaseName)
+    if ($LASTEXITCODE -ne 0) { throw ("Falló " + $_.BaseName) }
+}
+```
+
+Limitaciones conocidas: los perseguidores pueden coincidir por seguir el mismo camino; elegir una dirección contra una pared detiene a PacMan; los constructores de escenarios personalizados presuponen inicios transitables. No se modificaron estas reglas al agregar la consola.

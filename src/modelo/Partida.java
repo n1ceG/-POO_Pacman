@@ -108,8 +108,6 @@ public class Partida {
 
         this.pacMan.mover(direccionPacMan, this.laberinto);
 
-        int vidasAntes = this.vidas;
-
         for (int i = 0; i < this.fantasmas.length; i++) {
             Fantasma fantasma = this.fantasmas[i];
 
@@ -118,13 +116,21 @@ public class Partida {
                 this.laberinto
             );
 
-            if (fantasmasTocados.contains(fantasma)) {
-                resolverColision(fantasma);
+        }
 
-                if (this.vidas < vidasAntes) {
-                    return;
-                }
+        // Cobrar todos los asustados antes de resolver la perdida de vida.
+        boolean contactoPeligroso = false;
+        for (Fantasma fantasma : fantasmasTocados) {
+            if (fantasma.getEstado() == EstadoFantasma.ASUSTADO) {
+                resolverColision(fantasma);
+            } else if (fantasma.getEstado() == EstadoFantasma.PERSIGUIENDO) {
+                contactoPeligroso = true;
             }
+        }
+
+        if (contactoPeligroso) {
+            perderVida();
+            return;
         }
 
         // Un superpunto recién consumido conserva sus 10 segundos.
@@ -237,6 +243,21 @@ public class Partida {
     public Posicion getPosicionPacMan()
     {
         return this.pacMan.getPosicion();
+    }
+
+    // Copia para la vista: no expone celdas ni puntos mutables del modelo.
+    public char[][] getMapa()
+    {
+        char[][] mapa = new char[this.laberinto.getFilas()][this.laberinto.getColumnas()];
+        for (int fila = 0; fila < mapa.length; fila++) {
+            for (int columna = 0; columna < mapa[fila].length; columna++) {
+                Celda celda = this.laberinto.obtenerCelda(new Posicion(fila, columna));
+                mapa[fila][columna] = celda.esPared() ? '#'
+                    : celda.tipoPunto() instanceof SuperPunto ? 'o'
+                    : celda.tienePunto() ? '.' : ' ';
+            }
+        }
+        return mapa;
     }
 
     public int getVidas()
