@@ -44,11 +44,11 @@ public class Partida {
 
     public void actualizar(double tiempoTranscurrido)
     {
-        if (comprobarVictoria()) {
-            this.estado = EstadoPartida.VICTORIA;
-        }
         if (estado != EstadoPartida.EN_CURSO) {
             return;
+        }
+        if (comprobarVictoria()) {
+            this.estado = EstadoPartida.VICTORIA;
         }
       
         pacMan.mover(pacMan.getDireccion(), laberinto);
@@ -125,10 +125,18 @@ public class Partida {
     {}
 
     public void pausar()
-    {}
-    
+    {
+        if (this.estado == EstadoPartida.EN_CURSO) {
+            this.estado = EstadoPartida.PAUSADA;
+        }
+    }   
+
     public void reanudar()
-    {}
+    {
+        if (this.estado == EstadoPartida.PAUSADA) {
+            this.estado = EstadoPartida.EN_CURSO;
+        }
+    }
 
     public void elegirDireccionPacman(Direccion direccion)
     {
