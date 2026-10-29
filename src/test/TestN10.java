@@ -112,12 +112,19 @@ public class TestN10 {
     }
 
     private static void asustados() {
-        Laberinto[] mapas = {sala(), new Laberinto(new String[] {"..", ".."})};
-        Posicion[] inicios = {new Posicion(1, 1), new Posicion(0, 0)};
+        Laberinto[] mapas = {new Laberinto(new String[] {
+            "#########",
+            "# #######",
+            "###...###",
+            "#########",
+            "#########"
+        })};
+        Posicion[] inicios = {new Posicion(1, 1)};
         for (int m = 0; m < mapas.length; m++) {
             Partida partida = new Partida(mapas[m], inicios[m]);
             ControladorJuego controlador = new ControladorJuego(partida);
-            // Bloquea a PacMan y deja puntos sin consumir para evitar victoria.
+            // PacMan queda separado del pasillo de fantasmas y no puede provocar
+            // una colision o consumir los puntos durante esta prueba de movimiento.
             controlador.moverPacMan(Direccion.IZQUIERDA);
             for (Fantasma fantasma : fantasmas(partida)) {
                 fantasma.asustar(10);

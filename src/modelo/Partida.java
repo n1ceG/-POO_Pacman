@@ -110,20 +110,22 @@ public class Partida {
 
         this.pacMan.mover(direccionPacMan, this.laberinto);
 
+        int vidasAntes = this.vidas;
+
         for (int i = 0; i < this.fantasmas.length; i++) {
-            this.fantasmas[i].mover(
+            Fantasma fantasma = this.fantasmas[i];
+
+            fantasma.mover(
                 direccionesFantasmas[i],
                 this.laberinto
             );
-        }
 
-        int vidasAntes = this.vidas;
+            if (fantasmasTocados.contains(fantasma)) {
+                resolverColision(fantasma);
 
-        for (Fantasma fantasma : fantasmasTocados) {
-            resolverColision(fantasma);
-
-            if (this.vidas < vidasAntes) {
-                return;
+                if (this.vidas < vidasAntes) {
+                    return;
+                }
             }
         }
 

@@ -246,9 +246,11 @@ public class TestControlador {
     {
         System.out.println("\n-- Acumulación de puntos --");
         Laberinto mapa = new Laberinto(new String[] {
-            "#####",
-            "# .o#",
-            "#####"
+            "#######",
+            "# .o  #",
+            "#     #",
+            "#     #",
+            "#######"
         });
         ControladorJuego controlador = new ControladorJuego(
             new Partida(mapa, new Posicion(1, 1))
