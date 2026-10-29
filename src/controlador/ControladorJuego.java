@@ -62,7 +62,14 @@ public class ControladorJuego {
 
     public void nuevaPartida()
     {
-        this.partida.nuevaPartida();
+        EstadoPartida estadoActual = this.partida.getEstado();
+
+        if (
+            estadoActual == EstadoPartida.VICTORIA
+            || estadoActual == EstadoPartida.DERROTA
+        ) {
+            this.partida = new Partida();
+        }
     }
     
     public Posicion[] getPosicionesFantasmas()

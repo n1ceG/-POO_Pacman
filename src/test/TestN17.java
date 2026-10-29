@@ -221,8 +221,8 @@ public class TestN17 {
         final ControladorJuego controlador;
 
         Escenario(boolean sinPuntos) {
-            String[] filas = {"###########", "#.o.......#", "#.........#", "#.........#",
-                "#.........#", "#.........#", "###########"};
+            String[] filas = {"###########", "#.o.......#", "#...#######", "#...#.....#",
+                "#####.....#", "#####.....#", "###########"};
             if (sinPuntos) {
                 for (int i = 0; i < filas.length; i++) {
                     filas[i] = filas[i].replace('.', ' ').replace('o', ' ');

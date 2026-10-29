@@ -7,7 +7,6 @@ import extra.Posicion;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Partida {
 
     private int vidas;
@@ -36,65 +35,103 @@ public class Partida {
         this.fantasmas = new Fantasma[4];
         
         Posicion centro = laberinto.centro();
-        for(int i = 0; i<4; i++){
+        for(int i = 0; i < 4; i++){
             fantasmas[i] = new Fantasma(centro);
         }
     }
 
-
     public void actualizar(double tiempoTranscurrido)
     {
-        if (estado != EstadoPartida.EN_CURSO) {
+        if (this.estado != EstadoPartida.EN_CURSO) {
             return;
         }
 
-        Posicion posicionAnteriorPacman = pacMan.getPosicion();
-
-        pacMan.mover(pacMan.getDireccion(), laberinto);
-
-        Celda celda = laberinto.obtenerCelda(pacMan.getPosicion());
-        Punto punto = (celda != null) ? celda.retirarPunto() : null;
-        consumir(punto);
-
-        // El ultimo punto tiene prioridad sobre cualquier contacto de este paso.
         if (comprobarVictoria()) {
             this.estado = EstadoPartida.VICTORIA;
             return;
         }
 
-        Direccion[] direcciones = new Direccion[fantasmas.length];
-        List<Posicion> proximasPosiciones = new ArrayList<>(fantasmas.length);
-        for (int i = 0; i < fantasmas.length; i++) {
-            direcciones[i] = fantasmas[i].elegirDireccion(laberinto, pacMan.getPosicion());
-            proximasPosiciones.add(
-                fantasmas[i].calcularProximaPosicion(direcciones[i], laberinto)
+        Direccion direccionPacMan = this.pacMan.getDireccion();
+
+        Posicion proximaPosicionPacMan =
+            this.pacMan.calcularProximaPosicion(
+                direccionPacMan,
+                this.laberinto
+            );
+
+        Celda celdaDestino = this.laberinto.obtenerCelda(
+            proximaPosicionPacMan
+        );
+
+        Punto puntoConsumido = null;
+
+        if (celdaDestino != null) {
+            puntoConsumido = celdaDestino.retirarPunto();
+            consumir(puntoConsumido);
+        }
+
+        boolean sustoRenovado = puntoConsumido instanceof SuperPunto;
+
+        if (comprobarVictoria()) {
+            this.pacMan.mover(direccionPacMan, this.laberinto);
+            this.estado = EstadoPartida.VICTORIA;
+            return;
+        }
+
+        Direccion[] direccionesFantasmas =
+            new Direccion[this.fantasmas.length];
+
+        List<Posicion> proximasPosicionesFantasmas =
+            new ArrayList<>(this.fantasmas.length);
+
+        for (int i = 0; i < this.fantasmas.length; i++) {
+            direccionesFantasmas[i] =
+                this.fantasmas[i].elegirDireccion(
+                    this.laberinto,
+                    proximaPosicionPacMan
+                );
+
+            proximasPosicionesFantasmas.add(
+                this.fantasmas[i].calcularProximaPosicion(
+                    direccionesFantasmas[i],
+                    this.laberinto
+                )
             );
         }
 
-        List<Fantasma> contactos = detectarColision(
-            posicionAnteriorPacman,
-            pacMan.getPosicion(),
-            proximasPosiciones
+        // Detectar antes de mover conserva las posiciones anteriores
+        // necesarias para reconocer intercambios de celdas.
+        List<Fantasma> fantasmasTocados = detectarColision(
+            proximaPosicionPacMan,
+            proximasPosicionesFantasmas
         );
 
-        // Contactos antes del vencimiento. Una perdida de vida corta el paso.
-        for (int i = 0; i < fantasmas.length; i++) {
-            Fantasma fantasma = fantasmas[i];
-            fantasma.mover(direcciones[i], laberinto);
+        this.pacMan.mover(direccionPacMan, this.laberinto);
 
-            if (contactos.contains(fantasma)) {
-                int vidasAntes = this.vidas;
+        int vidasAntes = this.vidas;
+
+        for (int i = 0; i < this.fantasmas.length; i++) {
+            Fantasma fantasma = this.fantasmas[i];
+
+            fantasma.mover(
+                direccionesFantasmas[i],
+                this.laberinto
+            );
+
+            if (fantasmasTocados.contains(fantasma)) {
                 resolverColision(fantasma);
-                if (this.vidas != vidasAntes) {
+
+                if (this.vidas < vidasAntes) {
                     return;
                 }
             }
         }
 
-        // Un susto recien activado empieza a descontarse en el paso siguiente.
-        double tiempoEstado = (punto instanceof SuperPunto) ? 0 : tiempoTranscurrido;
-        for (Fantasma fantasma : fantasmas) {
-            fantasma.actualizarEstado(tiempoEstado);
+        // Un superpunto recién consumido conserva sus 10 segundos.
+        double tiempoADescontar = sustoRenovado ? 0 : tiempoTranscurrido;
+
+        for (Fantasma fantasma : this.fantasmas) {
+            fantasma.actualizarEstado(tiempoADescontar);
         }
     }
     
@@ -117,23 +154,11 @@ public class Partida {
         List<Posicion> proximasPosicionesFantasmas
     )
     {
-        return detectarColision(
-            pacMan.getPosicion(),
-            proximaPosicionPacman,
-            proximasPosicionesFantasmas
-        );
-    }
+        List<Fantasma> fantasmasTocados = new ArrayList<>(this.fantasmas.length);
+        Posicion posicionPacman = this.pacMan.getPosicion();
 
-    private List<Fantasma> detectarColision(
-        Posicion posicionPacman,
-        Posicion proximaPosicionPacman,
-        List<Posicion> proximasPosicionesFantasmas
-    )
-    {
-        List<Fantasma> fantasmasTocados = new ArrayList<>(fantasmas.length);
-
-        for (int i = 0; i < fantasmas.length; i++) {
-            Fantasma fantasma = fantasmas[i];
+        for (int i = 0; i < this.fantasmas.length; i++) {
+            Fantasma fantasma = this.fantasmas[i];
             Posicion actualFantasma = fantasma.getPosicion();
             Posicion proximaFantasma = proximasPosicionesFantasmas.get(i);
 
@@ -173,19 +198,20 @@ public class Partida {
 
     public void perderVida()
     {
-        if (this.estado != EstadoPartida.EN_CURSO) {
+        if (this.estado != EstadoPartida.EN_CURSO || this.vidas <= 0) {
             return;
         }
-
+    
         this.vidas--;
-
+    
+        this.pacMan.volverAlInicio();
+    
+        for (Fantasma fantasma : this.fantasmas) {
+            fantasma.volverAlInicio();
+        }
+    
         if (this.vidas == 0) {
             this.estado = EstadoPartida.DERROTA;
-        }
-
-        this.pacMan.volverAlInicio();
-        for (Fantasma fantasma : fantasmas) {
-            fantasma.volverAlInicio();
         }
     }
 
@@ -246,7 +272,4 @@ public class Partida {
         return estadosFantasmas;
     }
 
-
-    public void nuevaPartida()
-    {}
 }
