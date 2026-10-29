@@ -114,6 +114,9 @@ public class Partida {
             this.puntaje += 200;
             fantasma.serComido();
         }
+        else if (fantasma.getEstado() == EstadoFantasma.PERSIGUIENDO) {
+            perderVida();
+        }
     }
 
     public boolean comprobarVictoria()
