@@ -4,6 +4,7 @@ import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
 import extra.Posicion;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,6 +44,9 @@ public class Partida {
 
     public void actualizar(double tiempoTranscurrido)
     {
+        if (comprobarVictoria()) {
+            this.estado = EstadoPartida.VICTORIA;
+        }
         if (estado != EstadoPartida.EN_CURSO) {
             return;
         }
@@ -53,31 +57,19 @@ public class Partida {
         if (celda != null) {
             consumir(celda.retirarPunto());
         }
-
-        if (comprobarVictoria()) {
-            this.estado = EstadoPartida.VICTORIA;
-        }
         for(Fantasma f:fantasmas){
             f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
+            f.actualizarEstado(0);
         }
-        
     }
     
-    public List<Fantasma> detectarColision(
-        Posicion proximoPacman, 
-        List<Posicion> proximosFantasmas
-    )
-    {
-        return null;
-    }
-
     public void consumir(Punto punto)
     {
         if (punto == null) {
             return;
         }
         this.puntaje += punto.valor();
-
+        
         if (punto instanceof SuperPunto) {
             for (Fantasma fantasma : fantasmas) {
                 fantasma.asustar(DURACION_SUSTO);
@@ -85,6 +77,36 @@ public class Partida {
         }
     }
     
+    public List<Fantasma> detectarColision(
+        Posicion proximaPosicionPacman,
+        List<Posicion> proximasPosicionesFantasmas
+    )
+    {
+        List<Fantasma> fantasmasTocados = new ArrayList<>(fantasmas.length);
+        Posicion actualPacMan = pacMan.getPosicion();
+
+        for (int i = 0; i < fantasmas.length; i++) {
+            Fantasma fantasma = fantasmas[i];
+            Posicion actualFantasma = fantasma.getPosicion();
+            Posicion proximaFantasma = proximasPosicionesFantasmas.get(i);
+
+            boolean mismaLlegada =
+                proximaPosicionPacman.fila == proximaFantasma.fila
+                && proximaPosicionPacman.columna == proximaFantasma.columna;
+
+            boolean intercambio =
+                proximaPosicionPacman.fila == actualFantasma.fila
+                && proximaPosicionPacman.columna == actualFantasma.columna
+                && proximaFantasma.fila == actualPacMan.fila
+                && proximaFantasma.columna == actualPacMan.columna;
+
+            if (mismaLlegada || intercambio) {
+                fantasmasTocados.add(fantasma);
+            }
+        }
+
+        return fantasmasTocados;
+    }
 
     public void resolverColision(Fantasma fantasma)
     {
