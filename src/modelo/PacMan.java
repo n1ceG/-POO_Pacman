@@ -27,5 +27,6 @@ public class PacMan extends Personaje {
     public void volverAlInicio()
     {
         this.posicion = getPosicionInicial();
+        this.direccion = Direccion.DERECHA;
     }
 }
