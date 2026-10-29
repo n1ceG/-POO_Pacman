@@ -1,9 +1,11 @@
 package modelo;
 
 import extra.Direccion;
+import extra.EstadoFantasma;
 import extra.EstadoPartida;
 import extra.Posicion;
 import java.util.List;
+
 
 public class Partida {
 
@@ -50,8 +52,8 @@ public class Partida {
 
         if (comprobarVictoria()) {
             this.estado = EstadoPartida.VICTORIA;
+        }
         for(Fantasma f:fantasmas){
-            
             f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
         }
     }
@@ -112,4 +114,26 @@ public class Partida {
     {
         return this.estado;
     }
+
+    public Posicion[] getPosicionesFantasmas()
+    {
+        Posicion[] posicionesFantasmas = new Posicion[this.fantasmas.length];
+        for(int i = 0; i<posicionesFantasmas.length;i++){
+            posicionesFantasmas[i] = this.fantasmas[i].getPosicion();
+        }
+        return posicionesFantasmas;
+    }
+    
+    public EstadoFantasma[] getEstadosFantasmas()
+    {
+        EstadoFantasma[] estadosFantasmas = new EstadoFantasma[this.fantasmas.length];
+        for(int i = 0; i<estadosFantasmas.length;i++){
+            estadosFantasmas[i] = this.fantasmas[i].getEstado();
+        }
+        return estadosFantasmas;
+    }
+
+
+    public void nuevaPartida()
+    {}
 }

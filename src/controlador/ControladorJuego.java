@@ -1,6 +1,7 @@
 package controlador;
 
 import extra.Direccion;
+import extra.EstadoFantasma;
 import extra.EstadoPartida;
 import extra.Posicion;
 import modelo.Partida;
@@ -21,41 +22,57 @@ public class ControladorJuego {
 
     public void moverPacMan(Direccion direccion)
     {
-        partida.elegirDireccionPacman(direccion);
+        this.partida.elegirDireccionPacman(direccion);
     }
 
     public void actualizar(double tiempoTranscurrido)
     {
-        partida.actualizar(tiempoTranscurrido);
+        this.partida.actualizar(tiempoTranscurrido);
     }
 
     public Posicion getPosicionPacMan()
     {
-        return partida.getPosicionPacMan();
+        return this.partida.getPosicionPacMan();
     }
 
     public int getVidas()
     {
-        return partida.getVidas();
+        return this.partida.getVidas();
     }
 
     public int getPuntaje()
     {
-        return partida.getPuntaje();
+        return this.partida.getPuntaje();
     }
 
     public EstadoPartida getEstado()
     {
-        return partida.getEstado();
+        return this.partida.getEstado();
     }
 
     public void pausar()
-    {}
-
+    {
+        this.partida.pausar();
+    }
+    
     public void reanudar()
-    {}
+    {
+        this.partida.reanudar();
+    }
 
     public void nuevaPartida()
-    {}
+    {
+        this.partida.nuevaPartida();
+    }
+    
+    public Posicion[] getPosicionesFantasmas()
+    {
+        return this.partida.getPosicionesFantasmas();
+    }
+
+    public EstadoFantasma[] getEstadosFantasmas()
+    {
+        return this.partida.getEstadosFantasmas();
+    }
 
 }
