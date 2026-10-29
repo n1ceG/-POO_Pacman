@@ -8,19 +8,7 @@ import java.util.Objects;
 import modelo.Fantasma;
 import modelo.Laberinto;
 
-/**
- * Pruebas de N08 preparadas con asistencia de IA a pedido de Juan.
- * En VS Code: ejecutar Run sobre main(). No requiere JUnit ni -ea.
- * Desde TPO-Pacman, en PowerShell:
- * $fuentesN08 = @(Get-ChildItem .\src -Recurse -Filter *.java | ForEach-Object FullName)
- * javac --release 17 -encoding UTF-8 -d bin $fuentesN08
- * Si compila correctamente: java -cp bin test.TestN08
- *
- * Comprueba el estado individual del fantasma y el recorrido de regreso.
- * La conexion con el contacto de PacMan corresponde a N13/N14 y la llamada
- * desde Partida a N15. La reflexion permite consultar el temporizador sin
- * agregar getters al modelo.
- */
+
 public class TestN08 {
     private static int pruebas;
     private static int aprobadas;
