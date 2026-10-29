@@ -105,7 +105,13 @@ public class Fantasma extends Personaje {
     }
 
     public void serComido()
-    {}
+    {
+        if(this.estado != EstadoFantasma.ASUSTADO){
+            return;
+        }
+        this.estado = EstadoFantasma.REGRESANDO;
+        this.tiempoSustoRestante = 0;
+    }
 
     public void actualizarEstado(double tiempoTranscurrido)
     {
@@ -114,6 +120,13 @@ public class Fantasma extends Personaje {
             
             if(tiempoSustoRestante <= 0){   // Si se venció el tiempo restante.
                 tiempoSustoRestante = 0;
+                this.estado = EstadoFantasma.PERSIGUIENDO;
+            }
+        }
+        else if(this.estado == EstadoFantasma.REGRESANDO){
+            if(this.posicion.fila == this.posicionInicial.fila &&
+               this.posicion.columna == this.posicionInicial.columna){
+                this.tiempoSustoRestante = 0;
                 this.estado = EstadoFantasma.PERSIGUIENDO;
             }
         }
