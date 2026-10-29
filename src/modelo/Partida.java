@@ -122,7 +122,23 @@ public class Partida {
     }
 
     public void perderVida()
-    {}
+    {
+        if (this.estado != EstadoPartida.EN_CURSO) {
+            return;
+        }
+
+        this.vidas--;
+
+        if (this.vidas == 0) {
+            this.estado = EstadoPartida.DERROTA;
+            return;
+        }
+
+        this.pacMan.volverAlInicio();
+        for (Fantasma fantasma : fantasmas) {
+            fantasma.volverAlInicio();
+        }
+    }
 
     public void pausar()
     {}
