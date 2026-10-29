@@ -59,6 +59,7 @@ public class Partida {
         }
         for(Fantasma f:fantasmas){
             f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
+            f.actualizarEstado(0);
         }
     }
     
