@@ -18,6 +18,7 @@ public class Partida {
 
     private static final Posicion INICIO_PACMAN = new Posicion(13, 7);
     private static final int VIDAS_INICIALES = 3;
+    private static final double DURACION_SUSTO = 10;
 
     public Partida()
     {
@@ -76,6 +77,12 @@ public class Partida {
             return;
         }
         this.puntaje += punto.valor();
+
+        if (punto instanceof SuperPunto) {
+            for (Fantasma fantasma : fantasmas) {
+                fantasma.asustar(DURACION_SUSTO);
+            }
+        }
     }
     
 
