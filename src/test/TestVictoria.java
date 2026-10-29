@@ -11,9 +11,10 @@ public class TestVictoria {
     public static void main(String[] args)
     {
         Laberinto laberinto = new Laberinto(new String[] {
-            "#####",
-            "# .o#",
-            "#####"
+            "#######",
+            "# .o  #",
+            "#     #",
+            "#######"
         });
 
         Partida partida = new Partida(
@@ -81,9 +82,10 @@ public class TestVictoria {
         );
 
         Laberinto laberintoComun = new Laberinto(new String[] {
-            "#####",
-            "# o.#",
-            "#####"
+            "#######",
+            "# o.  #",
+            "#     #",
+            "#######"
         });
 
         Partida partidaComun = new Partida(

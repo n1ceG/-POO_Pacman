@@ -72,7 +72,7 @@ public class TestN17 {
         e.controlador.moverPacMan(Direccion.ABAJO);
         e.controlador.actualizar(0.25);
         Fantasma[] fantasmas = fantasmas(e.partida);
-        fantasmas[0].actualizarEstado(2.5); // Susto parcialmente consumido: 7.5 s.
+        fantasmas[0].actualizarEstado(2.5);
         fantasmas[1].serComido();
         fantasmas[2].actualizarEstado(10); // Mezcla de los tres estados.
         verificar("Preparacion: PacMan avanzo", "(2,2)", posicion(e.controlador.getPosicionPacMan()));
@@ -81,7 +81,7 @@ public class TestN17 {
             e.mapa.obtenerCelda(new Posicion(1, 2)).tienePunto());
         verificar("Preparacion: punto comun consumido", false,
             e.mapa.obtenerCelda(new Posicion(2, 2)).tienePunto());
-        verificar("Preparacion: susto parcial", 7.5, tiempo(fantasmas[0]));
+        verificar("Preparacion: susto parcial", 7.25, tiempo(fantasmas[0]));
         verificar("Preparacion: regreso", EstadoFantasma.REGRESANDO, fantasmas[1].getEstado());
         verificar("Preparacion: perseguidor", EstadoFantasma.PERSIGUIENDO, fantasmas[2].getEstado());
         Captura antes = capturar(e);

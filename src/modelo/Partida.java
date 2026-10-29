@@ -47,19 +47,54 @@ public class Partida {
         if (estado != EstadoPartida.EN_CURSO) {
             return;
         }
+
+        Posicion posicionAnteriorPacman = pacMan.getPosicion();
+
+        pacMan.mover(pacMan.getDireccion(), laberinto);
+
+        Celda celda = laberinto.obtenerCelda(pacMan.getPosicion());
+        Punto punto = (celda != null) ? celda.retirarPunto() : null;
+        consumir(punto);
+
+        // El ultimo punto tiene prioridad sobre cualquier contacto de este paso.
         if (comprobarVictoria()) {
             this.estado = EstadoPartida.VICTORIA;
+            return;
         }
-      
-        pacMan.mover(pacMan.getDireccion(), laberinto);
-      
-        Celda celda = laberinto.obtenerCelda(pacMan.getPosicion());
-        if (celda != null) {
-            consumir(celda.retirarPunto());
+
+        Direccion[] direcciones = new Direccion[fantasmas.length];
+        List<Posicion> proximasPosiciones = new ArrayList<>(fantasmas.length);
+        for (int i = 0; i < fantasmas.length; i++) {
+            direcciones[i] = fantasmas[i].elegirDireccion(laberinto, pacMan.getPosicion());
+            proximasPosiciones.add(
+                fantasmas[i].calcularProximaPosicion(direcciones[i], laberinto)
+            );
         }
-        for(Fantasma f:fantasmas){
-            f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
-            f.actualizarEstado(0);
+
+        List<Fantasma> contactos = detectarColision(
+            posicionAnteriorPacman,
+            pacMan.getPosicion(),
+            proximasPosiciones
+        );
+
+        // Contactos antes del vencimiento. Una perdida de vida corta el paso.
+        for (int i = 0; i < fantasmas.length; i++) {
+            Fantasma fantasma = fantasmas[i];
+            fantasma.mover(direcciones[i], laberinto);
+
+            if (contactos.contains(fantasma)) {
+                int vidasAntes = this.vidas;
+                resolverColision(fantasma);
+                if (this.vidas != vidasAntes) {
+                    return;
+                }
+            }
+        }
+
+        // Un susto recien activado empieza a descontarse en el paso siguiente.
+        double tiempoEstado = (punto instanceof SuperPunto) ? 0 : tiempoTranscurrido;
+        for (Fantasma fantasma : fantasmas) {
+            fantasma.actualizarEstado(tiempoEstado);
         }
     }
     
@@ -82,8 +117,20 @@ public class Partida {
         List<Posicion> proximasPosicionesFantasmas
     )
     {
+        return detectarColision(
+            pacMan.getPosicion(),
+            proximaPosicionPacman,
+            proximasPosicionesFantasmas
+        );
+    }
+
+    private List<Fantasma> detectarColision(
+        Posicion posicionPacman,
+        Posicion proximaPosicionPacman,
+        List<Posicion> proximasPosicionesFantasmas
+    )
+    {
         List<Fantasma> fantasmasTocados = new ArrayList<>(fantasmas.length);
-        Posicion actualPacMan = pacMan.getPosicion();
 
         for (int i = 0; i < fantasmas.length; i++) {
             Fantasma fantasma = fantasmas[i];
@@ -97,8 +144,8 @@ public class Partida {
             boolean intercambio =
                 proximaPosicionPacman.fila == actualFantasma.fila
                 && proximaPosicionPacman.columna == actualFantasma.columna
-                && proximaFantasma.fila == actualPacMan.fila
-                && proximaFantasma.columna == actualPacMan.columna;
+                && proximaFantasma.fila == posicionPacman.fila
+                && proximaFantasma.columna == posicionPacman.columna;
 
             if (mismaLlegada || intercambio) {
                 fantasmasTocados.add(fantasma);
@@ -134,7 +181,6 @@ public class Partida {
 
         if (this.vidas == 0) {
             this.estado = EstadoPartida.DERROTA;
-            return;
         }
 
         this.pacMan.volverAlInicio();

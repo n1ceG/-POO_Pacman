@@ -100,11 +100,11 @@ public class TestN12 {
         verificar("Quedan dos vidas", 2, partida.getVidas());
         verificar("Sigue EN_CURSO", EstadoPartida.EN_CURSO, partida.getEstado());
 
-        partida.elegirDireccionPacman(Direccion.DERECHA);
+        partida.elegirDireccionPacman(Direccion.ARRIBA);
         partida.actualizar(1);
 
-        verificar("PacMan vuelve a avanzar", 2,
-            partida.getPosicionPacMan().columna);
+        verificar("PacMan vuelve a avanzar", 1,
+            partida.getPosicionPacMan().fila);
         verificar("La partida no reinicia las vidas", 2, partida.getVidas());
     }
 
