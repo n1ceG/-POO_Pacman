@@ -97,7 +97,9 @@ public class Fantasma extends Personaje {
     
     public void asustar(double duracion)
     {
-        if(this.estado==EstadoFantasma.REGRESANDO){return;}
+        if(this.estado==EstadoFantasma.REGRESANDO){
+            return;
+        }
         this.estado = EstadoFantasma.ASUSTADO;
         tiempoSustoRestante = duracion;
     }
@@ -106,7 +108,16 @@ public class Fantasma extends Personaje {
     {}
 
     public void actualizarEstado(double tiempoTranscurrido)
-    {}
+    {
+        if(this.estado == EstadoFantasma.ASUSTADO){
+            this.tiempoSustoRestante -= tiempoTranscurrido;
+            
+            if(tiempoSustoRestante <= 0){   // Si se venció el tiempo restante.
+                tiempoSustoRestante = 0;
+                this.estado = EstadoFantasma.PERSIGUIENDO;
+            }
+        }
+    }
 
     public EstadoFantasma getEstado()
     { 
