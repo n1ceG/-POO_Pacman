@@ -48,15 +48,15 @@ public class TestN14 {
         ControladorJuego controlador = new ControladorJuego(partida);
         Fantasma[] fantasmas = fantasmas(partida);
 
-        partida.elegirDireccionPacman(Direccion.DERECHA);
+        partida.elegirDireccionPacman(Direccion.ARRIBA);
         partida.actualizar(1);
 
         int puntaje = controlador.getPuntaje();
         verificar("Preparacion: se consumio un punto", 10, puntaje);
         verificar("Preparacion: el fantasma persigue",
             EstadoFantasma.PERSIGUIENDO, fantasmas[0].getEstado());
-        verificar("Preparacion: PacMan se alejo del inicio", 2,
-            partida.getPosicionPacMan().columna);
+        verificar("Preparacion: PacMan se alejo del inicio", 1,
+            partida.getPosicionPacMan().fila);
 
         partida.resolverColision(fantasmas[0]);
 

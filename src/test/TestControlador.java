@@ -245,10 +245,11 @@ public class TestControlador {
     private static void probarAcumulacionPuntos()
     {
         System.out.println("\n-- Acumulación de puntos --");
+        // El centro queda fuera del camino para no perder una vida antes de
+        // consumir el segundo punto (contactos automaticos de N15).
         Laberinto mapa = new Laberinto(new String[] {
             "#######",
             "# .o  #",
-            "#     #",
             "#     #",
             "#######"
         });

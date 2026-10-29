@@ -72,7 +72,7 @@ public class TestN17 {
         e.controlador.moverPacMan(Direccion.ABAJO);
         e.controlador.actualizar(0.25);
         Fantasma[] fantasmas = fantasmas(e.partida);
-        fantasmas[0].actualizarEstado(2.5); // 10 - 0.25 - 2.5 = 7.25 s.
+        fantasmas[0].actualizarEstado(2.5);
         fantasmas[1].serComido();
         fantasmas[2].actualizarEstado(10); // Mezcla de los tres estados.
         verificar("Preparacion: PacMan avanzo", "(2,2)", posicion(e.controlador.getPosicionPacMan()));

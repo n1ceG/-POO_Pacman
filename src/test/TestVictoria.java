@@ -14,7 +14,6 @@ public class TestVictoria {
             "#######",
             "# .o  #",
             "#     #",
-            "#     #",
             "#######"
         });
 
@@ -85,7 +84,6 @@ public class TestVictoria {
         Laberinto laberintoComun = new Laberinto(new String[] {
             "#######",
             "# o.  #",
-            "#     #",
             "#     #",
             "#######"
         });

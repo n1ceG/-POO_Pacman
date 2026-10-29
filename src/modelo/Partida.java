@@ -7,7 +7,6 @@ import extra.Posicion;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Partida {
 
     private int vidas;
@@ -36,11 +35,10 @@ public class Partida {
         this.fantasmas = new Fantasma[4];
         
         Posicion centro = laberinto.centro();
-        for(int i = 0; i<4; i++){
+        for(int i = 0; i < 4; i++){
             fantasmas[i] = new Fantasma(centro);
         }
     }
-
 
     public void actualizar(double tiempoTranscurrido)
     {
@@ -156,11 +154,11 @@ public class Partida {
         List<Posicion> proximasPosicionesFantasmas
     )
     {
-        List<Fantasma> fantasmasTocados = new ArrayList<>(fantasmas.length);
-        Posicion actualPacMan = pacMan.getPosicion();
+        List<Fantasma> fantasmasTocados = new ArrayList<>(this.fantasmas.length);
+        Posicion posicionPacman = this.pacMan.getPosicion();
 
-        for (int i = 0; i < fantasmas.length; i++) {
-            Fantasma fantasma = fantasmas[i];
+        for (int i = 0; i < this.fantasmas.length; i++) {
+            Fantasma fantasma = this.fantasmas[i];
             Posicion actualFantasma = fantasma.getPosicion();
             Posicion proximaFantasma = proximasPosicionesFantasmas.get(i);
 
@@ -171,8 +169,8 @@ public class Partida {
             boolean intercambio =
                 proximaPosicionPacman.fila == actualFantasma.fila
                 && proximaPosicionPacman.columna == actualFantasma.columna
-                && proximaFantasma.fila == actualPacMan.fila
-                && proximaFantasma.columna == actualPacMan.columna;
+                && proximaFantasma.fila == posicionPacman.fila
+                && proximaFantasma.columna == posicionPacman.columna;
 
             if (mismaLlegada || intercambio) {
                 fantasmasTocados.add(fantasma);

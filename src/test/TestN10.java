@@ -130,6 +130,9 @@ public class TestN10 {
                 fantasma.asustar(10);
             }
             for (int tick = 0; tick < 20; tick++) {
+                for (Fantasma fantasma : fantasmas(partida)) {
+                    fantasma.asustar(10);
+                }
                 Posicion[] anteriores = controlador.getPosicionesFantasmas();
                 controlador.actualizar(0);
                 Posicion[] actuales = controlador.getPosicionesFantasmas();
