@@ -44,22 +44,96 @@ public class Partida {
 
     public void actualizar(double tiempoTranscurrido)
     {
-        if (estado != EstadoPartida.EN_CURSO) {
+        if (this.estado != EstadoPartida.EN_CURSO) {
             return;
         }
+
         if (comprobarVictoria()) {
             this.estado = EstadoPartida.VICTORIA;
+            return;
         }
-      
-        pacMan.mover(pacMan.getDireccion(), laberinto);
-      
-        Celda celda = laberinto.obtenerCelda(pacMan.getPosicion());
-        if (celda != null) {
-            consumir(celda.retirarPunto());
+
+        Direccion direccionPacMan = this.pacMan.getDireccion();
+
+        Posicion proximaPosicionPacMan =
+            this.pacMan.calcularProximaPosicion(
+                direccionPacMan,
+                this.laberinto
+            );
+
+        Celda celdaDestino = this.laberinto.obtenerCelda(
+            proximaPosicionPacMan
+        );
+
+        Punto puntoConsumido = null;
+
+        if (celdaDestino != null) {
+            puntoConsumido = celdaDestino.retirarPunto();
+            consumir(puntoConsumido);
         }
-        for(Fantasma f:fantasmas){
-            f.mover(f.elegirDireccion(laberinto, pacMan.getPosicion()), laberinto);
-            f.actualizarEstado(0);
+
+        boolean sustoRenovado = puntoConsumido instanceof SuperPunto;
+
+        if (comprobarVictoria()) {
+            this.pacMan.mover(direccionPacMan, this.laberinto);
+            this.estado = EstadoPartida.VICTORIA;
+            return;
+        }
+
+        Direccion[] direccionesFantasmas =
+            new Direccion[this.fantasmas.length];
+
+        List<Posicion> proximasPosicionesFantasmas =
+            new ArrayList<>(this.fantasmas.length);
+
+        for (int i = 0; i < this.fantasmas.length; i++) {
+            direccionesFantasmas[i] =
+                this.fantasmas[i].elegirDireccion(
+                    this.laberinto,
+                    proximaPosicionPacMan
+                );
+
+            proximasPosicionesFantasmas.add(
+                this.fantasmas[i].calcularProximaPosicion(
+                    direccionesFantasmas[i],
+                    this.laberinto
+                )
+            );
+        }
+
+        // Detectar antes de mover conserva las posiciones anteriores
+        // necesarias para reconocer intercambios de celdas.
+        List<Fantasma> fantasmasTocados = detectarColision(
+            proximaPosicionPacMan,
+            proximasPosicionesFantasmas
+        );
+
+        this.pacMan.mover(direccionPacMan, this.laberinto);
+
+        int vidasAntes = this.vidas;
+
+        for (int i = 0; i < this.fantasmas.length; i++) {
+            Fantasma fantasma = this.fantasmas[i];
+
+            fantasma.mover(
+                direccionesFantasmas[i],
+                this.laberinto
+            );
+
+            if (fantasmasTocados.contains(fantasma)) {
+                resolverColision(fantasma);
+
+                if (this.vidas < vidasAntes) {
+                    return;
+                }
+            }
+        }
+
+        // Un superpunto recién consumido conserva sus 10 segundos.
+        double tiempoADescontar = sustoRenovado ? 0 : tiempoTranscurrido;
+
+        for (Fantasma fantasma : this.fantasmas) {
+            fantasma.actualizarEstado(tiempoADescontar);
         }
     }
     
@@ -126,20 +200,20 @@ public class Partida {
 
     public void perderVida()
     {
-        if (this.estado != EstadoPartida.EN_CURSO) {
+        if (this.estado != EstadoPartida.EN_CURSO || this.vidas <= 0) {
             return;
         }
-
+    
         this.vidas--;
-
+    
+        this.pacMan.volverAlInicio();
+    
+        for (Fantasma fantasma : this.fantasmas) {
+            fantasma.volverAlInicio();
+        }
+    
         if (this.vidas == 0) {
             this.estado = EstadoPartida.DERROTA;
-            return;
-        }
-
-        this.pacMan.volverAlInicio();
-        for (Fantasma fantasma : fantasmas) {
-            fantasma.volverAlInicio();
         }
     }
 
@@ -200,7 +274,4 @@ public class Partida {
         return estadosFantasmas;
     }
 
-
-    public void nuevaPartida()
-    {}
 }
