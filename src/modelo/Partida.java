@@ -110,7 +110,8 @@ public class Partida {
 
     public void resolverColision(Fantasma fantasma)
     {
-        if(fantasma.getEstado()==EstadoFantasma.ASUSTADO){
+        if (fantasma.getEstado() == EstadoFantasma.ASUSTADO) {
+            this.puntaje += 200;
             fantasma.serComido();
         }
     }
