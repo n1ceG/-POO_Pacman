@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1540" height="1734" viewBox="0 0 1540 1734" role="img" aria-label="R02 - Paredes">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#334155"/></marker><marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M1 1L11 6L1 11" fill="none" stroke="#64748b" stroke-width="1.5"/></marker><marker id="triangle" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="15" markerHeight="15" orient="auto-start-reverse"><path d="M1 1L13 7L1 13Z" fill="white" stroke="#334155"/></marker><marker id="diamond" viewBox="0 0 18 12" refX="1" refY="6" markerWidth="18" markerHeight="12" orient="auto"><path d="M1 6L9 1L17 6L9 11Z" fill="#334155" stroke="#334155"/></marker></defs>
+<rect width="1540" height="1734" fill="#ffffff"/>
+<g font-family="Arial, sans-serif" fill="#0f172a">
+<text x="40" y="46" font-size="27" font-weight="bold">R02 · PAREDES</text>
+<text x="40" y="80" font-size="16" fill="#475569">Llamadas reales del código · notas para asignaciones y partes omitidas · lectura de arriba hacia abajo</text>
+<rect x="45" y="120" width="270" height="52" rx="4" fill="#dcfce7" stroke="#334155"/>
+<text x="180" y="152" font-size="17" text-anchor="middle" font-weight="bold">partida:Partida</text>
+<path d="M180 172V1679" stroke="#94a3b8" stroke-dasharray="7 6"/>
+<rect x="405" y="120" width="270" height="52" rx="4" fill="#dcfce7" stroke="#334155"/>
+<text x="540" y="152" font-size="17" text-anchor="middle" font-weight="bold">pac:PacMan</text>
+<path d="M540 172V1679" stroke="#94a3b8" stroke-dasharray="7 6"/>
+<rect x="765" y="120" width="270" height="52" rx="4" fill="#dcfce7" stroke="#334155"/>
+<text x="900" y="152" font-size="17" text-anchor="middle" font-weight="bold">lab:Laberinto</text>
+<path d="M900 172V1679" stroke="#94a3b8" stroke-dasharray="7 6"/>
+<rect x="1125" y="120" width="270" height="52" rx="4" fill="#dcfce7" stroke="#334155"/>
+<text x="1260" y="152" font-size="17" text-anchor="middle" font-weight="bold">celda:Celda</text>
+<path d="M1260 172V1679" stroke="#94a3b8" stroke-dasharray="7 6"/>
+<rect x="48" y="230" width="1444" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="62" y="254" font-size="16" fill="#475569">Detalle del movimiento en una grilla de celdas enteras. No hay coordenadas continuas ni un método adicional de alineación.</text>
+<polyline points="180,315 540,315" stroke="#334155" fill="none" stroke-width="1.5"/>
+<polygon points="530.0,310.5 540,315 530.0,319.5" fill="#334155" stroke="#334155" stroke-width="1.5"/>
+<rect x="148.45" y="288" width="423.1" height="22" fill="white"/>
+<text x="360.0" y="305" font-size="15" text-anchor="middle" fill="#0f172a">calcularProximaPosicion(direccionPacMan, laberinto)</text>
+<rect x="48" y="346" width="1444" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="62" y="370" font-size="16" fill="#475569">Método heredado de Personaje: candidata = posición actual desplazada una celda. Con direccion == null no desplaza.</text>
+<polyline points="540,431 900,431" stroke="#334155" fill="none" stroke-width="1.5"/>
+<polygon points="890.0,426.5 900,431 890.0,435.5" fill="#334155" stroke="#334155" stroke-width="1.5"/>
+<rect x="617.8" y="404" width="204.4" height="22" fill="white"/>
+<text x="720.0" y="421" font-size="15" text-anchor="middle" fill="#0f172a">esTransitable(candidata)</text>
+<polyline points="900,495 982,495 982,517 900,517" stroke="#334155" fill="none" stroke-width="1.5"/>
+<polygon points="910.0,521.5 900,517 910.0,512.5" fill="#334155" stroke="#334155" stroke-width="1.5"/>
+<rect x="911" y="468" width="188.20000000000002" height="22" fill="white"/>
+<text x="915" y="485" font-size="15" text-anchor="start" fill="#0f172a">obtenerCelda(posicion)</text>
+<rect x="30" y="542" width="1480" height="566" fill="none" stroke="#64748b" stroke-width="1.5"/>
+<path d="M30 542h65v22l-10 8h-55z" fill="#e2e8f0" stroke="#64748b"/>
+<text x="40" y="563" font-size="16" font-weight="bold">alt</text>
+<rect x="38" y="578" width="269.20000000000005" height="22" fill="white"/>
+<text x="42" y="595" font-size="15" text-anchor="start" fill="#334155">[posición nula o fuera del mapa]</text>
+<path d="M30 770H1510" stroke="#94a3b8" stroke-dasharray="7 5"/>
+<rect x="38" y="776" width="220.60000000000002" height="22" fill="white"/>
+<text x="42" y="793" font-size="15" text-anchor="start" fill="#334155">[posición dentro del mapa]</text>
+<polyline points="900,641 982,641 982,663 900,663" stroke="#334155" fill="none" stroke-width="1.5" stroke-dasharray="6 5"/>
+<polyline points="910.0,667.5 900,663 910.0,658.5" fill="none" stroke="#334155" stroke-width="1.5"/>
+<rect x="911" y="614" width="42.400000000000006" height="22" fill="white"/>
+<text x="915" y="631" font-size="15" text-anchor="start" fill="#475569">null</text>
+<polyline points="900,721 540,721" stroke="#334155" fill="none" stroke-width="1.5" stroke-dasharray="6 5"/>
+<polyline points="550.0,725.5 540,721 550.0,716.5" fill="none" stroke="#334155" stroke-width="1.5"/>
+<rect x="694.75" y="694" width="50.5" height="22" fill="white"/>
+<text x="720.0" y="711" font-size="15" text-anchor="middle" fill="#475569">false</text>
+<polyline points="900,839 982,839 982,861 900,861" stroke="#334155" fill="none" stroke-width="1.5" stroke-dasharray="6 5"/>
+<polyline points="910.0,865.5 900,861 910.0,856.5" fill="none" stroke="#334155" stroke-width="1.5"/>
+<rect x="911" y="812" width="50.5" height="22" fill="white"/>
+<text x="915" y="829" font-size="15" text-anchor="start" fill="#475569">celda</text>
+<polyline points="900,919 1260,919" stroke="#334155" fill="none" stroke-width="1.5"/>
+<polygon points="1250.0,914.5 1260,919 1250.0,923.5" fill="#334155" stroke="#334155" stroke-width="1.5"/>
+<rect x="1038.55" y="892" width="82.9" height="22" fill="white"/>
+<text x="1080.0" y="909" font-size="15" text-anchor="middle" fill="#0f172a">esPared()</text>
+<polyline points="1260,983 900,983" stroke="#334155" fill="none" stroke-width="1.5" stroke-dasharray="6 5"/>
+<polyline points="910.0,987.5 900,983 910.0,978.5" fill="none" stroke="#334155" stroke-width="1.5"/>
+<rect x="1054.75" y="956" width="50.5" height="22" fill="white"/>
+<text x="1080.0" y="973" font-size="15" text-anchor="middle" fill="#475569">pared</text>
+<polyline points="900,1047 540,1047" stroke="#334155" fill="none" stroke-width="1.5" stroke-dasharray="6 5"/>
+<polyline points="550.0,1051.5 540,1047 550.0,1042.5" fill="none" stroke="#334155" stroke-width="1.5"/>
+<rect x="690.7" y="1020" width="58.6" height="22" fill="white"/>
+<text x="720.0" y="1037" font-size="15" text-anchor="middle" fill="#475569">!pared</text>
+<rect x="30" y="1108" width="1480" height="278" fill="none" stroke="#64748b" stroke-width="1.5"/>
+<path d="M30 1108h65v22l-10 8h-55z" fill="#e2e8f0" stroke="#64748b"/>
+<text x="40" y="1129" font-size="16" font-weight="bold">alt</text>
+<rect x="38" y="1144" width="196.3" height="22" fill="white"/>
+<text x="42" y="1161" font-size="15" text-anchor="start" fill="#334155">[esTransitable == true]</text>
+<path d="M30 1256H1510" stroke="#94a3b8" stroke-dasharray="7 5"/>
+<rect x="38" y="1262" width="204.4" height="22" fill="white"/>
+<text x="42" y="1279" font-size="15" text-anchor="start" fill="#334155">[esTransitable == false]</text>
+<polyline points="540,1207 180,1207" stroke="#334155" fill="none" stroke-width="1.5" stroke-dasharray="6 5"/>
+<polyline points="190.0,1211.5 180,1207 190.0,1202.5" fill="none" stroke="#334155" stroke-width="1.5"/>
+<rect x="318.55" y="1180" width="82.9" height="22" fill="white"/>
+<text x="360.0" y="1197" font-size="15" text-anchor="middle" fill="#475569">candidata</text>
+<polyline points="540,1325 180,1325" stroke="#334155" fill="none" stroke-width="1.5" stroke-dasharray="6 5"/>
+<polyline points="190.0,1329.5 180,1325 190.0,1320.5" fill="none" stroke="#334155" stroke-width="1.5"/>
+<rect x="245.64999999999998" y="1298" width="228.70000000000002" height="22" fill="white"/>
+<text x="360.0" y="1315" font-size="15" text-anchor="middle" fill="#475569">copia de la posición actual</text>
+<rect x="48" y="1386" width="1444" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="62" y="1410" font-size="16" fill="#475569">Si el tick continúa, Partida procesa los demás eventos antes de confirmar el movimiento.</text>
+<polyline points="180,1471 540,1471" stroke="#334155" fill="none" stroke-width="1.5"/>
+<polygon points="530.0,1466.5 540,1471 530.0,1475.5" fill="#334155" stroke="#334155" stroke-width="1.5"/>
+<rect x="221.35" y="1444" width="277.3" height="22" fill="white"/>
+<text x="360.0" y="1461" font-size="15" text-anchor="middle" fill="#0f172a">mover(direccionPacMan, laberinto)</text>
+<polyline points="540,1535 622,1535 622,1557 540,1557" stroke="#334155" fill="none" stroke-width="1.5"/>
+<polygon points="550.0,1561.5 540,1557 550.0,1552.5" fill="#334155" stroke="#334155" stroke-width="1.5"/>
+<rect x="551" y="1508" width="374.5" height="22" fill="white"/>
+<text x="555" y="1525" font-size="15" text-anchor="start" fill="#0f172a">calcularProximaPosicion(direccion, laberinto)</text>
+<rect x="48" y="1582" width="1444" height="38" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="62" y="1606" font-size="16" fill="#475569">Se repite la misma validación y se asigna posicion. Una pared impide avanzar; la dirección elegida queda guardada.</text>
+<text x="40" y="1714" font-size="14" fill="#64748b">Código: src/ · R01–R10 según Requerimientos TPO PacMan 1.md · Elaboración asistida por IA</text>
+</g></svg>

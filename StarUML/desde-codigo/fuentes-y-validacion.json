@@ -1,0 +1,158 @@
+{
+  "fecha": "2026-10-30",
+  "rama": "develop",
+  "commit_base": "0d8309096b4f707c340a7b17210a8611dadffe6e",
+  "autoria": "Elaboración asistida por IA a pedido de Juan",
+  "fuentes": {
+    "src/consola/JuegoConsola.java": "0c0a254f55375346c5a8a965a575d2aa820001cba7a94f05efc2dcd82564a65f",
+    "src/controlador/ControladorJuego.java": "09bca856e8f7c33c33eb88e2695bf95a10d78e5b85bdc1e55ca4efa5395dd47b",
+    "src/extra/Direccion.java": "b66ce89ea41fce5ba029dc929849fdeb11a56f065f73ae15a1c3ef8b8f74647e",
+    "src/extra/EstadoFantasma.java": "eda68c4e14ccdd588edef26f5f2436d6defc7f5355503bc88a1e9c19adf5d326",
+    "src/extra/EstadoPartida.java": "37bd1bc31f86aeb29eb54ac0f1d4e0c086e579ae1020a0aeea4dd2d0d728bfd9",
+    "src/extra/Posicion.java": "d020fdf790da17c0cf35d2570fab34d7fa5149d38b59c7a432d675a17bd63b75",
+    "src/modelo/Celda.java": "788fcd0e0dcbc4789311d04e135ad6a16c37579d27fb5b3ca386bcd9042c7b78",
+    "src/modelo/Fantasma.java": "4bf5d0a20aace9a87347a9f9a4fcb6178d0a65011046fc5707728d4c071f3810",
+    "src/modelo/Laberinto.java": "18c89d6e69cad27b41896781367c723438ad5dca52f55cc1f3e73a08577139ec",
+    "src/modelo/PacMan.java": "fc028b6d8e0ad7a90561ef8d1a26b1d7592995c0e7afcb60d5f527396972fb64",
+    "src/modelo/Partida.java": "285aac8db5d92a3afec0cfd29b87da88412657713e21135f0333ffa5890dc3ba",
+    "src/modelo/Personaje.java": "f94798bc9d3babecbe5eb5cea9e56bdb4f3d869dd68fcd4f261c767c9794c2aa",
+    "src/modelo/Punto.java": "a40f940f006417128a938dece95900e551f27102db01b69f02f313fd9d538397",
+    "src/modelo/PuntoComun.java": "ad880a9435d38d0957b128c0142f53a72a277aea943f0124d3c1c0582a8df60d",
+    "src/modelo/SuperPunto.java": "20d10de2beae0ae7f69d8e4ba50b6ef8f55b294741dff2074b7409f1057d99ec"
+  },
+  "clases": {
+    "JuegoConsola": {
+      "atributos": 2,
+      "operaciones": 4,
+      "origen": "src/consola/JuegoConsola.java"
+    },
+    "ControladorJuego": {
+      "atributos": 4,
+      "operaciones": 19,
+      "origen": "src/controlador/ControladorJuego.java"
+    },
+    "Direccion": {
+      "atributos": 0,
+      "operaciones": 0,
+      "origen": "src/extra/Direccion.java"
+    },
+    "EstadoFantasma": {
+      "atributos": 0,
+      "operaciones": 0,
+      "origen": "src/extra/EstadoFantasma.java"
+    },
+    "EstadoPartida": {
+      "atributos": 0,
+      "operaciones": 0,
+      "origen": "src/extra/EstadoPartida.java"
+    },
+    "Posicion": {
+      "atributos": 2,
+      "operaciones": 3,
+      "origen": "src/extra/Posicion.java"
+    },
+    "Celda": {
+      "atributos": 3,
+      "operaciones": 8,
+      "origen": "src/modelo/Celda.java"
+    },
+    "Fantasma": {
+      "atributos": 2,
+      "operaciones": 8,
+      "origen": "src/modelo/Fantasma.java"
+    },
+    "Laberinto": {
+      "atributos": 2,
+      "operaciones": 18,
+      "origen": "src/modelo/Laberinto.java"
+    },
+    "PacMan": {
+      "atributos": 0,
+      "operaciones": 4,
+      "origen": "src/modelo/PacMan.java"
+    },
+    "Partida": {
+      "atributos": 9,
+      "operaciones": 18,
+      "origen": "src/modelo/Partida.java"
+    },
+    "Personaje": {
+      "atributos": 3,
+      "operaciones": 7,
+      "origen": "src/modelo/Personaje.java"
+    },
+    "Punto": {
+      "atributos": 0,
+      "operaciones": 1,
+      "origen": "src/modelo/Punto.java"
+    },
+    "PuntoComun": {
+      "atributos": 0,
+      "operaciones": 1,
+      "origen": "src/modelo/PuntoComun.java"
+    },
+    "SuperPunto": {
+      "atributos": 0,
+      "operaciones": 1,
+      "origen": "src/modelo/SuperPunto.java"
+    }
+  },
+  "diagramas": {
+    "R01": {
+      "width": 1900,
+      "height": 2014,
+      "messages": 21
+    },
+    "R02": {
+      "width": 1540,
+      "height": 1734,
+      "messages": 13
+    },
+    "R03": {
+      "width": 1900,
+      "height": 1616,
+      "messages": 11
+    },
+    "R04": {
+      "width": 1420,
+      "height": 2056,
+      "messages": 13
+    },
+    "R05": {
+      "width": 1900,
+      "height": 2342,
+      "messages": 14
+    },
+    "R06": {
+      "width": 1420,
+      "height": 1946,
+      "messages": 12
+    },
+    "R07": {
+      "width": 1420,
+      "height": 2570,
+      "messages": 13
+    },
+    "R08": {
+      "width": 1900,
+      "height": 2326,
+      "messages": 17
+    },
+    "R09": {
+      "width": 1900,
+      "height": 2228,
+      "messages": 16
+    },
+    "R10": {
+      "width": 1540,
+      "height": 2326,
+      "messages": 16
+    }
+  },
+  "validacion": {
+    "identificadores_unicos": 2175,
+    "referencias_resueltas": 5142,
+    "clases_y_enums": 15,
+    "secuencias": 10
+  }
+}
