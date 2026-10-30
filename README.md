@@ -1,5 +1,57 @@
 # Pac-Man - preparación para la fase B
 
+## Pruebas de los 10 requerimientos para entregar
+
+El archivo único de pruebas es [src/test/TestRequerimientos.java](src/test/TestRequerimientos.java),
+preparado con asistencia de IA a pedido de Juan. Su fuente es
+[Requerimientos TPO PacMan 1.md](Requerimientos%20TPO%20PacMan%201.md).
+Es independiente de los tests anteriores: no los invoca ni necesita compilarlos.
+
+Con JDK 17 o superior, desde la carpeta `TPO-Pacman`:
+
+```powershell
+javac --release 17 -encoding UTF-8 -d bin -sourcepath src src/test/TestRequerimientos.java
+if ($LASTEXITCODE -eq 0) { java -cp bin test.TestRequerimientos }
+```
+
+También se puede ejecutar el `main` de `TestRequerimientos` desde VS Code o IntelliJ.
+No requiere JUnit ni dependencias externas, habilitar assertions, ingresar teclas
+o esperar diez segundos reales. La compilación anterior toma automáticamente las
+clases del juego que necesita, incluyendo la consola, y omite los tests anteriores.
+Para entregar, incluir `src/modelo`, `src/extra`, `src/controlador`, `src/consola`
+y únicamente `src/test/TestRequerimientos.java` como archivo de pruebas.
+
+La ejecución muestra `[OK]` o `[FALLO]` por caso y un resumen para cada requerimiento.
+Ante un fallo informa la comprobación y, cuando corresponde, los valores esperado
+y obtenido; continúa con los otros casos. El proceso devuelve código 0 si todos
+pasan y 1 si hay fallos. Las pruebas anteriores se conservan como material de
+desarrollo y no forman parte de esta suite de entrega.
+
+| Requerimiento | Qué se comprueba |
+| --- | --- |
+| 1. Movimiento | Cuatro direcciones, giros, continuidad, una celda por tick, inicio hacia la derecha y teclas de consola. |
+| 2. Paredes | Bloqueo en las cuatro direcciones, bordes del mapa y elección de una salida libre. |
+| 3. Puntaje | Puntos comunes de 10, cuatro superpuntos de 50 en esquinas, consumo único, acumulación y consultas sin modificar el juego. |
+| 4. Enemigos | Cuatro fantasmas, posiciones iniciales propias, avance autónomo, elección en cruces, rodeos y ausencia de camino. |
+| 5. Superpunto | Susto de diez segundos, 240 ticks, renovación, pasos aleatorios legales, exclusión de regresando y prioridad sobre contacto. |
+| 6. Consumo de fantasmas | 200 por fantasma, varios contactos, cobro único, regreso al origen propio, reactivación e inocuidad mientras regresa. |
+| 7. Muerte | Misma llegada, intercambio de celdas, ausencia de falsos contactos, contactos múltiples y mixtos, reinicio y conservación del progreso. |
+| 8. Vidas | Tres vidas iniciales, tres colisiones hasta derrota, detención tras perder y mínimo de cero vidas. |
+| 9. Victoria | Espera hasta consumir comunes y superpuntos, último punto, prioridad sobre muerte y detención al ganar. |
+| 10. Control | Pausa de movimiento y temporizador, reanudación, reinicios permitidos/rechazados, restauración e independencia de partidas, comandos y salida. |
+
+Los escenarios se crean dentro del mismo archivo. Algunos separan a PacMan de
+los fantasmas y dejan un punto de reserva inaccesible para aislar una regla sin
+terminar prematuramente la partida. Otros preparan contactos mediante movimientos
+legales. La única lectura por reflection obtiene los fantasmas de la partida;
+no escribe campos privados ni fuerza estados finales. Victoria y derrota se
+alcanzan consumiendo puntos o recibiendo colisiones mediante el controlador.
+Los asustados se prueban por movimientos legales; no se exige una secuencia ni
+una distribución aleatoria determinada. Para los contactos se usa un pasillo con
+una única salida, de modo que el resultado no dependa del azar.
+
+Las secciones siguientes conservan el historial de preparación y desarrollo.
+
 Estructura preparada con asistencia de IA a pedido de Juan el 22/10/2026. Se replicó el formato de `Partida.java`, preparado por Juan: paquetes, imports, atributos, firmas de métodos y cuerpos vacíos o retornos provisionales. La lógica será desarrollada por Juan y su grupo.
 
 ## Alcance y fuentes
