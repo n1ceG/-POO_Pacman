@@ -8,7 +8,6 @@ import extra.Posicion;
 import java.util.Locale;
 import java.util.Scanner;
 
-/** Vista de consola por pasos, creada con asistencia de IA a pedido de Juan. */
 public class JuegoConsola {
 
     private final ControladorJuego controlador = new ControladorJuego();
@@ -42,33 +41,20 @@ public class JuegoConsola {
     {
         mensaje = "";
         switch (comando) {
-            case "w":
-                controlador.avanzarTurno(Direccion.ARRIBA);
-                break;
-            case "s":
-                controlador.avanzarTurno(Direccion.ABAJO);
-                break;
-            case "a":
-                controlador.avanzarTurno(Direccion.IZQUIERDA);
-                break;
-            case "d":
-                controlador.avanzarTurno(Direccion.DERECHA);
-                break;
-            case "":
-                controlador.avanzarTurno();
-                break;
-            case "p":
-                controlador.alternarPausa();
-                break;
-            case "n":
+            case "w" -> controlador.avanzarTurno(Direccion.ARRIBA);
+            case "s" -> controlador.avanzarTurno(Direccion.ABAJO);
+            case "a" -> controlador.avanzarTurno(Direccion.IZQUIERDA);
+            case "d" -> controlador.avanzarTurno(Direccion.DERECHA);
+            case "" -> controlador.avanzarTurno();
+            case "p" -> controlador.alternarPausa();
+            case "n" -> {
                 if (controlador.nuevaPartida()) {
                     mensaje = "Partida nueva.";
                 } else {
                     mensaje = "Solo podes iniciar otra partida despues de ganar o perder.";
                 }
-                break;
-            default:
-                mensaje = "Comando invalido. Usa una sola letra y Enter.";
+            }
+            default -> mensaje = "Comando invalido. Usa una sola letra y Enter.";
         }
     }
 

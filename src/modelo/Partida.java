@@ -35,8 +35,14 @@ public class Partida {
         this.fantasmas = new Fantasma[4];
         
         Posicion centro = laberinto.centro();
-        for(int i = 0; i < 4; i++){
-            fantasmas[i] = new Fantasma(centro);
+        int[] desplazamientos = {-2, -1, 1, 2};
+
+        for (int i = 0; i < fantasmas.length; i++) {
+            Posicion posicion = new Posicion(
+                centro.fila,
+                centro.columna + desplazamientos[i]
+            );
+            fantasmas[i] = new Fantasma(posicion);
         }
     }
 
