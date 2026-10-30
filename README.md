@@ -105,9 +105,25 @@ Se acepta mayúscula o minúscula. Los comandos inválidos, la pausa y los estad
 
 Cada tick representa `1.0 / 24.0` segundos simulados y mueve cada personaje como máximo una celda. No se ejecutan automáticamente 24 ticks por segundo real: se espera un comando por tick. Pensar o escribir no consume tiempo del juego. El susto conserva 10 segundos al consumir un superpunto y vence después de 240 ticks posteriores; se tolera el error mínimo de redondeo de `double`.
 
-La consola muestra `C` (PacMan), `F` (perseguidor), `f` (asustado), `r` (regresando), `#` (pared), `.` (punto) y `o` (superpunto). Si varios personajes se superponen, el tablero muestra un solo símbolo; debajo figuran los cuatro fantasmas con posición y estado. Antes de dibujar cada estado se limpia la pantalla mediante secuencias ANSI. Ejecutar en una terminal compatible, como la terminal integrada de VS Code o Windows Terminal.
+La consola muestra `P` (PacMan), `F` (perseguidor), `f` (asustado), `r` (regresando), `#` (pared), `.` (punto) y `o` (superpunto). Si varios personajes se superponen, el tablero muestra un solo símbolo; debajo figuran los cuatro fantasmas con posición y estado. Antes de dibujar cada estado se limpia la pantalla mediante secuencias ANSI. Ejecutar en una terminal compatible, como la terminal integrada de VS Code o Windows Terminal.
 
-`JuegoConsola` lee y presenta; `ControladorJuego` delega; `Partida` conserva las reglas. `getMapa()` devuelve una matriz nueva de símbolos sin exponer celdas mutables. En una colisión mixta se cobran todos los asustados tocados y después se pierde una sola vida, independientemente del orden de los fantasmas. Se mantienen las prioridades previas de superpunto antes de contacto y victoria antes de muerte.
+`JuegoConsola` lee y presenta; `ControladorJuego` coordina las acciones del jugador; `Partida` conserva las reglas. `getMapa()` devuelve una matriz nueva de símbolos sin exponer celdas mutables. En una colisión mixta se cobran todos los asustados tocados y después se pierde una sola vida, independientemente del orden de los fantasmas. Se mantienen las prioridades previas de superpunto antes de contacto y victoria antes de muerte.
+
+### Separación entre consola y controlador
+
+Refactor realizado con asistencia de IA a pedido de Juan. El punto de entrada sigue siendo `consola.JuegoConsola` y los comandos se mantienen.
+
+- `JuegoConsola` es la interfaz entre el jugador y el controlador: lee las letras, las convierte en acciones y muestra el tablero, el estado y los mensajes. Conserva el ciclo de lectura y la limpieza de pantalla porque pertenecen a la consola.
+- `ControladorJuego.avanzarTurno(direccion)` elige la dirección y avanza una sola vez; `avanzarTurno()` conserva la dirección actual. Cada turno usa `1.0 / 24.0` segundos. En pausa o al finalizar, el controlador impide tanto avanzar como cambiar la dirección.
+- `alternarPausa()` decide si corresponde pausar o reanudar. `nuevaPartida()` devuelve `true` si creó la partida y `false` si la rechazó; la consola usa ese resultado únicamente para informar al jugador.
+- El controlador lleva los ticks y el tiempo simulado, y los reinicia al crear otra partida. Se conservan `moverPacMan()` y `actualizar(segundos)` para las pruebas y otros clientes: elegir dirección no avanza; cada actualización aceptada cuenta un tick y suma los segundos recibidos.
+- `Partida.actualizar()` sigue resolviendo movimientos, consumo, colisiones, vidas y victoria. Estas reglas pertenecen al modelo y no se trasladan al controlador.
+
+La consola ya no compara puntajes y vidas antes y después de cada acción para generar mensajes adicionales: los totales se muestran en el encabezado. El controlador no conoce letras, `Scanner`, símbolos ni mensajes de consola, por lo que puede reutilizarse desde otra interfaz.
+
+Prueba de turnos, pausa, estados finales y reinicio: `java -cp bin test.TestTurnosControlador`.
+
+Verificación del refactor: compilación con `--release 17`, prueba nueva y secuencia de comandos por consola correctas (avance, entrada inválida, pausa, dirección durante pausa, reinicio rechazado, reanudación y salida). En la comparación antes/después sobre la copia de trabajo, conservaron fallos `TestB07`, `TestConsumo`, `TestControlador`, `TestN10`, `TestN12`, `TestN14`, `TestN18` y `TestVictoria`. Ambas ejecuciones incluyeron el cambio local previo de posiciones iniciales en `Partida`; varias pruebas todavía esperan fantasmas superpuestos en el centro. Esta verificación no declara aprobada la suite completa ni modifica ese cambio previo.
 
 Pruebas de la copia del mapa y los 240 ticks:
 
