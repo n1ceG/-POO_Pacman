@@ -251,6 +251,11 @@ public class Partida {
         return this.pacMan.getPosicion();
     }
 
+    public Direccion getDireccionPacMan()
+    {
+        return this.pacMan.getDireccion();
+    }
+
     // Copia para la vista: no expone celdas ni puntos mutables del modelo.
     public char[][] getMapa()
     {
