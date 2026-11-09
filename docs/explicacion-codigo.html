@@ -264,7 +264,7 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);paddin
   <div class="layers">
     <div class="layer"><div><span class="b b-pkg">vista</span><br><span class="b b-pkg" style="margin-top:4px">consola</span><h4>Vista</h4></div><div><p>Presenta el juego al usuario y captura entradas por teclado. No decide nada de las reglas del juego. Incluye la interfaz gráfica Swing completa (animación por timer a 5 FPS, dibujo 2D dinámico) y la versión clásica de consola.</p><div class="cls"><code>VentanaPrincipal</code><code>PanelLaberinto</code><code>JuegoConsola</code></div></div></div>
     <div class="arrow-down">▼ llama a métodos de</div>
-    <div class="layer"><div><span class="b b-pkg">controlador</span><h4>Controlador</h4></div><div><p>Puerta de entrada al modelo. Reenvía pedidos a <code>Partida</code> y es el único que puede crear una partida nueva.</p><div class="cls"><code>ControladorJuego</code></div></div></div>
+    <div class="layer"><div><span class="b b-pkg">controlador</span><br><span class="b b-pkg" style="margin-top:4px">controlador.dto</span><h4>Controlador & DTOs</h4></div><div><p>Puerta de entrada al modelo. Reenvía pedidos a <code>Partida</code> y empaqueta el estado en DTOs (Data Transfer Objects) para que la vista consuma datos sin acoplarse a las entidades ni a los enums de negocio.</p><div class="cls"><code>ControladorJuego</code><code>PartidaDTO</code><code>FantasmaDTO</code></div></div></div>
     <div class="arrow-down">▼ delega en</div>
     <div class="layer"><div><span class="b b-pkg">modelo</span><h4>Modelo (negocio)</h4></div><div><p>Todas las reglas: movimiento, puntos, colisiones, vidas, victoria. No imprime nada ni lee el teclado.</p><div class="cls"><code>Partida</code><code>Laberinto</code><code>Celda</code><code>Personaje</code><code>PacMan</code><code>Fantasma</code><code>Punto</code><code>PuntoComun</code><code>SuperPunto</code></div></div></div>
     <div class="arrow-down">⋯ todas las capas usan ⋯</div>
@@ -412,10 +412,10 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);paddin
         <tr><td>Tipo</td><td><span class="b b-abs">abstracta</span></td><td><span class="b b-con">concreta</span></td><td><span class="b b-con">concreta</span></td></tr>
         <tr><td>¿<code>new</code>?</td><td>No se puede</td><td>Sí</td><td>Sí</td></tr>
         <tr><td><code>valor()</code></td><td>sólo la firma</td><td><b>10</b></td><td><b>50</b></td></tr>
-        <tr><td>Efecto extra</td><td>—</td><td>—</td><td>Asusta a los fantasmas 10 s</td></tr>
-        <tr><td>En el mapa</td><td>—</td><td><code>.</code></td><td><code>o</code> (las 4 esquinas)</td></tr>
+        <tr><td><code>asustaFantasmas()</code></td><td>sólo la firma (boolean)</td><td><code>false</code></td><td><code>true</code></td></tr>
+        <tr><td><code>getSimbolo()</code></td><td>sólo la firma (char)</td><td><code>'.'</code></td><td><code>'o'</code> (4 esquinas)</td></tr>
       </table></div>
-      <div class="callout">Polimorfismo real: <code>Partida.consumir(Punto p)</code> hace <code>puntaje += p.valor()</code> sin saber qué tipo de punto es; Java llama a la versión correcta. El efecto de “asustar” en cambio se decide con <code>instanceof SuperPunto</code> dentro de <code>Partida</code>.</div>
+      <div class="callout"><b>Polimorfismo total:</b> <code>Partida.consumir(Punto p)</code> consulta <code>p.asustaFantasmas()</code> y <code>Partida.getMapa()</code> consulta <code>p.getSimbolo()</code> sin hacer ningún <code>instanceof</code>. Cada subclase encapsula por completo su puntaje, efecto y símbolo visual.</div>
     </div>
 
     <div class="panel cmp">
@@ -460,14 +460,15 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);paddin
 
     <div class="panel cmp">
       <h3><code>calcularProximaPosicion</code> vs <code>mover</code></h3>
-      <p>Consultar vs. hacer.</p>
+      <p>Consultar celda adyacente vs. desplazarse desacoplado.</p>
       <div class="table-wrap"><table>
-        <tr><th></th><th>calcularProximaPosicion</th><th>mover</th></tr>
-        <tr><td>Dónde está</td><td><code>Personaje</code> (concreto, compartido)</td><td>abstracto en <code>Personaje</code>, implementado en cada hijo</td></tr>
-        <tr><td>Cambia el objeto</td><td><b>No</b>: devuelve una <code>Posicion</code> nueva</td><td><b>Sí</b>: actualiza <code>posicion</code></td></tr>
-        <tr><td>Si hay pared</td><td>Devuelve la posición actual</td><td>El personaje se queda quieto</td></tr>
+        <tr><th></th><th>calcularProximaPosicion(dir)</th><th>mover(dir, puedeAvanzar)</th></tr>
+        <tr><td>Dónde está</td><td><code>Personaje</code> (concreto, compartido)</td><td><code>Personaje</code> (concreto, heredado por PacMan y Fantasma)</td></tr>
+        <tr><td>Parámetros</td><td>Sólo la <code>Direccion</code> (delta geométrico)</td><td><code>Direccion</code> y boolean <code>puedeAvanzar</code></td></tr>
+        <tr><td>Conoce a <code>Laberinto</code></td><td><b>No</b> (desacoplado de la grilla)</td><td><b>No</b> (la transitabilidad la verifica Partida/Laberinto)</td></tr>
+        <tr><td>Cambia el objeto</td><td><b>No</b>: devuelve la <code>Posicion</code> adyacente</td><td><b>Sí</b>: actualiza <code>posicion</code> si <code>puedeAvanzar</code></td></tr>
       </table></div>
-      <div class="callout">Se separan para que <code>Partida</code> pueda <b>calcular todas las próximas posiciones, detectar colisiones y recién después mover</b>. Si moviera primero, perdería la posición anterior y no detectaría cuando PacMan y un fantasma se cruzan.</div>
+      <div class="callout"><b>Desacoplamiento:</b> <code>Personaje</code> ya no necesita recibir <code>Laberinto</code> para moverse. <code>Partida</code> evalúa las celdas adyacentes, detecta colisiones antes de mover, y luego ordena <code>mover(dir, puedeAvanzar)</code>. Se conserva además <code>mover(dir, laberinto)</code> como sobrecarga por compatibilidad.</div>
     </div>
 
     <div class="panel cmp">
@@ -492,6 +493,18 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);paddin
         <tr><td>Cambia algo</td><td>No</td><td>Sí: +200 y <code>serComido()</code>, o <code>perderVida()</code></td></tr>
       </table></div>
       <p class="small muted" style="margin-top:8px">Hay choque si <b>llegan a la misma celda</b> o si <b>intercambian celdas</b> (se cruzan en el pasillo).</p>
+    </div>
+
+    <div class="panel cmp">
+      <h3>DTO (Data Transfer Object) vs Entidad de Negocio</h3>
+      <p>Aislamiento de la capa de presentación respecto a las reglas internas.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>DTOs (<code>PartidaDTO</code>, <code>FantasmaDTO</code>)</th><th>Entidades (<code>Partida</code>, <code>Fantasma</code>, <code>Celda</code>)</th></tr>
+        <tr><td>Capa</td><td><code>controlador.dto</code> (usados por la <code>vista</code>)</td><td><code>modelo</code> (negocio interno)</td></tr>
+        <tr><td>Mutabilidad</td><td><b>Inmutables</b> (campos <code>final</code>, sólo getters y queries)</td><td><b>Mutables</b> (cambian con el tiempo y ticks)</td></tr>
+        <tr><td>Lógica</td><td>Sin reglas de juego; sólo consultas booleanas (ej. <code>estaAsustado()</code>, <code>esVictoria()</code>)</td><td>Toda la lógica de movimiento, IA, colisiones y puntaje</td></tr>
+        <tr><td>Propósito</td><td>Entregar a Swing o consola una foto congelada y segura del estado visual sin exponer enums ni celdas</td><td>Simular y validar las reglas del juego</td></tr>
+      </table></div>
     </div>
 
     <div class="panel cmp">
@@ -598,14 +611,14 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);paddin
   <div class="grid2">
     <div class="panel concept"><h3>Abstracción</h3><p>Modelar sólo lo necesario. <code>Personaje</code> y <code>Punto</code> son <code>abstract</code>: describen “algo que se mueve” y “algo que vale puntos” sin poder crearse solas.</p><div class="where">Personaje.java, Punto.java</div></div>
     <div class="panel concept"><h3>Herencia</h3><p><code>PacMan</code> y <code>Fantasma</code> reciben gratis <code>posicion</code>, <code>posicionInicial</code>, <code>direccion</code>, <code>calcularProximaPosicion()</code> y <code>getPosicion()</code>. Llaman al constructor padre con <code>super(posicionInicial)</code>.</p><div class="where">PacMan.java, Fantasma.java, PuntoComun.java, SuperPunto.java</div></div>
-    <div class="panel concept"><h3>Polimorfismo (sobrescritura)</h3><p>Mismo mensaje, distinto comportamiento: <code>valor()</code> devuelve 10 o 50; <code>volverAlInicio()</code> resetea cosas distintas. Se marca con <code>@Override</code>.</p><div class="where">Partida.consumir() usa <code>punto.valor()</code></div></div>
+    <div class="panel concept"><h3>Polimorfismo (sobrescritura)</h3><p>Mismo mensaje, distinto comportamiento: <code>valor()</code> devuelve 10 o 50; <code>asustaFantasmas()</code> devuelve <code>false</code> o <code>true</code>; <code>getSimbolo()</code> devuelve <code>'.'</code> u <code>'o'</code>, eliminando todo <code>instanceof</code> en <code>Partida</code>. <code>volverAlInicio()</code> resetea cosas distintas. Se marca con <code>@Override</code>.</p><div class="where">Partida.consumir() usa <code>punto.asustaFantasmas()</code>; Partida.getMapa() usa <code>punto.getSimbolo()</code></div></div>
     <div class="panel concept"><h3>Sobrecarga</h3><p>Mismo nombre, distintos parámetros. <code>Laberinto</code> tiene 3 constructores (vacío, <code>Celda[][]</code>, <code>String[]</code>); <code>Celda</code> 3; <code>Partida</code> y <code>ControladorJuego</code> 2 cada una. El vacío llama al completo con <code>this(...)</code>.</p><div class="where">Laberinto.java, Celda.java, Partida.java</div></div>
     <div class="panel concept"><h3>Encapsulamiento</h3><p>Atributos <code>private</code>/<code>protected</code> y acceso por métodos. Además hay <b>copias defensivas</b>: <code>getPosicion()</code> devuelve una <code>Posicion</code> nueva y <code>getMapa()</code> devuelve <code>char[][]</code> en vez de las <code>Celda</code> reales, así la vista no puede romper el modelo.</p><div class="where">Personaje.getPosicion(), Partida.getMapa()</div></div>
     <div class="panel concept"><h3>Composición</h3><p>Objetos formados por otros: una <code>Partida</code> tiene un <code>Laberinto</code>, que tiene <code>Celda</code>s, que tienen un <code>Punto</code>. Cada uno se ocupa de lo suyo.</p><div class="where">Ver sección 4</div></div>
     <div class="panel concept"><h3>Inyección de dependencias</h3><p>Los constructores <code>Partida(Laberinto, Posicion)</code> y <code>ControladorJuego(Partida)</code> permiten a los tests armar escenarios chicos y controlados en vez del mapa completo.</p><div class="where">src/test/*.java</div></div>
     <div class="panel concept"><h3>Método de fábrica</h3><p><code>Laberinto.crearDefault()</code> es un método <code>static</code> que construye el laberinto estándar. Se llama sobre la clase, no sobre un objeto.</p><div class="where">Laberinto.java:112</div></div>
     <div class="panel concept"><h3>Enumeraciones</h3><p><code>Direccion</code>, <code>EstadoFantasma</code> y <code>EstadoPartida</code> limitan los valores posibles y permiten <code>switch</code> seguros.</p><div class="where">paquete extra</div></div>
-    <div class="panel concept"><h3>Separación de responsabilidades (MVC)</h3><p>La vista no conoce reglas, el modelo no conoce la vista. En la Fase C se incorporó la interfaz gráfica Swing (<code>VentanaPrincipal</code> y <code>PanelLaberinto</code>) reemplazando a <code>JuegoConsola</code> como cliente visual principal sin necesidad de modificar las reglas de negocio del <code>modelo</code>.</p><div class="where">vista / consola / controlador / modelo</div></div>
+    <div class="panel concept"><h3>Separación de responsabilidades & DTOs (MVC)</h3><p>La vista no conoce reglas ni entidades internas de negocio; el modelo no conoce la vista. El controlador expone <code>PartidaDTO</code> y <code>FantasmaDTO</code> (inmutables) para que Swing dibuje sin acoplarse a <code>EstadoFantasma</code> ni <code>EstadoPartida</code>. Asimismo, <code>Personaje.mover(dir, puedeAvanzar)</code> desacopla a los personajes del <code>Laberinto</code>.</p><div class="where">controlador.dto / vista / modelo</div></div>
   </div>
 </section>
 
@@ -614,6 +627,12 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);paddin
   <h2>11. Puntos a revisar</h2>
   <p class="lead">Cosas que aparecen al leer el código con lupa. No rompen el juego; son candidatas a pulir o a justificar si el docente pregunta.</p>
   <div class="obs">
+    <details open><summary>Devolución docente Fase 2: DTOs, polimorfismo y desacoplamiento de movimiento <span class="b b-con">arquitectura resuelta</span></summary><p>En la devolución de la Fase 2, la cátedra señaló tres oportunidades de mejora que fueron completamente resueltas:</p>
+    <ul>
+      <li><b>DTOs en el Controlador:</b> En lugar de exponer enums y entidades de negocio (<code>getEstado</code>, <code>getEstadosFantasmas</code>), <code>ControladorJuego</code> provee <code>getPartidaDTO()</code> y <code>getFantasmasDTO()</code> mediante <code>PartidaDTO</code> y <code>FantasmaDTO</code>. La vista Swing ahora se comunica pura y exclusivamente mediante estos DTOs inmutables con métodos de consulta (<code>estaAsustado()</code>, <code>esVictoria()</code>, <code>estaPausada()</code>).</li>
+      <li><b>Comportamiento polimórfico en <code>Punto</code>:</b> Se eliminó todo uso de <code>instanceof SuperPunto</code> en <code>Partida</code> y <code>Laberinto</code> agregando los métodos abstractos <code>boolean asustaFantasmas()</code> y <code>char getSimbolo()</code> en <code>Punto</code>, implementados polimórficamente en <code>PuntoComun</code> y <code>SuperPunto</code>.</li>
+      <li><b>Desacoplamiento de <code>Personaje.mover()</code>:</b> Los personajes ya no reciben el objeto <code>Laberinto</code> en el bucle principal. <code>calcularProximaPosicion(dir)</code> computa las coordenadas de la celda adyacente y <code>mover(dir, puedeAvanzar)</code> actualiza la posición sólo si la celda es transitable, delegando la validación del laberinto a <code>Partida</code>. Se mantiene la sobrecarga previa por compatibilidad con la suite de pruebas.</li>
+    </ul></details>
     <details><summary>Arranque en espera de dirección (<code>esperandoInicio</code>) <span class="b b-enu">diseño GUI</span></summary><p>Al iniciar la partida o presionar "Nueva Partida" (N), la interfaz gráfica entra en un estado de espera: el temporizador corre y el HUD muestra <code>¡Listo! (Elija una dirección)</code>, pero no avanza ticks en el modelo hasta que el jugador presiona una tecla de dirección (W/A/S/D o flechas). Esto da tiempo de reacción al jugador antes de que los 4 fantasmas arranquen a perseguirlo.</p></details>
     <details><summary>La leyenda dice <code>C</code> para PacMan, pero se dibuja <code>P</code> <span class="b b-dat">inconsistencia</span></summary><p><code>JuegoConsola.mostrar()</code> pone <code>'P'</code> en el mapa (<a href="../src/consola/JuegoConsola.java">JuegoConsola.java:129</a>) y la línea de ayuda dice <code>C: PacMan</code> (línea 136). El README también dice <code>C</code>. Unificar uno de los dos.</p></details>
     <details><summary><code>Posicion</code> tiene atributos <code>public</code> <span class="b b-abs">diseño</span></summary><p><code>fila</code> y <code>columna</code> se pueden modificar desde cualquier lado. Por eso <code>Personaje</code> y <code>Laberinto</code> devuelven copias. Además el constructor llama <code>x, y</code> a lo que en realidad es <code>fila, columna</code> (<a href="../src/extra/Posicion.java">Posicion.java:8</a>), lo que puede confundir (x suele ser columna). Alternativa: atributos <code>private final</code> con getters.</p></details>
@@ -735,108 +754,1296 @@ mazeEl.addEventListener("click", e=>{
 /* ---------------- CLASES ---------------- */
 const V = {"+":"pub","-":"pri","#":"pro"};
 const CLASES = [
- {"n":"VentanaPrincipal", "pkg":"vista", "k":"con", "src":"src/vista/VentanaPrincipal.java",
-  "d":"Ventana principal del juego (JFrame). Contiene el lienzo del laberinto, el panel superior con datos de la partida (HUD) y los controles de pausa y reinicio. Administra el bucle del juego mediante un Timer y captura las entradas por teclado.",
-  "a":[["-", "static final int INTERVALO_MS = 200", "Cadencia de actualización del Timer: 200 ms por tick (5 FPS)."], ["-", "final ControladorJuego controlador", "Punto de acceso exclusivo al modelo y a la lógica del juego."], ["-", "PanelLaberinto tablero", "Lienzo gráfico (JPanel) que dibuja las celdas, Pac-Man y fantasmas."], ["-", "Timer temporizador", "Temporizador Swing (javax.swing.Timer) que dispara el ciclo de actualización periódico."], ["-", "JLabel etiquetaPuntaje", "Muestra el puntaje acumulado en el panel superior."], ["-", "JLabel etiquetaVidas", "Muestra la cantidad de vidas restantes del jugador."], ["-", "JLabel etiquetaEstado", "Muestra si la partida está en espera, en curso, pausada, ganada o perdida."], ["-", "JButton botonPausa", "Botón interactivo para pausar o reanudar el juego sin usar el teclado."], ["-", "JButton botonReiniciar", "Botón para iniciar una nueva partida tras ganar o perder."], ["-", "boolean esperandoInicio = true", "Bandera de inicio diferido: el temporizador corre pero no avanza el modelo hasta que el jugador elige una dirección."]],
-  "m":[["+", "VentanaPrincipal()", "Constructor: inicializa el controlador, configura la ventana, monta los paneles, registra las teclas y arranca el temporizador."], ["-", "void configurarVentana()", "Define título, cierre por defecto (EXIT_ON_CLOSE) y BorderLayout."], ["-", "void crearPaneles()", "Construye el panel superior de información (HUD), el tablero central y el panel inferior de botones."], ["-", "void configurarTeclado()", "Registra las combinaciones de teclas para flechas, W/A/S/D, P (pausa) y N (nueva partida)."], ["-", "void asociarTeclaDireccion(String tecla, Direccion direccion)", "Asocia una tecla de movimiento: desactiva esperandoInicio y llama a controlador.moverPacMan."], ["-", "void asociarAccion(String tecla, Runnable accion)", "Vincula un KeyStroke al InputMap y ActionMap del tablero."], ["-", "void iniciarTemporizador()", "Crea e inicia el Timer; en cada ciclo actualiza el modelo (si no está esperandoInicio) y repinta la vista."], ["-", "void actualizarInformacion()", "Refresca los textos y estados de las etiquetas del HUD y la disponibilidad de los botones."], ["+", "static void main(String[] args)", "Punto de entrada de la aplicación gráfica; crea la ventana en el Event Dispatch Thread (SwingUtilities.invokeLater)."]],
-  "r":["ControladorJuego", "PanelLaberinto", "Direccion", "EstadoPartida"]},
-
- {"n":"PanelLaberinto", "pkg":"vista", "k":"con", "src":"src/vista/PanelLaberinto.java",
-  "d":"Lienzo gráfico (JPanel) que renderiza en 2D el estado visual del juego: laberinto, paredes, puntos, superpuntos, animación angular de Pac-Man, fantasmas según su estado y carteles superpuestos.",
-  "a":[["-", "static final int TAMANIO_CELDA = 30", "Dimensión en píxeles de cada casillero cuadrado (30×30 px)."], ["-", "final ControladorJuego controlador", "Referencia al controlador para consultar posiciones, mapas y estados al repintar."]],
-  "m":[["+", "PanelLaberinto(ControladorJuego controlador)", "Constructor: asigna el controlador, fondo negro y tamaño preferido proporcional a las dimensiones del mapa."], ["#", "void paintComponent(Graphics g)", "@Override: dibuja secuencialmente las celdas del laberinto, puntos, fantasmas, Pac-Man y carteles de fin/pausa."], ["-", "void dibujarPacMan(Graphics g)", "Dibuja a Pac-Man en amarillo con la boca abierta orientada según su rumbo actual (30°, 120°, 210°, 300°)."], ["-", "void dibujarFantasmas(Graphics g)", "Dibuja cada fantasma según su estado: con su color al perseguir, azul al estar asustado, o solo ojos al regresar."], ["-", "void dibujarOjos(Graphics g, int x, int y, Color colorPupila)", "Dibuja la esclerótica blanca y pupilas con el color indicado."], ["-", "void dibujarCartelEstado(Graphics g)", "Dibuja una franja semitransparente con texto centrado para PAUSA, ¡VICTORIA! o GAME OVER."]],
-  "r":["ControladorJuego", "Direccion", "EstadoFantasma", "EstadoPartida", "Posicion"]},
-
- {"n":"JuegoConsola", "pkg":"consola", "k":"con", "src":"src/consola/JuegoConsola.java",
-  "d":"Vista de terminal por turnos. Lee comandos de texto ingresados por el usuario, delega el avance en ControladorJuego y muestra el laberinto mediante caracteres y secuencias ANSI.",
-  "a":[["-", "final ControladorJuego controlador = new ControladorJuego()", "Instancia del controlador que gestiona la lógica del juego."], ["-", "String mensaje = ...", "Línea de estado y retroalimentación impresa debajo del tablero."]],
-  "m":[["+", "static void main(String[] args)", "Punto de entrada de consola: instancia la clase e inicia el bucle de ejecución."], ["-", "void ejecutar()", "Bucle interactivo: imprime el tablero, solicita un comando y lo procesa hasta recibir 'q' o fin de entrada."], ["-", "void procesar(String comando)", "Interpreta las teclas de comando: W/A/S/D o Enter (avanzar turno), P (alternar pausa) y N (nueva partida)."], ["-", "void mostrar()", "Limpia la terminal con códigos ANSI e imprime el estado de la partida y el tablero con caracteres."]],
-  "r":["ControladorJuego", "Direccion", "EstadoPartida", "EstadoFantasma", "Posicion"]},
-
- {"n":"ControladorJuego", "pkg":"controlador", "k":"con", "src":"src/controlador/ControladorJuego.java",
-  "d":"Intermediario entre las vistas (consola o Swing) y el modelo de negocio. Centraliza el avance de turnos, el conteo de tiempo y la creación de partidas, aislando las reglas internas de la presentación.",
-  "a":[["-", "static final double SEGUNDOS_POR_TICK = 1.0 / 24.0", "Tiempo simulado que avanza en cada turno por consola (1/24 s)."], ["-", "Partida partida", "Referencia a la partida en curso. Puede ser reemplazada al reiniciar."], ["-", "long ticks", "Contador acumulado de ticks ejecutados."], ["-", "double tiempoSimulado", "Segundos acumulados de juego transcurrido."]],
-  "m":[["+", "ControladorJuego()", "Constructor por defecto: crea una partida nueva con laberinto estándar."], ["+", "ControladorJuego(Partida partida)", "Constructor para pruebas: permite inyectar una partida con estado inicial controlado."], ["+", "void moverPacMan(Direccion direccion)", "Cambia la dirección elegida de Pac-Man sin avanzar el tiempo ni desplazarlo inmediatamente."], ["+", "void avanzarTurno(Direccion direccion)", "Cambia la dirección y avanza exactamente un tick de 1/24 s (usado por la consola)."], ["+", "void avanzarTurno()", "Avanza un tick de 1/24 s manteniendo la dirección actual de Pac-Man."], ["+", "void actualizar(double tiempoTranscurrido)", "Avanza el modelo el delta de tiempo especificado e incrementa el reloj del juego."], ["+", "long getTicks()", "Devuelve la cantidad de ticks transcurridos."], ["+", "double getTiempoSimulado()", "Devuelve los segundos acumulados de simulación."], ["+", "Posicion getPosicionPacMan()", "Devuelve una copia defensiva de la posición actual de Pac-Man."], ["+", "Direccion getDireccionPacMan()", "Devuelve la dirección hacia donde apunta Pac-Man para que la vista oriente la boca."], ["+", "int getVidas()", "Consulta las vidas restantes de la partida."], ["+", "char[][] getMapa()", "Devuelve una copia matricial de símbolos del laberinto sin exponer las celdas internas."], ["+", "int getPuntaje()", "Consulta el puntaje acumulado de la partida."], ["+", "EstadoPartida getEstado()", "Consulta el estado actual de la partida (EN_CURSO, PAUSADA, VICTORIA, DERROTA)."], ["+", "void pausar()", "Pasa la partida a estado PAUSADA si está EN_CURSO."], ["+", "void reanudar()", "Reanuda la partida a estado EN_CURSO si estaba PAUSADA."], ["+", "void alternarPausa()", "Conmuta entre pausa y reanudación según el estado actual."], ["+", "boolean nuevaPartida()", "Crea una nueva partida si la actual terminó en victoria o derrota. Devuelve true si se reinició."], ["+", "Posicion[] getPosicionesFantasmas()", "Devuelve un array con copias defensivas de las posiciones de los cuatro fantasmas."], ["+", "EstadoFantasma[] getEstadosFantasmas()", "Devuelve un array con el estado de cada uno de los cuatro fantasmas."]],
-  "r":["Partida", "VentanaPrincipal", "PanelLaberinto", "JuegoConsola", "Direccion", "EstadoPartida", "EstadoFantasma", "Posicion"]},
-
- {"n":"Partida", "pkg":"modelo", "k":"con", "src":"src/modelo/Partida.java",
-  "d":"Clase principal del modelo de dominio. Gestiona el ciclo de vida del juego, el avance de cada tick, el consumo de puntos, la detección y resolución de colisiones, las vidas y las condiciones de victoria o derrota.",
-  "a":[["-", "int vidas", "Vidas restantes del jugador (comienza con 3)."], ["-", "int puntaje", "Puntaje total acumulado."], ["-", "EstadoPartida estado", "Estado global: EN_CURSO, PAUSADA, VICTORIA o DERROTA."], ["-", "Laberinto laberinto", "El laberinto que contiene la cuadrícula de celdas y caminos."], ["-", "PacMan pacMan", "El personaje controlado por el jugador."], ["-", "Fantasma[] fantasmas", "Arreglo con los 4 fantasmas enemigos."], ["-", "static final Posicion INICIO_PACMAN = (13, 7)", "Posición fija inicial de Pac-Man en la parte inferior central del mapa."], ["-", "static final int VIDAS_INICIALES = 3", "Cantidad inicial reglamentaria de vidas."], ["-", "static final double DURACION_SUSTO = 10", "Duración en segundos del estado asustado de los fantasmas tras comer un superpunto."]],
-  "m":[["+", "Partida()", "Constructor por defecto: inicializa el laberinto estándar, a Pac-Man y a los 4 fantasmas en el centro."], ["+", "Partida(Laberinto laberinto, Posicion inicioPacMan)", "Constructor con inyección: permite configurar laberinto y posición inicial para escenarios de prueba."], ["+", "void actualizar(double tiempoTranscurrido)", "Ejecuta un tick completo: valida estado, consumo de puntos, decisión de fantasmas, colisiones, movimientos y temporizadores."], ["+", "void consumir(Punto punto)", "Suma el valor del punto consumido y, si es SuperPunto, asusta a todos los fantasmas elegibles."], ["+", "List<Fantasma> detectarColision(Posicion proximaPosicionPacman, List<Posicion> proximasPosicionesFantasmas)", "Detecta choques por misma celda de llegada o por cruce en pasillo antes de mover los personajes."], ["+", "void resolverColision(Fantasma fantasma)", "Aplica consecuencias: si está asustado suma 200 puntos y lo envía a casa; si persigue descuenta vida."], ["+", "boolean comprobarVictoria()", "Verifica si el laberinto quedó sin puntos transitables."], ["+", "void perderVida()", "Descuenta una vida, reinicia las posiciones de todos al origen y declara derrota si vidas llega a 0."], ["+", "void pausar()", "Cambia el estado de EN_CURSO a PAUSADA."], ["+", "void reanudar()", "Cambia el estado de PAUSADA a EN_CURSO."], ["+", "void elegirDireccionPacman(Direccion direccion)", "Guarda la dirección de movimiento solicitada por el jugador en Pac-Man."], ["+", "Posicion getPosicionPacMan()", "Devuelve una copia de la posición actual de Pac-Man."], ["+", "Direccion getDireccionPacMan()", "Devuelve la dirección hacia donde se desplaza o mira Pac-Man."], ["+", "char[][] getMapa()", "Construye una matriz de caracteres representativa de las celdas y puntos sin exponer objetos Celda."], ["+", "int getVidas()", "Consulta la cantidad de vidas restantes."], ["+", "int getPuntaje()", "Consulta el puntaje acumulado."], ["+", "EstadoPartida getEstado()", "Consulta el estado actual de la partida."], ["+", "Posicion[] getPosicionesFantasmas()", "Devuelve un arreglo con copias de las posiciones de los fantasmas."], ["+", "EstadoFantasma[] getEstadosFantasmas()", "Devuelve un arreglo con los estados individuales de los 4 fantasmas."]],
-  "r":["Laberinto", "PacMan", "Fantasma", "Punto", "SuperPunto", "Celda", "ControladorJuego", "EstadoPartida", "EstadoFantasma", "Posicion"]},
-
- {"n":"Laberinto", "pkg":"modelo", "k":"con", "src":"src/modelo/Laberinto.java",
-  "d":"Representa la grilla del tablero. Almacena las celdas, valida la transitabilidad de posiciones, calcula rutas óptimas con BFS y determina si aún restan puntos por comer.",
-  "a":[["-", "static final String[] MAPA_POR_DEFECTO", "Matriz de 15 cadenas con el diseño estándar de paredes (#), puntos (.) y superpuntos (o)."], ["-", "final Celda[][] celdas", "Arreglo bidimensional inmutable que contiene las instancias de Celda."]],
-  "m":[["+", "Laberinto()", "Constructor por defecto: crea el laberinto a partir de MAPA_POR_DEFECTO."], ["+", "Laberinto(Celda[][] celdas)", "Constructor por matriz de celdas: valida dimensiones rectangulares y ausencia de nulos."], ["+", "Laberinto(String[] mapa)", "Constructor por arreglo de strings: parsea caracteres y genera las instancias de Celda."], ["+", "static Laberinto crearDefault()", "Método de fábrica estático que devuelve una instancia nueva con el mapa por defecto."], ["+", "boolean esTransitable(Posicion posicion)", "Devuelve true si la posición está dentro de los límites y no es una pared."], ["+", "List<Direccion> direccionesDisponibles(Posicion posicion)", "Calcula las direcciones transitables hacia celdas vecinas desde una posición dada."], ["+", "List<Posicion> caminoMasCorto(Posicion origen, Posicion destino)", "Calcula la ruta más corta mediante Búsqueda en Anchura (BFS), explorando en orden ARRIBA, ABAJO, IZQUIERDA, DERECHA."], ["+", "boolean quedanPuntos()", "Recorre la grilla y verifica si al menos una celda contiene un punto sin comer."], ["+", "Posicion centro()", "Devuelve la coordenada central del laberinto (7, 7)."], ["+", "Celda obtenerCelda(Posicion posicion)", "Devuelve la celda en la posición indicada, o null si está fuera de límites."], ["+", "int getFilas()", "Devuelve la cantidad de filas del laberinto (15)."], ["+", "int getColumnas()", "Devuelve la cantidad de columnas del laberinto (15)."], ["+", "void imprimirLaberinto()", "Imprime en consola una representación visual del mapa para propósitos de depuración."], ["+", "static void main(String[] args)", "Punto de entrada de depuración para probar la impresión directa del laberinto."], ["-", "Posicion vecino(Posicion posicion, Direccion direccion)", "Calcula la coordenada adyacente según la dirección indicada."], ["-", "List<Posicion> reconstruirCamino(Posicion[][] padre, Posicion origen, Posicion destino)", "Reconstruye la lista de posiciones desde el destino hasta el origen siguiendo la tabla de predecesores del BFS."], ["-", "boolean mismaPosicion(Posicion primera, Posicion segunda)", "Compara si dos instancias de Posicion tienen iguales fila y columna."], ["-", "Posicion copiar(Posicion posicion)", "Crea y devuelve una copia defensiva de una coordenada."]],
-  "r":["Celda", "Posicion", "Direccion", "PuntoComun", "SuperPunto", "Partida", "Personaje", "Fantasma"]},
-
- {"n":"Celda", "pkg":"modelo", "k":"con", "src":"src/modelo/Celda.java",
-  "d":"Casillero individual del laberinto. Almacena su coordenada, si es pared o camino, y el punto que contiene (si no fue consumido).",
-  "a":[["-", "Posicion posicion", "Coordenada espacial de la celda dentro de la grilla."], ["-", "boolean pared", "Indica si la celda es un obstáculo infranqueable."], ["-", "Punto punto", "Punto contenido en la celda; pasa a null una vez consumido."]],
-  "m":[["+", "Celda()", "Constructor vacío por defecto."], ["+", "Celda(boolean esPared, boolean esSuperPunto, int x, int y)", "Constructor que crea automáticamente PuntoComun o SuperPunto según el flag."], ["+", "Celda(boolean esPared, Punto punto, int x, int y)", "Constructor principal: recibe el objeto Punto explícito y coordenadas fila/columna."], ["+", "Punto retirarPunto()", "Consume el punto: devuelve la referencia y deja el atributo interno en null para no ser comido dos veces."], ["+", "Posicion getPosicion()", "Devuelve la coordenada de la celda."], ["+", "Punto tipoPunto()", "Consulta el punto actual sin retirarlo."], ["+", "boolean esPared()", "Indica si la celda es pared."], ["+", "boolean tienePunto()", "Indica si la celda contiene un punto actualmente."]],
-  "r":["Punto", "PuntoComun", "SuperPunto", "Posicion", "Laberinto"]},
-
- {"n":"Punto", "pkg":"modelo", "k":"abs", "src":"src/modelo/Punto.java",
-  "d":"Clase base abstracta para los elementos consumibles del laberinto. Obliga a cada subclase a definir su puntaje mediante el método polimórfico valor().",
-  "a":[],
-  "m":[["+", "abstract int valor()", "Método polimórfico abstracto que devuelve el puntaje otorgado al consumirse."]],
-  "r":["PuntoComun", "SuperPunto", "Celda", "Partida"]},
-
- {"n":"PuntoComun", "pkg":"modelo", "k":"con", "src":"src/modelo/PuntoComun.java",
-  "d":"Punto estándar distribuido a lo largo de los pasillos del laberinto. Otorga 10 puntos al ser comido.",
-  "a":[],
-  "m":[["+", "int valor()", "@Override polimórfico: devuelve 10 puntos."]],
-  "r":["Punto"]},
-
- {"n":"SuperPunto", "pkg":"modelo", "k":"con", "src":"src/modelo/SuperPunto.java",
-  "d":"Punto especial ubicado en las esquinas del laberinto. Otorga 50 puntos y provoca que la partida asuste a los fantasmas durante 10 segundos.",
-  "a":[],
-  "m":[["+", "int valor()", "@Override polimórfico: devuelve 50 puntos."]],
-  "r":["Punto", "Partida", "Fantasma"]},
-
- {"n":"Personaje", "pkg":"modelo", "k":"abs", "src":"src/modelo/Personaje.java",
-  "d":"Clase base abstracta para entidades móviles del laberinto (Pac-Man y Fantasmas). Encapsula las coordenadas de posición, origen y dirección, y el cálculo de avance en la grilla.",
-  "a":[["#", "Posicion posicion", "Ubicación actual del personaje en el laberinto."], ["#", "Posicion posicionInicial", "Ubicación de origen donde regresa al reiniciar o perder vidas."], ["#", "Direccion direccion", "Dirección hacia donde apunta o se desplaza el personaje."]],
-  "m":[["#", "Personaje(Posicion posicionInicial)", "Constructor protegido: inicializa y guarda copias defensivas de la posición de origen."], ["+", "Posicion calcularProximaPosicion(Direccion direccion, Laberinto laberinto)", "Calcula la coordenada resultante de dar un paso en la dirección dada; si hay pared devuelve la actual sin mover."], ["+", "abstract void mover(Direccion direccion, Laberinto laberinto)", "Método abstracto: cada entidad actualiza su posición según sus reglas."], ["+", "abstract void volverAlInicio()", "Método abstracto: restablece la posición al origen y resetea estados internos."], ["+", "Posicion getPosicion()", "Devuelve una copia defensiva de la posición actual."], ["+", "Direccion getDireccion()", "Devuelve la dirección actual del personaje."], ["#", "Posicion getPosicionInicial()", "Devuelve una copia defensiva de la posición inicial (solo accesible para subclases)."]],
-  "r":["PacMan", "Fantasma", "Posicion", "Direccion", "Laberinto"]},
-
- {"n":"PacMan", "pkg":"modelo", "k":"con", "src":"src/modelo/PacMan.java",
-  "d":"Personaje controlado por el jugador. Recuerda la última dirección elegida y avanza paso a paso en cada tick por las celdas transitables.",
-  "a":[["#", "posicion, posicionInicial, direccion", "Atributos protegidos heredados de Personaje."]],
-  "m":[["+", "PacMan(Posicion posicionInicial)", "Constructor: invoca al padre con la posición inicial e inicia mirando hacia DERECHA."], ["+", "void elegirDireccion(Direccion direccion)", "Almacena la dirección deseada por el jugador para ser utilizada en los siguientes avances."], ["+", "void mover(Direccion direccion, Laberinto laberinto)", "@Override: actualiza su posición a la próxima calculada según la dirección."], ["+", "void volverAlInicio()", "@Override: teletransporta a Pac-Man a su posición inicial y reorienta hacia DERECHA."]],
-  "r":["Personaje", "Partida", "Direccion", "Posicion", "Laberinto"]},
-
- {"n":"Fantasma", "pkg":"modelo", "k":"con", "src":"src/modelo/Fantasma.java",
-  "d":"Enemigo autónomo del laberinto. Posee una máquina de estados (PERSIGUIENDO, ASUSTADO, REGRESANDO) que define su comportamiento de navegación por BFS o azar.",
-  "a":[["-", "EstadoFantasma estado", "Modo actual de comportamiento del fantasma (inicia en PERSIGUIENDO)."], ["-", "double tiempoSustoRestante", "Contador regresivo en segundos del tiempo de susto activo."]],
-  "m":[["+", "Fantasma(Posicion posicionInicial)", "Constructor: inicializa la posición heredada y fija el estado en PERSIGUIENDO."], ["+", "void mover(Direccion direccion, Laberinto laberinto)", "@Override: traslada al fantasma a la coordenada calculada."], ["+", "void volverAlInicio()", "@Override: regresa al fantasma a su celda de inicio, fija estado PERSIGUIENDO y reinicia el susto a 0."], ["+", "Direccion elegirDireccion(Laberinto laberinto, Posicion posicionPacman)", "Inteligencia artificial: si está ASUSTADO elige al azar entre salidas libres; si PERSIGUE va hacia Pac-Man por BFS; si REGRESA va hacia su origen."], ["+", "void asustar(double duracion)", "Cambia el estado a ASUSTADO y fija el temporizador en la duración recibida (salvo que ya esté REGRESANDO)."], ["+", "void serComido()", "Si estaba ASUSTADO pasa a REGRESANDO y pone el contador de susto en 0."], ["+", "void actualizarEstado(double tiempoTranscurrido)", "Descuenta el tiempo de susto o, si está REGRESANDO y alcanzó su casa, vuelve a PERSIGUIENDO."], ["+", "EstadoFantasma getEstado()", "Consulta el estado actual del fantasma."]],
-  "r":["Personaje", "Partida", "Laberinto", "EstadoFantasma", "Direccion", "Posicion"]},
-
- {"n":"Posicion", "pkg":"extra", "k":"dat", "src":"src/extra/Posicion.java",
-  "d":"Clase de datos que representa una coordenada bidimensional en la cuadrícula (fila y columna).",
-  "a":[["+", "int fila", "Coordenada vertical en el laberinto (0 es la fila superior)."], ["+", "int columna", "Coordenada horizontal en el laberinto (0 es la columna izquierda)."]],
-  "m":[["+", "Posicion(int x, int y)", "Constructor: asigna fila = x y columna = y."], ["+", "int[] getPosicion()", "Devuelve un arreglo de enteros con {fila, columna}."], ["+", "void setPosicion(int x, int y)", "Modifica simultáneamente ambos valores."]],
-  "r":["Personaje", "Celda", "Laberinto", "Partida"]},
-
- {"n":"Direccion", "pkg":"extra", "k":"enu", "src":"src/extra/Direccion.java",
-  "d":"Enumeración de los cuatro rumbos cardinales de desplazamiento por el laberinto. Su orden define también la prioridad de desempate en la búsqueda en anchura (BFS).",
-  "a":[["+", "ARRIBA, ABAJO, IZQUIERDA, DERECHA", "Constantes de la enumeración."]],
-  "m":[],
-  "r":["Personaje", "PacMan", "Fantasma", "Laberinto", "VentanaPrincipal", "PanelLaberinto"]},
-
- {"n":"EstadoFantasma", "pkg":"extra", "k":"enu", "src":"src/extra/EstadoFantasma.java",
-  "d":"Enumeración con los tres modos de comportamiento de los fantasmas enemigos.",
-  "a":[["+", "PERSIGUIENDO, ASUSTADO, REGRESANDO", "Constantes: PERSIGUIENDO (persigue a Pac-Man con BFS), ASUSTADO (huye al azar) y REGRESANDO (ojos regresan a la base tras ser comidos)."]],
-  "m":[],
-  "r":["Fantasma", "Partida", "PanelLaberinto"]},
-
- {"n":"EstadoPartida", "pkg":"extra", "k":"enu", "src":"src/extra/EstadoPartida.java",
-  "d":"Enumeración con los cuatro estados globales posibles de la partida.",
-  "a":[["+", "EN_CURSO, PAUSADA, VICTORIA, DERROTA", "Constantes: EN_CURSO (partida activa), PAUSADA (congelada temporalmente), VICTORIA (comió todos los puntos) y DERROTA (perdió las 3 vidas)."]],
-  "m":[],
-  "r":["Partida", "ControladorJuego", "VentanaPrincipal", "PanelLaberinto", "JuegoConsola"]}
-
+ {
+  "n": "VentanaPrincipal",
+  "pkg": "vista",
+  "k": "con",
+  "src": "src/vista/VentanaPrincipal.java",
+  "d": "Ventana principal del juego (JFrame). Contiene el lienzo del laberinto, el panel superior con datos de la partida (HUD) y los controles de pausa y reinicio. Administra el bucle del juego mediante un Timer y captura las entradas por teclado.",
+  "a": [
+   [
+    "-",
+    "static final int INTERVALO_MS = 200",
+    "Cadencia de actualización del Timer: 200 ms por tick (5 FPS)."
+   ],
+   [
+    "-",
+    "final ControladorJuego controlador",
+    "Punto de acceso exclusivo al modelo y a la lógica del juego."
+   ],
+   [
+    "-",
+    "PanelLaberinto tablero",
+    "Lienzo gráfico (JPanel) que dibuja las celdas, Pac-Man y fantasmas."
+   ],
+   [
+    "-",
+    "Timer temporizador",
+    "Temporizador Swing (javax.swing.Timer) que dispara el ciclo de actualización periódico."
+   ],
+   [
+    "-",
+    "JLabel etiquetaPuntaje",
+    "Muestra el puntaje acumulado en el panel superior."
+   ],
+   [
+    "-",
+    "JLabel etiquetaVidas",
+    "Muestra la cantidad de vidas restantes del jugador."
+   ],
+   [
+    "-",
+    "JLabel etiquetaEstado",
+    "Muestra si la partida está en espera, en curso, pausada, ganada o perdida."
+   ],
+   [
+    "-",
+    "JButton botonPausa",
+    "Botón interactivo para pausar o reanudar el juego sin usar el teclado."
+   ],
+   [
+    "-",
+    "JButton botonReiniciar",
+    "Botón para iniciar una nueva partida tras ganar o perder."
+   ],
+   [
+    "-",
+    "boolean esperandoInicio = true",
+    "Bandera de inicio diferido: el temporizador corre pero no avanza el modelo hasta que el jugador elige una dirección."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "VentanaPrincipal()",
+    "Constructor: inicializa el controlador, configura la ventana, monta los paneles, registra las teclas y arranca el temporizador."
+   ],
+   [
+    "-",
+    "void configurarVentana()",
+    "Define título, cierre por defecto (EXIT_ON_CLOSE) y BorderLayout."
+   ],
+   [
+    "-",
+    "void crearPaneles()",
+    "Construye el panel superior de información (HUD), el tablero central y el panel inferior de botones."
+   ],
+   [
+    "-",
+    "void configurarTeclado()",
+    "Registra las combinaciones de teclas para flechas, W/A/S/D, P (pausa) y N (nueva partida)."
+   ],
+   [
+    "-",
+    "void asociarTeclaDireccion(String tecla, Direccion direccion)",
+    "Asocia una tecla de movimiento: desactiva esperandoInicio y llama a controlador.moverPacMan."
+   ],
+   [
+    "-",
+    "void asociarAccion(String tecla, Runnable accion)",
+    "Vincula un KeyStroke al InputMap y ActionMap del tablero."
+   ],
+   [
+    "-",
+    "void iniciarTemporizador()",
+    "Crea e inicia el Timer; en cada ciclo actualiza el modelo (si no está esperandoInicio) y repinta la vista."
+   ],
+   [
+    "-",
+    "void actualizarInformacion()",
+    "Refresca las etiquetas del HUD y los botones consumiendo controlador.getPartidaDTO() sin acoplarse a enums de dominio."
+   ],
+   [
+    "+",
+    "static void main(String[] args)",
+    "Punto de entrada de la aplicación gráfica; crea la ventana en el Event Dispatch Thread (SwingUtilities.invokeLater)."
+   ]
+  ],
+  "r": [
+   "ControladorJuego",
+   "PanelLaberinto",
+   "Direccion",
+   "PartidaDTO"
+  ]
+ },
+ {
+  "n": "PanelLaberinto",
+  "pkg": "vista",
+  "k": "con",
+  "src": "src/vista/PanelLaberinto.java",
+  "d": "Lienzo gráfico (JPanel) que renderiza en 2D el estado visual del juego: laberinto, paredes, puntos, superpuntos, animación angular de Pac-Man, fantasmas según su estado y carteles superpuestos.",
+  "a": [
+   [
+    "-",
+    "static final int TAMANIO_CELDA = 30",
+    "Dimensión en píxeles de cada casillero cuadrado (30×30 px)."
+   ],
+   [
+    "-",
+    "final ControladorJuego controlador",
+    "Referencia al controlador para consultar posiciones, mapas y estados al repintar."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "PanelLaberinto(ControladorJuego controlador)",
+    "Constructor: asigna el controlador, fondo negro y tamaño preferido proporcional a las dimensiones del mapa."
+   ],
+   [
+    "#",
+    "void paintComponent(Graphics g)",
+    "@Override: dibuja secuencialmente las celdas del laberinto, puntos, fantasmas, Pac-Man y carteles consumiendo PartidaDTO."
+   ],
+   [
+    "-",
+    "void dibujarPacMan(Graphics g, PartidaDTO partida)",
+    "Dibuja a Pac-Man en amarillo con la boca abierta orientada según partida.getPacManDireccion()."
+   ],
+   [
+    "-",
+    "void dibujarFantasmas(Graphics g, List<FantasmaDTO> fantasmas)",
+    "Dibuja cada fantasma según los datos de su DTO: cuerpo según estado y ojos correspondientes."
+   ],
+   [
+    "-",
+    "void dibujarOjos(Graphics g, int x, int y, Color colorPupila)",
+    "Dibuja la esclerótica blanca y pupilas con el color indicado."
+   ],
+   [
+    "-",
+    "void dibujarCartelEstado(Graphics g, PartidaDTO partida)",
+    "Dibuja una franja semitransparente con texto centrado para PAUSA, ¡VICTORIA! o GAME OVER consultando los métodos booleanos del DTO."
+   ]
+  ],
+  "r": [
+   "ControladorJuego",
+   "PartidaDTO",
+   "FantasmaDTO"
+  ]
+ },
+ {
+  "n": "JuegoConsola",
+  "pkg": "consola",
+  "k": "con",
+  "src": "src/consola/JuegoConsola.java",
+  "d": "Vista de terminal por turnos. Lee comandos de texto ingresados por el usuario, delega el avance en ControladorJuego y muestra el laberinto mediante caracteres y secuencias ANSI.",
+  "a": [
+   [
+    "-",
+    "final ControladorJuego controlador = new ControladorJuego()",
+    "Instancia del controlador que gestiona la lógica del juego."
+   ],
+   [
+    "-",
+    "String mensaje = ...",
+    "Línea de estado y retroalimentación impresa debajo del tablero."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "static void main(String[] args)",
+    "Punto de entrada de consola: instancia la clase e inicia el bucle de ejecución."
+   ],
+   [
+    "-",
+    "void ejecutar()",
+    "Bucle interactivo: imprime el tablero, solicita un comando y lo procesa hasta recibir 'q' o fin de entrada."
+   ],
+   [
+    "-",
+    "void procesar(String comando)",
+    "Interpreta las teclas de comando: W/A/S/D o Enter (avanzar turno), P (alternar pausa) y N (nueva partida)."
+   ],
+   [
+    "-",
+    "void mostrar()",
+    "Limpia la terminal con códigos ANSI e imprime el estado de la partida y el tablero con caracteres."
+   ]
+  ],
+  "r": [
+   "ControladorJuego",
+   "Direccion",
+   "EstadoPartida",
+   "EstadoFantasma",
+   "Posicion"
+  ]
+ },
+ {
+  "n": "ControladorJuego",
+  "pkg": "controlador",
+  "k": "con",
+  "src": "src/controlador/ControladorJuego.java",
+  "d": "Intermediario entre las vistas (consola o Swing) y el modelo. Centraliza turnos, reloj, creación de partidas y empaquetamiento de estado en DTOs para no exponer entidades de negocio.",
+  "a": [
+   [
+    "-",
+    "static final double SEGUNDOS_POR_TICK = 1.0 / 24.0",
+    "Tiempo simulado que avanza en cada turno por consola (1/24 s)."
+   ],
+   [
+    "-",
+    "Partida partida",
+    "Referencia a la partida en curso. Puede ser reemplazada al reiniciar."
+   ],
+   [
+    "-",
+    "long ticks",
+    "Contador acumulado de ticks ejecutados."
+   ],
+   [
+    "-",
+    "double tiempoSimulado",
+    "Segundos acumulados de juego transcurrido."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "ControladorJuego()",
+    "Constructor por defecto: crea una partida nueva con laberinto estándar."
+   ],
+   [
+    "+",
+    "ControladorJuego(Partida partida)",
+    "Constructor para pruebas: permite inyectar una partida con estado inicial controlado."
+   ],
+   [
+    "+",
+    "void moverPacMan(Direccion direccion)",
+    "Cambia la dirección elegida de Pac-Man sin avanzar el tiempo ni desplazarlo inmediatamente."
+   ],
+   [
+    "+",
+    "void avanzarTurno(Direccion direccion)",
+    "Cambia la dirección y avanza exactamente un tick de 1/24 s (usado por la consola)."
+   ],
+   [
+    "+",
+    "void avanzarTurno()",
+    "Avanza un tick de 1/24 s manteniendo la dirección actual de Pac-Man."
+   ],
+   [
+    "+",
+    "void actualizar(double tiempoTranscurrido)",
+    "Avanza el modelo el delta de tiempo especificado e incrementa el reloj del juego."
+   ],
+   [
+    "+",
+    "long getTicks()",
+    "Devuelve la cantidad de ticks transcurridos."
+   ],
+   [
+    "+",
+    "double getTiempoSimulado()",
+    "Devuelve los segundos acumulados de simulación."
+   ],
+   [
+    "+",
+    "Posicion getPosicionPacMan()",
+    "Devuelve una copia defensiva de la posición actual de Pac-Man."
+   ],
+   [
+    "+",
+    "Direccion getDireccionPacMan()",
+    "Devuelve la dirección hacia donde apunta Pac-Man para que la vista oriente la boca."
+   ],
+   [
+    "+",
+    "int getVidas()",
+    "Consulta las vidas restantes de la partida."
+   ],
+   [
+    "+",
+    "char[][] getMapa()",
+    "Devuelve una copia matricial de símbolos del laberinto sin exponer las celdas internas."
+   ],
+   [
+    "+",
+    "int getPuntaje()",
+    "Consulta el puntaje acumulado de la partida."
+   ],
+   [
+    "+",
+    "EstadoPartida getEstado()",
+    "Consulta el estado actual de la partida (EN_CURSO, PAUSADA, VICTORIA, DERROTA)."
+   ],
+   [
+    "+",
+    "void pausar()",
+    "Pasa la partida a estado PAUSADA si está EN_CURSO."
+   ],
+   [
+    "+",
+    "void reanudar()",
+    "Reanuda la partida a estado EN_CURSO si estaba PAUSADA."
+   ],
+   [
+    "+",
+    "void alternarPausa()",
+    "Conmuta entre pausa y reanudación según el estado actual."
+   ],
+   [
+    "+",
+    "boolean nuevaPartida()",
+    "Crea una nueva partida si la actual terminó en victoria o derrota. Devuelve true si se reinició."
+   ],
+   [
+    "+",
+    "Posicion[] getPosicionesFantasmas()",
+    "Devuelve un array con copias defensivas de las posiciones de los cuatro fantasmas."
+   ],
+   [
+    "+",
+    "EstadoFantasma[] getEstadosFantasmas()",
+    "Devuelve un array con el estado de cada uno de los cuatro fantasmas."
+   ],
+   [
+    "+",
+    "List<FantasmaDTO> getFantasmasDTO()",
+    "Construye y devuelve una lista de FantasmaDTO con las posiciones y estados de los fantasmas."
+   ],
+   [
+    "+",
+    "PartidaDTO getPartidaDTO()",
+    "Construye y devuelve un PartidaDTO completo e inmutable con el estado de la partida para la vista."
+   ],
+   [
+    "+",
+    "String getEstadoTexto()",
+    "Devuelve el nombre del estado actual como String sin exponer el enum de negocio."
+   ]
+  ],
+  "r": [
+   "Partida",
+   "VentanaPrincipal",
+   "PanelLaberinto",
+   "JuegoConsola",
+   "Direccion",
+   "EstadoPartida",
+   "EstadoFantasma",
+   "Posicion",
+   "PartidaDTO",
+   "FantasmaDTO"
+  ]
+ },
+ {
+  "n": "Partida",
+  "pkg": "modelo",
+  "k": "con",
+  "src": "src/modelo/Partida.java",
+  "d": "Clase central del modelo de negocio. Administra el bucle de juego, valida transitabilidad con Laberinto, mueve a Pac-Man y fantasmas desacopladamente, detecta colisiones y gestiona vidas, puntaje y victoria sin recurrir a instanceof.",
+  "a": [
+   [
+    "-",
+    "int vidas",
+    "Vidas restantes del jugador (comienza con 3)."
+   ],
+   [
+    "-",
+    "int puntaje",
+    "Puntaje total acumulado."
+   ],
+   [
+    "-",
+    "EstadoPartida estado",
+    "Estado global: EN_CURSO, PAUSADA, VICTORIA o DERROTA."
+   ],
+   [
+    "-",
+    "Laberinto laberinto",
+    "El laberinto que contiene la cuadrícula de celdas y caminos."
+   ],
+   [
+    "-",
+    "PacMan pacMan",
+    "El personaje controlado por el jugador."
+   ],
+   [
+    "-",
+    "Fantasma[] fantasmas",
+    "Arreglo con los 4 fantasmas enemigos."
+   ],
+   [
+    "-",
+    "static final Posicion INICIO_PACMAN = (13, 7)",
+    "Posición fija inicial de Pac-Man en la parte inferior central del mapa."
+   ],
+   [
+    "-",
+    "static final int VIDAS_INICIALES = 3",
+    "Cantidad inicial reglamentaria de vidas."
+   ],
+   [
+    "-",
+    "static final double DURACION_SUSTO = 10",
+    "Duración en segundos del estado asustado de los fantasmas tras comer un superpunto."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "Partida()",
+    "Constructor por defecto: inicializa el laberinto estándar, a Pac-Man y a los 4 fantasmas en el centro."
+   ],
+   [
+    "+",
+    "Partida(Laberinto laberinto, Posicion inicioPacMan)",
+    "Constructor con inyección: permite configurar laberinto y posición inicial para escenarios de prueba."
+   ],
+   [
+    "+",
+    "void actualizar(double tiempoTranscurrido)",
+    "Ejecuta un tick completo: valida estado, consumo de puntos, decisión de fantasmas, colisiones, movimientos y temporizadores."
+   ],
+   [
+    "+",
+    "void consumir(Punto punto)",
+    "Suma el valor del punto consumido y, si es SuperPunto, asusta a todos los fantasmas elegibles."
+   ],
+   [
+    "+",
+    "List<Fantasma> detectarColision(Posicion proximaPosicionPacman, List<Posicion> proximasPosicionesFantasmas)",
+    "Detecta choques por misma celda de llegada o por cruce en pasillo antes de mover los personajes."
+   ],
+   [
+    "+",
+    "void resolverColision(Fantasma fantasma)",
+    "Aplica consecuencias: si está asustado suma 200 puntos y lo envía a casa; si persigue descuenta vida."
+   ],
+   [
+    "+",
+    "boolean comprobarVictoria()",
+    "Verifica si el laberinto quedó sin puntos transitables."
+   ],
+   [
+    "+",
+    "void perderVida()",
+    "Descuenta una vida, reinicia las posiciones de todos al origen y declara derrota si vidas llega a 0."
+   ],
+   [
+    "+",
+    "void pausar()",
+    "Cambia el estado de EN_CURSO a PAUSADA."
+   ],
+   [
+    "+",
+    "void reanudar()",
+    "Cambia el estado de PAUSADA a EN_CURSO."
+   ],
+   [
+    "+",
+    "void elegirDireccionPacman(Direccion direccion)",
+    "Guarda la dirección de movimiento solicitada por el jugador en Pac-Man."
+   ],
+   [
+    "+",
+    "Posicion getPosicionPacMan()",
+    "Devuelve una copia de la posición actual de Pac-Man."
+   ],
+   [
+    "+",
+    "Direccion getDireccionPacMan()",
+    "Devuelve la dirección hacia donde se desplaza o mira Pac-Man."
+   ],
+   [
+    "+",
+    "char[][] getMapa()",
+    "Construye una matriz de caracteres representativa de las celdas y puntos sin exponer objetos Celda."
+   ],
+   [
+    "+",
+    "int getVidas()",
+    "Consulta la cantidad de vidas restantes."
+   ],
+   [
+    "+",
+    "int getPuntaje()",
+    "Consulta el puntaje acumulado."
+   ],
+   [
+    "+",
+    "EstadoPartida getEstado()",
+    "Consulta el estado actual de la partida."
+   ],
+   [
+    "+",
+    "Posicion[] getPosicionesFantasmas()",
+    "Devuelve un arreglo con copias de las posiciones de los fantasmas."
+   ],
+   [
+    "+",
+    "EstadoFantasma[] getEstadosFantasmas()",
+    "Devuelve un arreglo con los estados individuales de los 4 fantasmas."
+   ]
+  ],
+  "r": [
+   "Laberinto",
+   "PacMan",
+   "Fantasma",
+   "Punto",
+   "SuperPunto",
+   "Celda",
+   "ControladorJuego",
+   "EstadoPartida",
+   "EstadoFantasma",
+   "Posicion"
+  ]
+ },
+ {
+  "n": "Laberinto",
+  "pkg": "modelo",
+  "k": "con",
+  "src": "src/modelo/Laberinto.java",
+  "d": "Representa la grilla del tablero. Almacena las celdas, valida la transitabilidad de posiciones, calcula rutas óptimas con BFS y determina si aún restan puntos por comer.",
+  "a": [
+   [
+    "-",
+    "static final String[] MAPA_POR_DEFECTO",
+    "Matriz de 15 cadenas con el diseño estándar de paredes (#), puntos (.) y superpuntos (o)."
+   ],
+   [
+    "-",
+    "final Celda[][] celdas",
+    "Arreglo bidimensional inmutable que contiene las instancias de Celda."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "Laberinto()",
+    "Constructor por defecto: crea el laberinto a partir de MAPA_POR_DEFECTO."
+   ],
+   [
+    "+",
+    "Laberinto(Celda[][] celdas)",
+    "Constructor por matriz de celdas: valida dimensiones rectangulares y ausencia de nulos."
+   ],
+   [
+    "+",
+    "Laberinto(String[] mapa)",
+    "Constructor por arreglo de strings: parsea caracteres y genera las instancias de Celda."
+   ],
+   [
+    "+",
+    "static Laberinto crearDefault()",
+    "Método de fábrica estático que devuelve una instancia nueva con el mapa por defecto."
+   ],
+   [
+    "+",
+    "boolean esTransitable(Posicion posicion)",
+    "Devuelve true si la posición está dentro de los límites y no es una pared."
+   ],
+   [
+    "+",
+    "List<Direccion> direccionesDisponibles(Posicion posicion)",
+    "Calcula las direcciones transitables hacia celdas vecinas desde una posición dada."
+   ],
+   [
+    "+",
+    "List<Posicion> caminoMasCorto(Posicion origen, Posicion destino)",
+    "Calcula la ruta más corta mediante Búsqueda en Anchura (BFS), explorando en orden ARRIBA, ABAJO, IZQUIERDA, DERECHA."
+   ],
+   [
+    "+",
+    "boolean quedanPuntos()",
+    "Recorre la grilla y verifica si al menos una celda contiene un punto sin comer."
+   ],
+   [
+    "+",
+    "Posicion centro()",
+    "Devuelve la coordenada central del laberinto (7, 7)."
+   ],
+   [
+    "+",
+    "Celda obtenerCelda(Posicion posicion)",
+    "Devuelve la celda en la posición indicada, o null si está fuera de límites."
+   ],
+   [
+    "+",
+    "int getFilas()",
+    "Devuelve la cantidad de filas del laberinto (15)."
+   ],
+   [
+    "+",
+    "int getColumnas()",
+    "Devuelve la cantidad de columnas del laberinto (15)."
+   ],
+   [
+    "+",
+    "void imprimirLaberinto()",
+    "Imprime en consola una representación visual del mapa para propósitos de depuración."
+   ],
+   [
+    "+",
+    "static void main(String[] args)",
+    "Punto de entrada de depuración para probar la impresión directa del laberinto."
+   ],
+   [
+    "-",
+    "Posicion vecino(Posicion posicion, Direccion direccion)",
+    "Calcula la coordenada adyacente según la dirección indicada."
+   ],
+   [
+    "-",
+    "List<Posicion> reconstruirCamino(Posicion[][] padre, Posicion origen, Posicion destino)",
+    "Reconstruye la lista de posiciones desde el destino hasta el origen siguiendo la tabla de predecesores del BFS."
+   ],
+   [
+    "-",
+    "boolean mismaPosicion(Posicion primera, Posicion segunda)",
+    "Compara si dos instancias de Posicion tienen iguales fila y columna."
+   ],
+   [
+    "-",
+    "Posicion copiar(Posicion posicion)",
+    "Crea y devuelve una copia defensiva de una coordenada."
+   ]
+  ],
+  "r": [
+   "Celda",
+   "Posicion",
+   "Direccion",
+   "PuntoComun",
+   "SuperPunto",
+   "Partida",
+   "Personaje",
+   "Fantasma"
+  ]
+ },
+ {
+  "n": "Celda",
+  "pkg": "modelo",
+  "k": "con",
+  "src": "src/modelo/Celda.java",
+  "d": "Casillero individual del laberinto. Almacena su coordenada, si es pared o camino, y el punto que contiene (si no fue consumido).",
+  "a": [
+   [
+    "-",
+    "Posicion posicion",
+    "Coordenada espacial de la celda dentro de la grilla."
+   ],
+   [
+    "-",
+    "boolean pared",
+    "Indica si la celda es un obstáculo infranqueable."
+   ],
+   [
+    "-",
+    "Punto punto",
+    "Punto contenido en la celda; pasa a null una vez consumido."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "Celda()",
+    "Constructor vacío por defecto."
+   ],
+   [
+    "+",
+    "Celda(boolean esPared, boolean esSuperPunto, int x, int y)",
+    "Constructor que crea automáticamente PuntoComun o SuperPunto según el flag."
+   ],
+   [
+    "+",
+    "Celda(boolean esPared, Punto punto, int x, int y)",
+    "Constructor principal: recibe el objeto Punto explícito y coordenadas fila/columna."
+   ],
+   [
+    "+",
+    "Punto retirarPunto()",
+    "Consume el punto: devuelve la referencia y deja el atributo interno en null para no ser comido dos veces."
+   ],
+   [
+    "+",
+    "Posicion getPosicion()",
+    "Devuelve la coordenada de la celda."
+   ],
+   [
+    "+",
+    "Punto tipoPunto()",
+    "Consulta el punto actual sin retirarlo."
+   ],
+   [
+    "+",
+    "boolean esPared()",
+    "Indica si la celda es pared."
+   ],
+   [
+    "+",
+    "boolean tienePunto()",
+    "Indica si la celda contiene un punto actualmente."
+   ]
+  ],
+  "r": [
+   "Punto",
+   "PuntoComun",
+   "SuperPunto",
+   "Posicion",
+   "Laberinto"
+  ]
+ },
+ {
+  "n": "Punto",
+  "pkg": "modelo",
+  "k": "abs",
+  "src": "src/modelo/Punto.java",
+  "d": "Clase base abstracta para los elementos consumibles del laberinto. Define el contrato polimórfico común: puntaje otorgado (valor), efecto de asustar y símbolo visual.",
+  "a": [],
+  "m": [
+   [
+    "+",
+    "abstract int valor()",
+    "Método polimórfico abstracto que devuelve el puntaje otorgado al consumirse (10 o 50)."
+   ],
+   [
+    "+",
+    "abstract boolean asustaFantasmas()",
+    "Método polimórfico abstracto: indica si su consumo asusta a los fantasmas (true para SuperPunto, false para PuntoComun)."
+   ],
+   [
+    "+",
+    "abstract char getSimbolo()",
+    "Método polimórfico abstracto: devuelve el carácter representativo para mapas y visualización ('.' o 'o')."
+   ]
+  ],
+  "r": [
+   "PuntoComun",
+   "SuperPunto",
+   "Celda",
+   "Partida"
+  ]
+ },
+ {
+  "n": "PuntoComun",
+  "pkg": "modelo",
+  "k": "con",
+  "src": "src/modelo/PuntoComun.java",
+  "d": "Punto estándar distribuido a lo largo de los pasillos del laberinto. Otorga 10 puntos al ser comido.",
+  "a": [],
+  "m": [
+   [
+    "+",
+    "int valor()",
+    "@Override polimórfico: devuelve 10 puntos."
+   ],
+   [
+    "+",
+    "boolean asustaFantasmas()",
+    "@Override polimórfico: devuelve false."
+   ],
+   [
+    "+",
+    "char getSimbolo()",
+    "@Override polimórfico: devuelve '.'."
+   ]
+  ],
+  "r": [
+   "Punto"
+  ]
+ },
+ {
+  "n": "SuperPunto",
+  "pkg": "modelo",
+  "k": "con",
+  "src": "src/modelo/SuperPunto.java",
+  "d": "Punto especial ubicado en las esquinas del laberinto. Otorga 50 puntos y provoca que la partida asuste a los fantasmas durante 10 segundos.",
+  "a": [],
+  "m": [
+   [
+    "+",
+    "int valor()",
+    "@Override polimórfico: devuelve 50 puntos."
+   ],
+   [
+    "+",
+    "boolean asustaFantasmas()",
+    "@Override polimórfico: devuelve true (asusta a los 4 fantasmas durante 10 s)."
+   ],
+   [
+    "+",
+    "char getSimbolo()",
+    "@Override polimórfico: devuelve 'o'."
+   ]
+  ],
+  "r": [
+   "Punto",
+   "Partida",
+   "Fantasma"
+  ]
+ },
+ {
+  "n": "Personaje",
+  "pkg": "modelo",
+  "k": "abs",
+  "src": "src/modelo/Personaje.java",
+  "d": "Clase base abstracta para entidades móviles del laberinto (Pac-Man y Fantasmas). Encapsula posición, origen, dirección y movimiento desacoplado del laberinto.",
+  "a": [
+   [
+    "#",
+    "Posicion posicion",
+    "Ubicación actual del personaje en el laberinto."
+   ],
+   [
+    "#",
+    "Posicion posicionInicial",
+    "Ubicación de origen donde regresa al reiniciar o perder vidas."
+   ],
+   [
+    "#",
+    "Direccion direccion",
+    "Dirección hacia donde apunta o se desplaza el personaje."
+   ]
+  ],
+  "m": [
+   [
+    "#",
+    "Personaje(Posicion posicionInicial)",
+    "Constructor protegido: inicializa y guarda copias defensivas de la posición de origen."
+   ],
+   [
+    "+",
+    "Posicion calcularProximaPosicion(Direccion direccion)",
+    "Calcula la coordenada de la celda adyacente según la dirección indicada mediante delta geométrico, sin acoplarse al laberinto."
+   ],
+   [
+    "+",
+    "void mover(Direccion direccion, boolean puedeAvanzar)",
+    "Actualiza la dirección y desplaza el personaje a la celda adyacente sólo si puedeAvanzar es verdadero."
+   ],
+   [
+    "+",
+    "void moverA(Posicion nuevaPosicion)",
+    "Desplaza directamente el personaje a una coordenada destino validada."
+   ],
+   [
+    "+",
+    "void mover(Direccion direccion, Laberinto laberinto)",
+    "Sobrecarga de compatibilidad: consulta la transitabilidad al laberinto y delega en mover(direccion, puedeAvanzar)."
+   ],
+   [
+    "+",
+    "Posicion calcularProximaPosicion(Direccion direccion, Laberinto laberinto)",
+    "Sobrecarga de compatibilidad con validación de pared sobre el laberinto."
+   ],
+   [
+    "+",
+    "abstract void volverAlInicio()",
+    "Método abstracto: restablece la posición al origen y resetea estados internos."
+   ],
+   [
+    "+",
+    "Posicion getPosicion()",
+    "Devuelve una copia defensiva de la posición actual."
+   ],
+   [
+    "+",
+    "Direccion getDireccion()",
+    "Devuelve la dirección actual del personaje."
+   ],
+   [
+    "#",
+    "Posicion getPosicionInicial()",
+    "Devuelve una copia defensiva de la posición inicial (solo accesible para subclases)."
+   ]
+  ],
+  "r": [
+   "PacMan",
+   "Fantasma",
+   "Posicion",
+   "Direccion",
+   "Laberinto"
+  ]
+ },
+ {
+  "n": "PacMan",
+  "pkg": "modelo",
+  "k": "con",
+  "src": "src/modelo/PacMan.java",
+  "d": "Personaje controlado por el jugador. Recuerda la última dirección elegida y avanza paso a paso en cada tick por las celdas transitables.",
+  "a": [
+   [
+    "#",
+    "posicion, posicionInicial, direccion",
+    "Atributos protegidos heredados de Personaje."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "PacMan(Posicion posicionInicial)",
+    "Constructor: asigna origen e inicia mirando hacia la DERECHA."
+   ],
+   [
+    "+",
+    "void elegirDireccion(Direccion direccion)",
+    "Registra el rumbo deseado por el jugador para el próximo paso."
+   ],
+   [
+    "+",
+    "void volverAlInicio()",
+    "@Override: vuelve a la coordenada de salida y reorienta la marcha hacia la DERECHA."
+   ]
+  ],
+  "r": [
+   "Personaje",
+   "Partida",
+   "Direccion",
+   "Posicion",
+   "Laberinto"
+  ]
+ },
+ {
+  "n": "Fantasma",
+  "pkg": "modelo",
+  "k": "con",
+  "src": "src/modelo/Fantasma.java",
+  "d": "Enemigo autónomo del laberinto. Posee una máquina de estados (PERSIGUIENDO, ASUSTADO, REGRESANDO) que define su comportamiento de navegación por BFS o azar.",
+  "a": [
+   [
+    "-",
+    "EstadoFantasma estado",
+    "Modo actual de comportamiento del fantasma (inicia en PERSIGUIENDO)."
+   ],
+   [
+    "-",
+    "double tiempoSustoRestante",
+    "Contador regresivo en segundos del tiempo de susto activo."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "Fantasma(Posicion posicionInicial)",
+    "Constructor: asigna origen y arranca en estado PERSIGUIENDO."
+   ],
+   [
+    "+",
+    "void volverAlInicio()",
+    "@Override: vuelve a la coordenada de origen, resetea estado a PERSIGUIENDO y susto en 0."
+   ],
+   [
+    "+",
+    "Direccion elegirDireccion(Laberinto laberinto, Posicion posicionPacman)",
+    "Inteligencia del fantasma: si está ASUSTADO elige al azar entre las direcciones legales; si está PERSIGUIENDO o REGRESANDO calcula el camino más corto con BFS."
+   ],
+   [
+    "+",
+    "void asustar(double duracion)",
+    "Cambia el estado a ASUSTADO y fija el contador con la duración recibida (salvo que ya esté REGRESANDO)."
+   ],
+   [
+    "+",
+    "void serComido()",
+    "Si estaba ASUSTADO pasa a REGRESANDO y pone el contador de susto en 0."
+   ],
+   [
+    "+",
+    "void actualizarEstado(double tiempoTranscurrido)",
+    "Descuenta el tiempo de susto o, si está REGRESANDO y alcanzó su casa, vuelve a PERSIGUIENDO."
+   ],
+   [
+    "+",
+    "EstadoFantasma getEstado()",
+    "Consulta el estado actual del fantasma."
+   ]
+  ],
+  "r": [
+   "Personaje",
+   "Partida",
+   "Laberinto",
+   "EstadoFantasma",
+   "Direccion",
+   "Posicion"
+  ]
+ },
+ {
+  "n": "Posicion",
+  "pkg": "extra",
+  "k": "dat",
+  "src": "src/extra/Posicion.java",
+  "d": "Clase de datos que representa una coordenada bidimensional en la cuadrícula (fila y columna).",
+  "a": [
+   [
+    "+",
+    "int fila",
+    "Coordenada vertical en el laberinto (0 es la fila superior)."
+   ],
+   [
+    "+",
+    "int columna",
+    "Coordenada horizontal en el laberinto (0 es la columna izquierda)."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "Posicion(int x, int y)",
+    "Constructor: asigna fila = x y columna = y."
+   ],
+   [
+    "+",
+    "int[] getPosicion()",
+    "Devuelve un arreglo de enteros con {fila, columna}."
+   ],
+   [
+    "+",
+    "void setPosicion(int x, int y)",
+    "Modifica simultáneamente ambos valores."
+   ]
+  ],
+  "r": [
+   "Personaje",
+   "Celda",
+   "Laberinto",
+   "Partida"
+  ]
+ },
+ {
+  "n": "Direccion",
+  "pkg": "extra",
+  "k": "enu",
+  "src": "src/extra/Direccion.java",
+  "d": "Enumeración de los cuatro rumbos cardinales de desplazamiento por el laberinto. Su orden define también la prioridad de desempate en la búsqueda en anchura (BFS).",
+  "a": [
+   [
+    "+",
+    "ARRIBA, ABAJO, IZQUIERDA, DERECHA",
+    "Constantes de la enumeración."
+   ]
+  ],
+  "m": [],
+  "r": [
+   "Personaje",
+   "PacMan",
+   "Fantasma",
+   "Laberinto",
+   "VentanaPrincipal",
+   "PanelLaberinto"
+  ]
+ },
+ {
+  "n": "EstadoFantasma",
+  "pkg": "extra",
+  "k": "enu",
+  "src": "src/extra/EstadoFantasma.java",
+  "d": "Enumeración con los tres modos de comportamiento de los fantasmas enemigos.",
+  "a": [
+   [
+    "+",
+    "PERSIGUIENDO, ASUSTADO, REGRESANDO",
+    "Constantes: PERSIGUIENDO (persigue a Pac-Man con BFS), ASUSTADO (huye al azar) y REGRESANDO (ojos regresan a la base tras ser comidos)."
+   ]
+  ],
+  "m": [],
+  "r": [
+   "Fantasma",
+   "Partida",
+   "PanelLaberinto"
+  ]
+ },
+ {
+  "n": "EstadoPartida",
+  "pkg": "extra",
+  "k": "enu",
+  "src": "src/extra/EstadoPartida.java",
+  "d": "Enumeración con los cuatro estados globales posibles de la partida.",
+  "a": [
+   [
+    "+",
+    "EN_CURSO, PAUSADA, VICTORIA, DERROTA",
+    "Constantes: EN_CURSO (partida activa), PAUSADA (congelada temporalmente), VICTORIA (comió todos los puntos) y DERROTA (perdió las 3 vidas)."
+   ]
+  ],
+  "m": [],
+  "r": [
+   "Partida",
+   "ControladorJuego",
+   "VentanaPrincipal",
+   "PanelLaberinto",
+   "JuegoConsola"
+  ]
+ },
+ {
+  "n": "FantasmaDTO",
+  "pkg": "controlador",
+  "k": "dat",
+  "src": "src/controlador/dto/FantasmaDTO.java",
+  "d": "Objeto de transferencia de datos (DTO) que empaqueta las coordenadas y el estado visual de un fantasma para desacoplar la vista de las entidades y enums de dominio.",
+  "a": [
+   [
+    "-",
+    "final int fila",
+    "Coordenada vertical en la cuadrícula."
+   ],
+   [
+    "-",
+    "final int columna",
+    "Coordenada horizontal en la cuadrícula."
+   ],
+   [
+    "-",
+    "final String estado",
+    "Nombre del estado ('PERSIGUIENDO', 'ASUSTADO', 'REGRESANDO')."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "FantasmaDTO(int fila, int columna, String estado)",
+    "Constructor del DTO con coordenadas y estado."
+   ],
+   [
+    "+",
+    "int getFila()",
+    "Devuelve la coordenada de fila."
+   ],
+   [
+    "+",
+    "int getColumna()",
+    "Devuelve la coordenada de columna."
+   ],
+   [
+    "+",
+    "String getEstado()",
+    "Devuelve el nombre del estado."
+   ],
+   [
+    "+",
+    "boolean estaAsustado()",
+    "Devuelve true si el fantasma está asustado (cuerpo azul y ojos anaranjados)."
+   ],
+   [
+    "+",
+    "boolean estaRegresando()",
+    "Devuelve true si fue comido y regresa a la base (se dibujan únicamente ojos)."
+   ]
+  ],
+  "r": [
+   "ControladorJuego",
+   "PartidaDTO",
+   "PanelLaberinto"
+  ]
+ },
+ {
+  "n": "PartidaDTO",
+  "pkg": "controlador",
+  "k": "dat",
+  "src": "src/controlador/dto/PartidaDTO.java",
+  "d": "Objeto de transferencia de datos (DTO) que empaqueta el estado global e inmutable de la partida (puntaje, vidas, estado, posición y dirección de Pac-Man, lista de FantasmaDTO) para la vista.",
+  "a": [
+   [
+    "-",
+    "final int puntaje",
+    "Puntaje acumulado."
+   ],
+   [
+    "-",
+    "final int vidas",
+    "Vidas restantes."
+   ],
+   [
+    "-",
+    "final String estado",
+    "Estado de la partida ('EN_CURSO', 'PAUSADA', 'VICTORIA', 'DERROTA')."
+   ],
+   [
+    "-",
+    "final int pacManFila",
+    "Fila actual de Pac-Man."
+   ],
+   [
+    "-",
+    "final int pacManColumna",
+    "Columna actual de Pac-Man."
+   ],
+   [
+    "-",
+    "final String pacManDireccion",
+    "Dirección cardinal de Pac-Man ('ARRIBA', 'ABAJO', 'IZQUIERDA', 'DERECHA')."
+   ],
+   [
+    "-",
+    "final List<FantasmaDTO> fantasmas",
+    "Lista inmutable con los DTOs de los cuatro fantasmas."
+   ]
+  ],
+  "m": [
+   [
+    "+",
+    "PartidaDTO(int puntaje, int vidas, String estado, int pacManFila, int pacManColumna, String pacManDireccion, List<FantasmaDTO> fantasmas)",
+    "Constructor inmutable que encapsula todos los datos requeridos por la vista."
+   ],
+   [
+    "+",
+    "int getPuntaje()",
+    "Consulta el puntaje acumulado."
+   ],
+   [
+    "+",
+    "int getVidas()",
+    "Consulta las vidas restantes."
+   ],
+   [
+    "+",
+    "String getEstado()",
+    "Consulta el estado en texto."
+   ],
+   [
+    "+",
+    "int getPacManFila()",
+    "Fila de Pac-Man."
+   ],
+   [
+    "+",
+    "int getPacManColumna()",
+    "Columna de Pac-Man."
+   ],
+   [
+    "+",
+    "String getPacManDireccion()",
+    "Dirección cardinal de Pac-Man."
+   ],
+   [
+    "+",
+    "List<FantasmaDTO> getFantasmas()",
+    "Devuelve la lista inmutable de FantasmaDTO."
+   ],
+   [
+    "+",
+    "boolean estaEnCurso()",
+    "Indica si la partida está en curso."
+   ],
+   [
+    "+",
+    "boolean estaPausada()",
+    "Indica si el juego está pausado."
+   ],
+   [
+    "+",
+    "boolean esVictoria()",
+    "Indica si se ganaron todos los puntos."
+   ],
+   [
+    "+",
+    "boolean esDerrota()",
+    "Indica si se perdieron todas las vidas."
+   ],
+   [
+    "+",
+    "boolean estaFinalizada()",
+    "Indica si la partida concluyó (victoria o derrota)."
+   ]
+  ],
+  "r": [
+   "ControladorJuego",
+   "FantasmaDTO",
+   "VentanaPrincipal",
+   "PanelLaberinto"
+  ]
+ }
 ];
 const KIND = {abs:["abstracta","b-abs"],con:["clase","b-con"],enu:["enum","b-enu"],dat:["datos","b-dat"]};
 const visCell = v => v ? `<span class="vis vis-${V[v]}" title="${{pub:"public",pri:"private",pro:"protected"}[V[v]]}">${v}</span>` : "";
@@ -881,24 +2088,24 @@ const STEPS = [
  ["¿Ya ganó?","Partida → Laberinto",
   "Si no quedan puntos, la partida pasa a <code>VICTORIA</code>.",
   "if (comprobarVictoria()) {\n    this.estado = EstadoPartida.VICTORIA;\n    return;\n}"],
- ["PacMan calcula su próxima celda","PacMan (heredado de Personaje)",
-  "Usa la última dirección elegida por el jugador. Todavía <b>no se mueve</b>: sólo calcula. Si hay pared, la “próxima” es la misma celda.",
-  "Direccion direccionPacMan = this.pacMan.getDireccion();\nPosicion proximaPosicionPacMan =\n    this.pacMan.calcularProximaPosicion(direccionPacMan, this.laberinto);"],
+ ["PacMan calcula y valida su celda adyacente","PacMan → Laberinto",
+  "Usa la última dirección elegida. <code>calcularProximaPosicion(dir)</code> sólo proyecta el delta geométrico; <code>Laberinto.esTransitable(candidata)</code> valida si no hay pared. Todavía <b>no se mueve</b>: sólo calcula.",
+  "Direccion direccionPacMan = this.pacMan.getDireccion();\nPosicion candidataPacMan = this.pacMan.calcularProximaPosicion(direccionPacMan);\nboolean puedeAvanzarPacMan = this.laberinto.esTransitable(candidataPacMan);\nPosicion proximaPosicionPacMan = puedeAvanzarPacMan ? candidataPacMan : this.pacMan.getPosicion();"],
  ["Come el punto de esa celda","Celda → Partida.consumir()",
-  "Retira el punto de la celda destino (queda <code>null</code>) y lo cobra. Si era un <code>SuperPunto</code>, <code>consumir</code> asusta a los 4 fantasmas por 10 s. Se recuerda si el susto se acaba de renovar.",
-  "Celda celdaDestino = this.laberinto.obtenerCelda(proximaPosicionPacMan);\nPunto puntoConsumido = celdaDestino.retirarPunto();\nconsumir(puntoConsumido);\nboolean sustoRenovado = puntoConsumido instanceof SuperPunto;"],
+  "Retira el punto de la celda destino (queda <code>null</code>) y lo cobra polimórficamente. Si <code>punto.asustaFantasmas()</code> es verdadero, <code>consumir</code> asusta a los 4 fantasmas por 10 s sin usar <code>instanceof</code>.",
+  "Celda celdaDestino = this.laberinto.obtenerCelda(proximaPosicionPacMan);\nPunto puntoConsumido = null;\nif (celdaDestino != null) {\n    puntoConsumido = celdaDestino.retirarPunto();\n    consumir(puntoConsumido);\n}\nboolean sustoRenovado = puntoConsumido != null && puntoConsumido.asustaFantasmas();"],
  ["¿Era el último punto?","Partida",
-  "Si con ese punto se vació el laberinto, PacMan se mueve y se gana <b>antes</b> de mirar a los fantasmas: la victoria tiene prioridad sobre la muerte.",
-  "if (comprobarVictoria()) {\n    this.pacMan.mover(direccionPacMan, this.laberinto);\n    this.estado = EstadoPartida.VICTORIA;\n    return;\n}"],
- ["Los fantasmas deciden","Fantasma → Laberinto",
-  "Cada fantasma elige su dirección según su estado, apuntando a la <b>próxima</b> posición de PacMan, y calcula su próxima celda.",
-  "for (int i = 0; i < this.fantasmas.length; i++) {\n    direccionesFantasmas[i] =\n        this.fantasmas[i].elegirDireccion(this.laberinto, proximaPosicionPacMan);\n    proximasPosicionesFantasmas.add(\n        this.fantasmas[i].calcularProximaPosicion(direccionesFantasmas[i], this.laberinto));\n}"],
+  "Si con ese punto se vació el laberinto, PacMan avanza mediante <code>mover(direccionPacMan, puedeAvanzarPacMan)</code> y se gana <b>antes</b> de mirar a los fantasmas: la victoria tiene prioridad sobre la muerte.",
+  "if (comprobarVictoria()) {\n    this.pacMan.mover(direccionPacMan, puedeAvanzarPacMan);\n    this.estado = EstadoPartida.VICTORIA;\n    return;\n}"],
+ ["Los fantasmas deciden y validan avance","Fantasma → Laberinto",
+  "Cada fantasma elige su dirección según su estado hacia la próxima posición de PacMan. Calcula su celda adyacente y <code>Laberinto</code> valida si puede avanzar.",
+  "for (int i = 0; i < this.fantasmas.length; i++) {\n    direccionesFantasmas[i] = this.fantasmas[i].elegirDireccion(this.laberinto, proximaPosicionPacMan);\n    Posicion candidata = this.fantasmas[i].calcularProximaPosicion(direccionesFantasmas[i]);\n    boolean puedeAvanzar = this.laberinto.esTransitable(candidata);\n    puedenAvanzarFantasmas[i] = puedeAvanzar;\n    proximasPosicionesFantasmas.add(puedeAvanzar ? candidata : this.fantasmas[i].getPosicion());\n}"],
  ["Detectar choques","Partida.detectarColision()",
   "Con las posiciones actuales y las próximas busca fantasmas que <b>llegan a la misma celda</b> que PacMan o que <b>intercambian</b> lugar con él. Se hace antes de mover para no perder las posiciones viejas.",
   "List<Fantasma> fantasmasTocados = detectarColision(\n    proximaPosicionPacMan, proximasPosicionesFantasmas);"],
- ["Mover a todos","PacMan, Fantasma",
-  "Ahora sí se actualizan las posiciones de los 5 personajes.",
-  "this.pacMan.mover(direccionPacMan, this.laberinto);\nfor (int i = 0; i < this.fantasmas.length; i++) {\n    fantasmas[i].mover(direccionesFantasmas[i], this.laberinto);\n}"],
+ ["Mover a todos (desacoplado)","PacMan, Fantasma",
+  "Ahora sí se actualizan las posiciones de los 5 personajes con <code>mover(dir, puedeAvanzar)</code>, sin pasarles el objeto <code>Laberinto</code>.",
+  "this.pacMan.mover(direccionPacMan, puedeAvanzarPacMan);\nfor (int i = 0; i < this.fantasmas.length; i++) {\n    this.fantasmas[i].mover(direccionesFantasmas[i], puedenAvanzarFantasmas[i]);\n}"],
  ["Resolver choques","Partida.resolverColision() → Fantasma.serComido()",
   "Primero se cobran <b>todos</b> los fantasmas asustados tocados (+200 c/u, pasan a REGRESANDO). Los que estaban PERSIGUIENDO sólo marcan <code>contactoPeligroso</code>. Los REGRESANDO se ignoran.",
   "boolean contactoPeligroso = false;\nfor (Fantasma fantasma : fantasmasTocados) {\n    if (fantasma.getEstado() == EstadoFantasma.ASUSTADO) {\n        resolverColision(fantasma);\n    } else if (fantasma.getEstado() == EstadoFantasma.PERSIGUIENDO) {\n        contactoPeligroso = true;\n    }\n}"],

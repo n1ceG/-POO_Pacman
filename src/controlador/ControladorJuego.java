@@ -1,9 +1,13 @@
 package controlador;
 
+import controlador.dto.FantasmaDTO;
+import controlador.dto.PartidaDTO;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
 import extra.Posicion;
+import java.util.ArrayList;
+import java.util.List;
 import modelo.Partida;
 
 public class ControladorJuego {
@@ -137,6 +141,43 @@ public class ControladorJuego {
     public EstadoFantasma[] getEstadosFantasmas()
     {
         return this.partida.getEstadosFantasmas();
+    }
+
+    public List<FantasmaDTO> getFantasmasDTO()
+    {
+        Posicion[] posiciones = this.partida.getPosicionesFantasmas();
+        EstadoFantasma[] estados = this.partida.getEstadosFantasmas();
+        List<FantasmaDTO> lista = new ArrayList<>(posiciones.length);
+
+        for (int i = 0; i < posiciones.length; i++) {
+            lista.add(new FantasmaDTO(
+                posiciones[i].fila,
+                posiciones[i].columna,
+                estados[i].name()
+            ));
+        }
+        return lista;
+    }
+
+    public PartidaDTO getPartidaDTO()
+    {
+        Posicion posPac = this.partida.getPosicionPacMan();
+        Direccion dirPac = this.partida.getDireccionPacMan();
+
+        return new PartidaDTO(
+            this.partida.getPuntaje(),
+            this.partida.getVidas(),
+            this.partida.getEstado().name(),
+            posPac.fila,
+            posPac.columna,
+            dirPac != null ? dirPac.name() : "DERECHA",
+            getFantasmasDTO()
+        );
+    }
+
+    public String getEstadoTexto()
+    {
+        return this.partida.getEstado().name();
     }
 
 }

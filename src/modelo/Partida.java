@@ -59,11 +59,11 @@ public class Partida {
 
         Direccion direccionPacMan = this.pacMan.getDireccion();
 
-        Posicion proximaPosicionPacMan =
-            this.pacMan.calcularProximaPosicion(
-                direccionPacMan,
-                this.laberinto
-            );
+        Posicion candidataPacMan = this.pacMan.calcularProximaPosicion(direccionPacMan);
+        boolean puedeAvanzarPacMan = this.laberinto.esTransitable(candidataPacMan);
+        Posicion proximaPosicionPacMan = puedeAvanzarPacMan
+            ? candidataPacMan
+            : this.pacMan.getPosicion();
 
         Celda celdaDestino = this.laberinto.obtenerCelda(
             proximaPosicionPacMan
@@ -76,16 +76,19 @@ public class Partida {
             consumir(puntoConsumido);
         }
 
-        boolean sustoRenovado = puntoConsumido instanceof SuperPunto;
+        boolean sustoRenovado = puntoConsumido != null && puntoConsumido.asustaFantasmas();
 
         if (comprobarVictoria()) {
-            this.pacMan.mover(direccionPacMan, this.laberinto);
+            this.pacMan.mover(direccionPacMan, puedeAvanzarPacMan);
             this.estado = EstadoPartida.VICTORIA;
             return;
         }
 
         Direccion[] direccionesFantasmas =
             new Direccion[this.fantasmas.length];
+
+        boolean[] puedenAvanzarFantasmas =
+            new boolean[this.fantasmas.length];
 
         List<Posicion> proximasPosicionesFantasmas =
             new ArrayList<>(this.fantasmas.length);
@@ -97,11 +100,13 @@ public class Partida {
                     proximaPosicionPacMan
                 );
 
+            Posicion candidataFantasma =
+                this.fantasmas[i].calcularProximaPosicion(direccionesFantasmas[i]);
+            boolean puedeAvanzar = this.laberinto.esTransitable(candidataFantasma);
+            puedenAvanzarFantasmas[i] = puedeAvanzar;
+
             proximasPosicionesFantasmas.add(
-                this.fantasmas[i].calcularProximaPosicion(
-                    direccionesFantasmas[i],
-                    this.laberinto
-                )
+                puedeAvanzar ? candidataFantasma : this.fantasmas[i].getPosicion()
             );
         }
 
@@ -112,16 +117,13 @@ public class Partida {
             proximasPosicionesFantasmas
         );
 
-        this.pacMan.mover(direccionPacMan, this.laberinto);
+        this.pacMan.mover(direccionPacMan, puedeAvanzarPacMan);
 
         for (int i = 0; i < this.fantasmas.length; i++) {
-            Fantasma fantasma = this.fantasmas[i];
-
-            fantasma.mover(
+            this.fantasmas[i].mover(
                 direccionesFantasmas[i],
-                this.laberinto
+                puedenAvanzarFantasmas[i]
             );
-
         }
 
         // Cobrar todos los asustados antes de resolver la perdida de vida.
@@ -154,7 +156,7 @@ public class Partida {
         }
         this.puntaje += punto.valor();
         
-        if (punto instanceof SuperPunto) {
+        if (punto.asustaFantasmas()) {
             for (Fantasma fantasma : fantasmas) {
                 fantasma.asustar(DURACION_SUSTO);
             }
@@ -264,8 +266,7 @@ public class Partida {
             for (int columna = 0; columna < mapa[fila].length; columna++) {
                 Celda celda = this.laberinto.obtenerCelda(new Posicion(fila, columna));
                 mapa[fila][columna] = celda.esPared() ? '#'
-                    : celda.tipoPunto() instanceof SuperPunto ? 'o'
-                    : celda.tienePunto() ? '.' : ' ';
+                    : celda.tienePunto() ? celda.tipoPunto().getSimbolo() : ' ';
             }
         }
         return mapa;

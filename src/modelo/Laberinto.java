@@ -227,10 +227,8 @@ public class Laberinto {
             for (Celda celda : fila) {
                 if (celda.esPared()) {
                     System.out.print("# ");
-                } else if (celda.tipoPunto() instanceof SuperPunto) {
-                    System.out.print("o ");
                 } else if (celda.tienePunto()) {
-                    System.out.print(". ");
+                    System.out.print(celda.tipoPunto().getSimbolo() + " ");
                 } else {
                     System.out.print("  ");
                 }

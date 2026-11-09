@@ -1,8 +1,8 @@
 package vista;
 
 import controlador.ControladorJuego;
+import controlador.dto.PartidaDTO;
 import extra.Direccion;
-import extra.EstadoPartida;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -154,28 +154,29 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void actualizarInformacion() {
-        etiquetaPuntaje.setText("Puntaje: " + controlador.getPuntaje());
-        etiquetaVidas.setText("Vidas: " + controlador.getVidas());
+        PartidaDTO partida = controlador.getPartidaDTO();
+        etiquetaPuntaje.setText("Puntaje: " + partida.getPuntaje());
+        etiquetaVidas.setText("Vidas: " + partida.getVidas());
 
-        EstadoPartida estado = controlador.getEstado();
-        String textoEstado = switch (estado) {
-            case EN_CURSO -> esperandoInicio ? "¡Listo! (Elija una dirección)" : "En curso";
-            case PAUSADA -> "Pausada";
-            case VICTORIA -> "¡VICTORIA!";
-            case DERROTA -> "DERROTA";
-        };
+        String textoEstado;
+        if (partida.estaPausada()) {
+            textoEstado = "Pausada";
+        } else if (partida.esVictoria()) {
+            textoEstado = "¡VICTORIA!";
+        } else if (partida.esDerrota()) {
+            textoEstado = "DERROTA";
+        } else {
+            textoEstado = esperandoInicio ? "¡Listo! (Elija una dirección)" : "En curso";
+        }
         etiquetaEstado.setText("Estado: " + textoEstado);
 
-        if (estado == EstadoPartida.PAUSADA) {
+        if (partida.estaPausada()) {
             botonPausa.setText("Reanudar");
         } else {
             botonPausa.setText("Pausar");
         }
 
-        boolean finalizada =
-            estado == EstadoPartida.VICTORIA
-            || estado == EstadoPartida.DERROTA;
-
+        boolean finalizada = partida.estaFinalizada();
         botonPausa.setEnabled(!finalizada);
         botonReiniciar.setEnabled(finalizada);
     }

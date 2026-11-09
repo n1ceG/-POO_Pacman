@@ -19,12 +19,6 @@ public class Fantasma extends Personaje {
     }
 
     @Override
-    public void mover(Direccion direccion, Laberinto laberinto)
-    {
-        this.posicion = calcularProximaPosicion(direccion, laberinto);
-    }
-
-    @Override
     public void volverAlInicio()
     {
         this.posicion = getPosicionInicial();

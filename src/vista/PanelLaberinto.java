@@ -1,15 +1,14 @@
 package vista;
 
 import controlador.ControladorJuego;
-import extra.Direccion;
-import extra.EstadoFantasma;
-import extra.EstadoPartida;
-import extra.Posicion;
+import controlador.dto.FantasmaDTO;
+import controlador.dto.PartidaDTO;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.util.List;
 import javax.swing.JPanel;
 
 public class PanelLaberinto extends JPanel {
@@ -61,23 +60,22 @@ public class PanelLaberinto extends JPanel {
                 }
             }
         }
-        dibujarFantasmas(g);
-        dibujarPacMan(g);
-        dibujarCartelEstado(g);
+
+        PartidaDTO partida = controlador.getPartidaDTO();
+        dibujarFantasmas(g, partida.getFantasmas());
+        dibujarPacMan(g, partida);
+        dibujarCartelEstado(g, partida);
     }
 
-    private void dibujarPacMan(Graphics g) {
-        Posicion posicion = controlador.getPosicionPacMan();
-        Direccion direccion = controlador.getDireccionPacMan();
+    private void dibujarPacMan(Graphics g, PartidaDTO partida) {
+        int x = partida.getPacManColumna() * TAMANIO_CELDA;
+        int y = partida.getPacManFila() * TAMANIO_CELDA;
 
-        int x = posicion.columna * TAMANIO_CELDA;
-        int y = posicion.fila * TAMANIO_CELDA;
-
-        int anguloInicio = switch (direccion) {
-            case DERECHA -> 30;
-            case ARRIBA -> 120;
-            case IZQUIERDA -> 210;
-            case ABAJO -> 300;
+        int anguloInicio = switch (partida.getPacManDireccion()) {
+            case "ARRIBA" -> 120;
+            case "IZQUIERDA" -> 210;
+            case "ABAJO" -> 300;
+            default -> 30; // DERECHA
         };
 
         g.setColor(Color.YELLOW);
@@ -91,10 +89,7 @@ public class PanelLaberinto extends JPanel {
         );
     }
 
-    private void dibujarFantasmas(Graphics g) {
-        Posicion[] posiciones = controlador.getPosicionesFantasmas();
-        EstadoFantasma[] estados = controlador.getEstadosFantasmas();
-
+    private void dibujarFantasmas(Graphics g, List<FantasmaDTO> fantasmas) {
         Color[] colores = {
             Color.RED,
             Color.PINK,
@@ -102,17 +97,18 @@ public class PanelLaberinto extends JPanel {
             Color.ORANGE
         };
 
-        for (int i = 0; i < posiciones.length; i++) {
-            int x = posiciones[i].columna * TAMANIO_CELDA;
-            int y = posiciones[i].fila * TAMANIO_CELDA;
+        for (int i = 0; i < fantasmas.size(); i++) {
+            FantasmaDTO fantasma = fantasmas.get(i);
+            int x = fantasma.getColumna() * TAMANIO_CELDA;
+            int y = fantasma.getFila() * TAMANIO_CELDA;
 
-            if (estados[i] == EstadoFantasma.REGRESANDO) {
+            if (fantasma.estaRegresando()) {
                 // Solo ojos cuando regresa a la base tras ser comido
                 dibujarOjos(g, x, y, Color.BLUE);
                 continue;
             }
 
-            Color colorCuerpo = (estados[i] == EstadoFantasma.ASUSTADO)
+            Color colorCuerpo = fantasma.estaAsustado()
                 ? Color.BLUE
                 : colores[i % colores.length];
 
@@ -124,7 +120,7 @@ public class PanelLaberinto extends JPanel {
                 TAMANIO_CELDA - 4
             );
 
-            if (estados[i] == EstadoFantasma.ASUSTADO) {
+            if (fantasma.estaAsustado()) {
                 dibujarOjos(g, x, y, Color.ORANGE);
             } else {
                 dibujarOjos(g, x, y, Color.BLUE);
@@ -144,9 +140,8 @@ public class PanelLaberinto extends JPanel {
         g.fillOval(x + 17, y + 9, 3, 4);
     }
 
-    private void dibujarCartelEstado(Graphics g) {
-        EstadoPartida estado = controlador.getEstado();
-        if (estado == EstadoPartida.EN_CURSO) {
+    private void dibujarCartelEstado(Graphics g, PartidaDTO partida) {
+        if (partida.estaEnCurso()) {
             return;
         }
 
@@ -160,19 +155,25 @@ public class PanelLaberinto extends JPanel {
         g.setFont(new Font("Arial", Font.BOLD, 22));
         FontMetrics fmTitulo = g.getFontMetrics();
 
-        String titulo = switch (estado) {
-            case PAUSADA -> "PAUSA";
-            case VICTORIA -> "¡VICTORIA!";
-            case DERROTA -> "GAME OVER";
-            default -> "";
-        };
+        String titulo;
+        Color colorTexto;
+        String subtitulo;
 
-        Color colorTexto = switch (estado) {
-            case PAUSADA -> Color.YELLOW;
-            case VICTORIA -> Color.GREEN;
-            case DERROTA -> Color.RED;
-            default -> Color.WHITE;
-        };
+        if (partida.estaPausada()) {
+            titulo = "PAUSA";
+            colorTexto = Color.YELLOW;
+            subtitulo = "Presione Pausar (P) para reanudar";
+        } else if (partida.esVictoria()) {
+            titulo = "¡VICTORIA!";
+            colorTexto = Color.GREEN;
+            subtitulo = "Presione Nueva Partida (N) para jugar otra vez";
+        } else if (partida.esDerrota()) {
+            titulo = "GAME OVER";
+            colorTexto = Color.RED;
+            subtitulo = "Presione Nueva Partida (N) para jugar otra vez";
+        } else {
+            return;
+        }
 
         g.setColor(colorTexto);
         int xTitulo = (ancho - fmTitulo.stringWidth(titulo)) / 2;
@@ -181,12 +182,6 @@ public class PanelLaberinto extends JPanel {
 
         g.setFont(new Font("Arial", Font.PLAIN, 13));
         FontMetrics fmSub = g.getFontMetrics();
-
-        String subtitulo = switch (estado) {
-            case PAUSADA -> "Presione Pausar (P) para reanudar";
-            case VICTORIA, DERROTA -> "Presione Nueva Partida (N) para jugar otra vez";
-            default -> "";
-        };
 
         g.setColor(Color.WHITE);
         int xSub = (ancho - fmSub.stringWidth(subtitulo)) / 2;
