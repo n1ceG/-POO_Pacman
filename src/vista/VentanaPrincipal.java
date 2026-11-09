@@ -28,6 +28,7 @@ public class VentanaPrincipal extends JFrame {
     private JLabel etiquetaEstado;
     private JButton botonPausa;
     private JButton botonReiniciar;
+    private boolean esperandoInicio = true;
 
     public VentanaPrincipal() {
         controlador = new ControladorJuego();
@@ -78,6 +79,7 @@ public class VentanaPrincipal extends JFrame {
         botonReiniciar = new JButton("Nueva Partida");
         botonReiniciar.addActionListener(e -> {
             if (controlador.nuevaPartida()) {
+                esperandoInicio = true;
                 actualizarInformacion();
                 tablero.repaint();
             }
@@ -113,6 +115,7 @@ public class VentanaPrincipal extends JFrame {
 
         asociarAccion("N", () -> {
             if (controlador.nuevaPartida()) {
+                esperandoInicio = true;
                 actualizarInformacion();
                 tablero.repaint();
             }
@@ -120,7 +123,10 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void asociarTeclaDireccion(String tecla, Direccion direccion) {
-        asociarAccion(tecla, () -> controlador.moverPacMan(direccion));
+        asociarAccion(tecla, () -> {
+            esperandoInicio = false;
+            controlador.moverPacMan(direccion);
+        });
     }
 
     private void asociarAccion(String tecla, Runnable accion) {
@@ -137,7 +143,9 @@ public class VentanaPrincipal extends JFrame {
 
     private void iniciarTemporizador() {
         temporizador = new Timer(INTERVALO_MS, e -> {
-            controlador.actualizar(INTERVALO_MS / 1000.0);
+            if (!esperandoInicio) {
+                controlador.actualizar(INTERVALO_MS / 1000.0);
+            }
             actualizarInformacion();
             tablero.repaint();
         });
@@ -151,7 +159,7 @@ public class VentanaPrincipal extends JFrame {
 
         EstadoPartida estado = controlador.getEstado();
         String textoEstado = switch (estado) {
-            case EN_CURSO -> "En curso";
+            case EN_CURSO -> esperandoInicio ? "¡Listo! (Elija una dirección)" : "En curso";
             case PAUSADA -> "Pausada";
             case VICTORIA -> "¡VICTORIA!";
             case DERROTA -> "DERROTA";

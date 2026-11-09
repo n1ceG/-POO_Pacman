@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Pac-Man POO · Explicación del código</title>
+<style>
+:root{
+  --bg:#f4f5f8;--paper:#fff;--ink:#172239;--muted:#5a6880;--line:#dfe3ec;
+  --brand:#5749d8;--soft:#efedff;--yellow:#f5c400;--yellow-bg:#fff7d1;
+  --abs:#7a3fc4;--abs-bg:#f3ebff;--con:#1d5fb8;--con-bg:#e7f0ff;
+  --enu:#207451;--enu-bg:#e6f5ec;--dat:#7a5a12;--dat-bg:#fbf1da;
+  --warn:#8a4b06;--warn-bg:#fff3dc;--red:#c0392b;
+  --code-bg:#f1f3f8;--shadow:0 6px 24px #1722390c;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Cascadia Code",monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#12161f;--paper:#1b2230;--ink:#e7ebf4;--muted:#aab5c8;--line:#313b4e;
+  --brand:#b3a8ff;--soft:#2e2950;--yellow:#ffd84d;--yellow-bg:#3a3318;
+  --abs:#cfa8ff;--abs-bg:#33264a;--con:#8fbaff;--con-bg:#1e2d47;
+  --enu:#8fd8b0;--enu-bg:#1f3a2e;--dat:#e8c47a;--dat-bg:#3a301b;
+  --warn:#f0c27e;--warn-bg:#3b2f1c;--red:#ff8a7a;--code-bg:#141a26;--shadow:none;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--brand)}
+code,pre{font-family:var(--mono);font-size:.88em}
+code{background:var(--code-bg);padding:1px 5px;border-radius:5px}
+pre{background:var(--code-bg);padding:12px 14px;border-radius:9px;overflow:auto;line-height:1.5;margin:10px 0}
+pre code{background:none;padding:0}
+h1,h2,h3,h4{line-height:1.25}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:7px 12px}
+button:hover{border-color:var(--brand)}
+button.on{background:var(--brand);color:var(--paper);border-color:var(--brand)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+
+header{background:var(--paper);border-bottom:1px solid var(--line);padding:26px max(24px,calc((100vw - 1320px)/2))}
+.id{display:flex;align-items:center;gap:16px}
+.logo{width:48px;height:48px;flex:none}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+header h1{margin:2px 0 4px;font-size:26px}
+header p{margin:0;color:var(--muted)}
+
+.layout{max-width:1320px;margin:auto;padding:26px 24px 60px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:30px}
+nav{position:sticky;top:18px;align-self:start;font-size:14px}
+nav ol{list-style:none;margin:0;padding:0;display:grid;gap:2px;counter-reset:n}
+nav li a{display:block;padding:7px 11px;border-radius:8px;text-decoration:none;color:var(--muted);counter-increment:n}
+nav li a::before{content:counter(n) ". ";font-variant-numeric:tabular-nums;opacity:.6}
+nav li a:hover{background:var(--paper);color:var(--ink)}
+nav li a.active{background:var(--paper);color:var(--brand);font-weight:600;box-shadow:var(--shadow)}
+
+main section{margin-bottom:46px}
+main h2{font-size:24px;margin:0 0 6px;padding-top:4px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:820px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+/* badges */
+.b{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:99px;vertical-align:middle;white-space:nowrap}
+.b-abs{color:var(--abs);background:var(--abs-bg)}
+.b-con{color:var(--con);background:var(--con-bg)}
+.b-enu{color:var(--enu);background:var(--enu-bg)}
+.b-dat{color:var(--dat);background:var(--dat-bg)}
+.b-pkg{color:var(--muted);background:var(--code-bg);font-family:var(--mono);font-weight:500}
+.vis{font-family:var(--mono);font-weight:700;display:inline-block;width:16px;text-align:center}
+.vis-pub{color:var(--enu)}.vis-pri{color:var(--red)}.vis-pro{color:var(--warn)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+tr:last-child td{border-bottom:0}
+.table-wrap{overflow-x:auto}
+td code{white-space:nowrap}
+
+/* layers */
+.layers{display:grid;gap:10px}
+.layer{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--paper)}
+.layer h4{margin:0;font-size:15px}
+.layer p{margin:0;font-size:14px;color:var(--muted)}
+.layer .cls{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.arrow-down{text-align:center;color:var(--muted);font-size:13px;line-height:1.2}
+
+/* maze */
+.maze-wrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:start}
+.maze{display:grid;grid-template-columns:repeat(15,26px);grid-auto-rows:26px;gap:2px;background:#0b1030;padding:8px;border-radius:12px}
+.cell{border-radius:4px;display:grid;place-items:center;font:700 11px var(--mono);cursor:pointer;position:relative}
+.cell.wall{background:#2c3aa6;cursor:default}
+.cell.path{background:#0b1030}
+.cell.path:hover{outline:2px solid #fff6}
+.cell .dot{width:5px;height:5px;border-radius:50%;background:#ffd8b0}
+.cell .sdot{width:12px;height:12px;border-radius:50%;background:#ffd8b0;box-shadow:0 0 6px #ffd8b0}
+.cell.pac::after{content:"";position:absolute;inset:3px;background:var(--yellow);clip-path:polygon(50% 50%,100% 20%,100% 0,0 0,0 100%,100% 100%,100% 80%);border-radius:50%}
+.cell.ghost::after{content:"";position:absolute;inset:3px;background:#ff5a5a;border-radius:50% 50% 2px 2px}
+.cell.bfs{background:#2e7d5b}
+.cell.bfs1{background:#40c48a}
+.cell.sel{outline:2px solid var(--yellow)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+#cellInfo{min-height:120px}
+#cellInfo h4{margin:0 0 6px}
+
+/* svg diagrams */
+.diagram{width:100%;height:auto;display:block}
+.diagram .box rect{fill:var(--paper);stroke:var(--ink);stroke-width:1.3}
+.diagram .box.abs rect{stroke:var(--abs);stroke-width:2}
+.diagram .box.enu rect{stroke:var(--enu)}
+.diagram .box.dat rect{stroke:var(--dat)}
+.diagram .box{cursor:pointer}
+.diagram .box:hover rect{fill:var(--soft)}
+.diagram .box text{fill:var(--ink);text-anchor:middle}
+.diagram .box .st{font-size:11px;fill:var(--muted)}
+.diagram .box .nm{font-size:15px;font-weight:700}
+.diagram .box.abs .nm{font-style:italic;fill:var(--abs)}
+.diagram .ln{fill:none;stroke:var(--ink);stroke-width:1.4}
+.diagram .dash{stroke-dasharray:6 5}
+.diagram .lbl{font-size:12px;fill:var(--muted)}
+.diagram .pkg{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:4 4}
+.diagram .pkgname{font:600 12px var(--mono);fill:var(--muted)}
+.diagram .mk-fill{fill:var(--ink)}
+.diagram .mk-hollow{fill:var(--paper);stroke:var(--ink);stroke-width:1.3}
+.diagram .mk-open{fill:none;stroke:var(--ink);stroke-width:1.4}
+.diagram .state rect{fill:var(--paper);stroke-width:2}
+.diagram .state text{text-anchor:middle;font:700 14px var(--mono)}
+.diagram .tr{fill:none;stroke:var(--muted);stroke-width:1.6}
+.diagram .tlbl{font-size:12.5px;fill:var(--ink)}
+.diagram .note{font-size:12.5px;fill:var(--muted)}
+.uml-legend{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;color:var(--muted);margin-top:12px}
+.uml-legend svg{vertical-align:middle;margin-right:4px}
+
+/* class cards */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.cards{display:grid;gap:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:16px}
+.card.flash{animation:flash 1.4s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:var(--shadow)}}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.card-head h3{margin:0 0 4px;font-size:20px;font-family:var(--mono)}
+.card-head h3.abs{font-style:italic}
+.card-head p{margin:0;color:var(--muted);font-size:14px;max-width:760px}
+.card-head .tags{display:flex;gap:6px;flex-wrap:wrap}
+.card-body{padding:6px 20px 16px}
+.card-body h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 0 6px}
+.card-body td:first-child{width:22px;padding-right:0}
+.rel-list{display:flex;flex-wrap:wrap;gap:6px}
+.rel-list button{font-size:12.5px;padding:3px 9px;background:var(--bg)}
+.src{font:12px var(--mono);color:var(--muted)}
+
+/* compare */
+.cmp h3{margin:0 0 4px;font-size:17px}
+.cmp>p{margin:0 0 10px;color:var(--muted);font-size:14px}
+.cmp table td:first-child{font-weight:600;white-space:nowrap}
+.callout{border-left:3px solid var(--brand);background:var(--soft);padding:10px 14px;border-radius:0 9px 9px 0;font-size:14px;margin-top:12px}
+.callout.warn{border-color:var(--warn);background:var(--warn-bg)}
+
+/* stepper */
+.stepper{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:4px;counter-reset:s}
+.steps li button{width:100%;text-align:left;border-color:transparent;background:transparent;font-size:13.5px;padding:7px 10px;counter-increment:s;display:flex;gap:8px}
+.steps li button::before{content:counter(s);flex:none;width:21px;height:21px;border-radius:50%;background:var(--code-bg);display:grid;place-items:center;font-size:11px;font-weight:700}
+.steps li button.on{background:var(--soft);color:var(--brand);border-color:var(--brand)}
+.steps li button.on::before{background:var(--brand);color:var(--paper)}
+#stepView h3{margin:0 0 4px}
+#stepView .who{font-size:13px;color:var(--muted);margin-bottom:8px}
+.step-nav{display:flex;gap:8px;margin-top:12px}
+
+/* concepts */
+.concept h3{margin:0 0 6px;font-size:16px}
+.concept p{margin:0 0 8px;font-size:14px}
+.concept .where{font-size:13px;color:var(--muted)}
+
+/* observations */
+.obs{display:grid;gap:10px}
+.obs details{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:12px 16px}
+.obs summary{cursor:pointer;font-weight:600}
+.obs summary .b{margin-left:6px}
+.obs details p{margin:8px 0 0;font-size:14px}
+
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr}
+  nav{position:static}
+  nav ol{grid-template-columns:repeat(2,1fr)}
+  .grid2,.grid3,.stepper,.maze-wrap{grid-template-columns:1fr}
+  .layer{grid-template-columns:1fr}
+}
+@media (max-width:520px){.maze{grid-template-columns:repeat(15,18px);grid-auto-rows:18px}}
+@media print{nav,.filters,.step-nav{display:none}.layout{display:block}.card,.panel{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="id">
+    <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#ffe06a"/><path d="M38 15A16 16 0 1 0 38 33L24 24Z" fill="#3d3320"/></svg>
+    <div>
+      <div class="eyebrow">POO · TPO Pac-Man · Fase C (Interfaz Gráfica)</div>
+      <h1>Cómo está hecho nuestro Pac-Man</h1>
+      <p>Clases, atributos, métodos, diferencias entre ellas y cómo se relacionan. Actualizado con la interfaz gráfica Swing (<code>src/vista</code>) y lógica completa del juego (rama <code>feature/fase-c-interfaz-grafica</code>, Noviembre 2026).</p>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+<nav aria-label="Secciones">
+  <ol>
+    <li><a href="#juego">El juego</a></li>
+    <li><a href="#capas">Arquitectura en capas</a></li>
+    <li><a href="#diagrama">Diagrama de clases</a></li>
+    <li><a href="#relaciones">Relaciones</a></li>
+    <li><a href="#clases">Clases en detalle</a></li>
+    <li><a href="#diferencias">Diferencias clave</a></li>
+    <li><a href="#tick">Un tick paso a paso</a></li>
+    <li><a href="#estados">Máquinas de estado</a></li>
+    <li><a href="#requerimientos">Requerimientos → código</a></li>
+    <li><a href="#conceptos">Conceptos de POO</a></li>
+    <li><a href="#observaciones">Puntos a revisar</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- 1. JUEGO -->
+<section id="juego">
+  <h2>1. El juego en un minuto</h2>
+  <p class="lead">PacMan recorre un laberinto de 15×15 celdas comiendo puntos. Cuatro fantasmas lo persiguen por el camino más corto. Si come un <b>superpunto</b>, los fantasmas se asustan durante 10 segundos y PacMan puede comérselos. Gana al vaciar el laberinto; pierde al quedarse sin sus 3 vidas.</p>
+
+  <div class="maze-wrap">
+    <div>
+      <div class="maze" id="maze" role="grid" aria-label="Laberinto por defecto"></div>
+      <div class="legend">
+        <span><i class="sw" style="background:#2c3aa6"></i>pared <code>#</code></span>
+        <span><i class="sw" style="background:#0b1030;box-shadow:inset 0 0 0 4px #0b1030,inset 0 0 0 7px #ffd8b0"></i>punto <code>.</code></span>
+        <span><i class="sw" style="background:#ffd8b0;border-radius:50%"></i>superpunto <code>o</code></span>
+        <span><i class="sw" style="background:var(--yellow);border-radius:50%"></i>PacMan (13,7)</span>
+        <span><i class="sw" style="background:#ff5a5a;border-radius:50% 50% 2px 2px"></i>4 fantasmas (7,7)</span>
+      </div>
+    </div>
+    <div class="panel" id="cellInfo">
+      <h4>Probá el laberinto</h4>
+      <p class="small muted">Este es <code>Laberinto.MAPA_POR_DEFECTO</code> tal cual. Pasá el mouse por una celda para ver qué es, o <b>hacé clic en una celda transitable</b>: se dibuja el camino que calcularía <code>Laberinto.caminoMasCorto()</code> (búsqueda en anchura, BFS) desde los fantasmas (7,7) hasta esa celda. El primer paso (verde claro) es la dirección que devolvería <code>Fantasma.elegirDireccion()</code>.</p>
+      <p class="small muted" id="mazeStats"></p>
+    </div>
+  </div>
+
+  <div class="grid3" style="margin-top:16px">
+    <div class="panel"><b>Puntaje</b><br><span class="small muted">Punto común <b>+10</b> · Superpunto <b>+50</b> · Fantasma asustado <b>+200</b></span></div>
+    <div class="panel"><b>Tiempo</b><br><span class="small muted">Cada comando de la consola = 1 tick = <code>1/24</code> s. El susto dura <code>10</code> s = 240 ticks.</span></div>
+    <div class="panel"><b>Vidas</b><br><span class="small muted">Empieza con <b>3</b>. Al perder una, PacMan y los fantasmas vuelven a su inicio. Con 0 → <code>DERROTA</code>.</span></div>
+  </div>
+</section>
+
+<!-- 2. CAPAS -->
+<section id="capas">
+  <h2>2. Arquitectura en capas</h2>
+  <p class="lead">El proyecto sigue el esquema <b>vista → controlador → modelo</b> (MVC), igual que el ejemplo <i>MuevoObjetos</i> de la cátedra. Cada capa sólo conoce a la de abajo: la vista nunca toca un <code>Fantasma</code> ni una <code>Celda</code>, sólo habla con el controlador.</p>
+  <div class="layers">
+    <div class="layer"><div><span class="b b-pkg">vista</span><br><span class="b b-pkg" style="margin-top:4px">consola</span><h4>Vista</h4></div><div><p>Presenta el juego al usuario y captura entradas por teclado. No decide nada de las reglas del juego. Incluye la interfaz gráfica Swing completa (animación por timer a 5 FPS, dibujo 2D dinámico) y la versión clásica de consola.</p><div class="cls"><code>VentanaPrincipal</code><code>PanelLaberinto</code><code>JuegoConsola</code></div></div></div>
+    <div class="arrow-down">▼ llama a métodos de</div>
+    <div class="layer"><div><span class="b b-pkg">controlador</span><h4>Controlador</h4></div><div><p>Puerta de entrada al modelo. Reenvía pedidos a <code>Partida</code> y es el único que puede crear una partida nueva.</p><div class="cls"><code>ControladorJuego</code></div></div></div>
+    <div class="arrow-down">▼ delega en</div>
+    <div class="layer"><div><span class="b b-pkg">modelo</span><h4>Modelo (negocio)</h4></div><div><p>Todas las reglas: movimiento, puntos, colisiones, vidas, victoria. No imprime nada ni lee el teclado.</p><div class="cls"><code>Partida</code><code>Laberinto</code><code>Celda</code><code>Personaje</code><code>PacMan</code><code>Fantasma</code><code>Punto</code><code>PuntoComun</code><code>SuperPunto</code></div></div></div>
+    <div class="arrow-down">⋯ todas las capas usan ⋯</div>
+    <div class="layer"><div><span class="b b-pkg">extra</span><h4>Tipos auxiliares</h4></div><div><p>Valores simples compartidos por todos: coordenadas y enumeraciones.</p><div class="cls"><code>Posicion</code><code>Direccion</code><code>EstadoFantasma</code><code>EstadoPartida</code></div></div></div>
+    <div class="arrow-down">⋯</div>
+    <div class="layer"><div><span class="b b-pkg">test</span><h4>Pruebas</h4></div><div><p>Programas con <code>main</code> que arman escenarios (laberintos chicos, partidas con posiciones elegidas) y verifican resultados por el controlador o la partida.</p><div class="cls"><code>TestControlador</code><code>TestRequerimientos</code><code>TestConsumo</code><code>TestVictoria</code><code>TestConsola</code></div></div></div>
+  </div>
+</section>
+
+<!-- 3. DIAGRAMA -->
+<section id="diagrama">
+  <h2>3. Diagrama de clases</h2>
+  <p class="lead">Vista simplificada (sin atributos ni métodos, que están en la sección 5). <b>Hacé clic en una clase</b> para ir a su ficha.</p>
+  <div class="panel">
+  <svg class="diagram" viewBox="0 0 1160 820" role="img" aria-label="Diagrama de clases del proyecto">
+    <defs>
+      <marker id="mDia" viewBox="0 0 18 10" refX="1" refY="5" markerWidth="18" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path class="mk-fill" d="M1,5 L9,1 L17,5 L9,9 z"/></marker>
+      <marker id="mDiaH" viewBox="0 0 18 10" refX="1" refY="5" markerWidth="18" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path class="mk-hollow" d="M1,5 L9,1 L17,5 L9,9 z"/></marker>
+      <marker id="mTri" viewBox="0 0 14 14" refX="13" refY="7" markerWidth="14" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto"><path class="mk-hollow" d="M1,1 L13,7 L1,13 z"/></marker>
+      <marker id="mOpen" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"><path class="mk-open" d="M1,1 L11,6 L1,11"/></marker>
+    </defs>
+
+    <!-- paquete vista -->
+    <rect class="pkg" x="20" y="12" width="395" height="74" rx="10"/>
+    <text class="pkgname" x="32" y="32">vista</text>
+    <!-- paquete modelo -->
+    <rect class="pkg" x="6" y="226" width="1000" height="588" rx="10"/>
+    <text class="pkgname" x="18" y="246">modelo</text>
+    <!-- paquete extra -->
+    <rect class="pkg" x="900" y="12" width="250" height="196" rx="10"/>
+    <text class="pkgname" x="912" y="32">extra</text>
+
+    <!-- relaciones -->
+    <path class="ln" d="M205,50 L230,50" marker-start="url(#mDia)"/><text class="lbl" x="214" y="44">1</text>
+    <path class="ln" d="M120,76 L120,165 L450,165" marker-start="url(#mDia)"/><text class="lbl" x="128" y="100">1</text>
+    <path class="ln dash" d="M315,76 L315,145 L450,145" marker-end="url(#mOpen)"/><text class="lbl" x="323" y="100">usa</text>
+    <path class="ln" d="M550,76 L550,130" marker-start="url(#mDia)"/><text class="lbl" x="558" y="124">1</text>
+    <path class="ln" d="M550,186 L550,240" marker-start="url(#mDia)"/><text class="lbl" x="558" y="234">1</text>
+    <path class="ln" d="M450,276 L210,276 L210,380" marker-start="url(#mDia)"/><text class="lbl" x="218" y="372">1</text>
+    <path class="ln" d="M600,296 L600,520" marker-start="url(#mDia)"/><text class="lbl" x="606" y="512">1</text>
+    <path class="ln" d="M650,262 L890,262 L890,520" marker-start="url(#mDia)"/><text class="lbl" x="896" y="512">4</text>
+    <path class="ln" d="M660,520 L660,478 L860,478 L860,520"/>
+    <path class="ln" d="M750,478 L750,436" marker-end="url(#mTri)"/>
+    <path class="ln dash" d="M650,408 L310,408" marker-end="url(#mOpen)"/><text class="lbl" x="350" y="400">usa (parámetro)</text>
+    <path class="ln" d="M210,436 L210,500" marker-start="url(#mDia)"/><text class="lbl" x="218" y="478">filas × columnas</text>
+    <path class="ln" d="M210,556 L210,620" marker-start="url(#mDiaH)"/><text class="lbl" x="218" y="604">0..1</text>
+    <path class="ln" d="M120,740 L120,706 L340,706 L340,740"/>
+    <path class="ln" d="M210,706 L210,676" marker-end="url(#mTri)"/>
+    <path class="ln dash" d="M650,250 L700,250 L700,190 L900,190" marker-end="url(#mOpen)"/><text class="lbl" x="710" y="182">todas usan extra</text>
+
+    <!-- clases -->
+    <g class="box" data-go="VentanaPrincipal"><rect x="35" y="24" width="170" height="52" rx="8"/><text class="st" x="120" y="42">vista (GUI)</text><text class="nm" x="120" y="62" style="font-size:14px">VentanaPrincipal</text></g>
+    <g class="box" data-go="PanelLaberinto"><rect x="230" y="24" width="170" height="52" rx="8"/><text class="st" x="315" y="42">vista (2D)</text><text class="nm" x="315" y="62" style="font-size:14px">PanelLaberinto</text></g>
+    <g class="box" data-go="JuegoConsola"><rect x="450" y="20" width="200" height="56" rx="8"/><text class="st" x="550" y="40">consola</text><text class="nm" x="550" y="62">JuegoConsola</text></g>
+    <g class="box" data-go="ControladorJuego"><rect x="450" y="130" width="200" height="56" rx="8"/><text class="st" x="550" y="150">controlador</text><text class="nm" x="550" y="172">ControladorJuego</text></g>
+    <g class="box" data-go="Partida"><rect x="450" y="240" width="200" height="56" rx="8"/><text class="st" x="550" y="260">modelo</text><text class="nm" x="550" y="282">Partida</text></g>
+    <g class="box" data-go="Laberinto"><rect x="110" y="380" width="200" height="56" rx="8"/><text class="st" x="210" y="400">modelo</text><text class="nm" x="210" y="422">Laberinto</text></g>
+    <g class="box abs" data-go="Personaje"><rect x="650" y="380" width="200" height="56" rx="8"/><text class="st" x="750" y="400">«abstract»</text><text class="nm" x="750" y="422">Personaje</text></g>
+    <g class="box" data-go="Celda"><rect x="110" y="500" width="200" height="56" rx="8"/><text class="st" x="210" y="520">modelo</text><text class="nm" x="210" y="542">Celda</text></g>
+    <g class="box" data-go="PacMan"><rect x="530" y="520" width="200" height="56" rx="8"/><text class="st" x="630" y="540">modelo</text><text class="nm" x="630" y="562">PacMan</text></g>
+    <g class="box" data-go="Fantasma"><rect x="770" y="520" width="200" height="56" rx="8"/><text class="st" x="870" y="540">modelo</text><text class="nm" x="870" y="562">Fantasma</text></g>
+    <g class="box abs" data-go="Punto"><rect x="110" y="620" width="200" height="56" rx="8"/><text class="st" x="210" y="640">«abstract»</text><text class="nm" x="210" y="662">Punto</text></g>
+    <g class="box" data-go="PuntoComun"><rect x="20" y="740" width="200" height="56" rx="8"/><text class="st" x="120" y="760">valor() = 10</text><text class="nm" x="120" y="782">PuntoComun</text></g>
+    <g class="box" data-go="SuperPunto"><rect x="240" y="740" width="200" height="56" rx="8"/><text class="st" x="340" y="760">valor() = 50</text><text class="nm" x="340" y="782">SuperPunto</text></g>
+
+    <g class="box dat" data-go="Posicion"><rect x="915" y="44" width="220" height="34" rx="7"/><text class="nm" x="1025" y="66" style="font-size:13px">Posicion</text></g>
+    <g class="box enu" data-go="Direccion"><rect x="915" y="84" width="220" height="34" rx="7"/><text class="nm" x="1025" y="106" style="font-size:13px">«enum» Direccion</text></g>
+    <g class="box enu" data-go="EstadoFantasma"><rect x="915" y="124" width="220" height="34" rx="7"/><text class="nm" x="1025" y="146" style="font-size:13px">«enum» EstadoFantasma</text></g>
+    <g class="box enu" data-go="EstadoPartida"><rect x="915" y="164" width="220" height="34" rx="7"/><text class="nm" x="1025" y="186" style="font-size:13px">«enum» EstadoPartida</text></g>
+  </svg>
+  <div class="uml-legend">
+    <span><svg width="46" height="12"><path d="M2,6 L10,2 L18,6 L10,10z" fill="currentColor"/><path d="M18,6 H44" stroke="currentColor"/></svg>composición (el dueño crea y contiene a la parte)</span>
+    <span><svg width="46" height="12"><path d="M2,6 L10,2 L18,6 L10,10z" fill="none" stroke="currentColor"/><path d="M18,6 H44" stroke="currentColor"/></svg>agregación (puede no estar: <code>null</code>)</span>
+    <span><svg width="46" height="14"><path d="M2,7 H32" stroke="currentColor"/><path d="M32,1 L44,7 L32,13z" fill="none" stroke="currentColor"/></svg>herencia (<code>extends</code>)</span>
+    <span><svg width="46" height="12"><path d="M2,6 H42" stroke="currentColor" stroke-dasharray="5 4"/><path d="M34,1 L43,6 L34,11" fill="none" stroke="currentColor"/></svg>dependencia (lo usa sin guardarlo)</span>
+    <span><i>Cursiva</i> = clase abstracta</span>
+  </div>
+  </div>
+</section>
+
+<!-- 4. RELACIONES -->
+<section id="relaciones">
+  <h2>4. Cómo se relacionan</h2>
+  <p class="lead">Cada flecha del diagrama, con la línea de código que la produce.</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>Desde</th><th>Relación</th><th>Hacia</th><th>Cant.</th><th>En el código</th></tr></thead>
+      <tbody>
+        <tr><td>VentanaPrincipal</td><td>composición</td><td>ControladorJuego</td><td>1</td><td><code>private final ControladorJuego controlador;</code></td></tr>
+        <tr><td>VentanaPrincipal</td><td>composición</td><td>PanelLaberinto</td><td>1</td><td><code>private final PanelLaberinto panelLaberinto;</code></td></tr>
+        <tr><td>PanelLaberinto</td><td>dependencia / consulta</td><td>ControladorJuego</td><td>1</td><td><code>private final ControladorJuego controlador;</code> — consulta estado, mapa, posiciones y dirección para renderizar</td></tr>
+        <tr><td>JuegoConsola</td><td>composición</td><td>ControladorJuego</td><td>1</td><td><code>private final ControladorJuego controlador = new ControladorJuego();</code></td></tr>
+        <tr><td>ControladorJuego</td><td>composición</td><td>Partida</td><td>1</td><td><code>private Partida partida;</code> — la crea en el constructor y la reemplaza en <code>nuevaPartida()</code>. Los tests pueden inyectar una.</td></tr>
+        <tr><td>Partida</td><td>composición</td><td>Laberinto</td><td>1</td><td><code>private Laberinto laberinto;</code> (por defecto <code>Laberinto.crearDefault()</code>)</td></tr>
+        <tr><td>Partida</td><td>composición</td><td>PacMan</td><td>1</td><td><code>this.pacMan = new PacMan(inicioPacMan);</code></td></tr>
+        <tr><td>Partida</td><td>composición</td><td>Fantasma</td><td>4</td><td><code>this.fantasmas = new Fantasma[4];</code> todos en <code>laberinto.centro()</code></td></tr>
+        <tr><td>Laberinto</td><td>composición</td><td>Celda</td><td>filas×col.</td><td><code>private final Celda[][] celdas;</code> (225 celdas en el mapa por defecto)</td></tr>
+        <tr><td>Celda</td><td>agregación</td><td>Punto</td><td>0..1</td><td><code>private Punto punto;</code> — <code>null</code> si es pared o si ya se comió</td></tr>
+        <tr><td>Celda / Personaje</td><td>composición</td><td>Posicion</td><td>1 / 2</td><td>Celda: <code>posicion</code>. Personaje: <code>posicion</code> y <code>posicionInicial</code></td></tr>
+        <tr><td>PacMan, Fantasma</td><td>herencia</td><td>Personaje</td><td>—</td><td><code>public class PacMan extends Personaje</code></td></tr>
+        <tr><td>PuntoComun, SuperPunto</td><td>herencia</td><td>Punto</td><td>—</td><td><code>public class SuperPunto extends Punto</code></td></tr>
+        <tr><td>Personaje</td><td>dependencia</td><td>Laberinto</td><td>—</td><td>lo recibe por parámetro en <code>calcularProximaPosicion(dir, laberinto)</code> y <code>mover(dir, laberinto)</code>; no lo guarda</td></tr>
+        <tr><td>Fantasma</td><td>dependencia</td><td>Laberinto</td><td>—</td><td><code>elegirDireccion(laberinto, posicionPacman)</code> usa <code>caminoMasCorto</code> y <code>direccionesDisponibles</code></td></tr>
+        <tr><td>Partida</td><td>dependencia</td><td>Punto</td><td>—</td><td><code>consumir(Punto punto)</code> llama a <code>punto.valor()</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><b>¿Composición o dependencia?</b> Si la clase lo guarda en un <i>atributo</i>, es una asociación (composición/agregación). Si sólo lo recibe como <i>parámetro</i> o lo usa dentro de un método, es una dependencia. Por eso <code>Personaje</code> “usa” al <code>Laberinto</code> pero no lo “tiene”: el laberinto es de la <code>Partida</code>.</div>
+</section>
+
+<!-- 5. CLASES -->
+<section id="clases">
+  <h2>5. Clases en detalle</h2>
+  <p class="lead">Atributos y métodos de cada clase. Visibilidad: <span class="vis vis-pub">+</span> public · <span class="vis vis-pri">−</span> private · <span class="vis vis-pro">#</span> protected. Lo marcado <code>static</code> pertenece a la clase, no a cada objeto.</p>
+  <div class="filters" id="filters"></div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<!-- 6. DIFERENCIAS -->
+<section id="diferencias">
+  <h2>6. Diferencias clave</h2>
+  <p class="lead">Las comparaciones que más se confunden.</p>
+  <div class="grid2">
+
+    <div class="panel cmp">
+      <h3>PacMan vs Fantasma</h3>
+      <p>Hermanos: ambos heredan de <code>Personaje</code>.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>PacMan</th><th>Fantasma</th></tr>
+        <tr><td>Quién decide hacia dónde va</td><td>El jugador (teclado)</td><td>Él mismo (IA con BFS o azar)</td></tr>
+        <tr><td><code>elegirDireccion</code></td><td><code>void elegirDireccion(Direccion)</code><br><span class="small muted">guarda la dirección pedida</span></td><td><code>Direccion elegirDireccion(Laberinto, Posicion)</code><br><span class="small muted">calcula y devuelve una dirección</span></td></tr>
+        <tr><td>Atributo <code>direccion</code></td><td>Sí lo usa (arranca en <code>DERECHA</code>)</td><td>Heredado pero nunca se asigna (queda <code>null</code>)</td></tr>
+        <tr><td>Estado propio</td><td>No tiene</td><td><code>estado</code> + <code>tiempoSustoRestante</code></td></tr>
+        <tr><td><code>volverAlInicio()</code></td><td>Posición inicial + mira a <code>DERECHA</code></td><td>Posición inicial + <code>PERSIGUIENDO</code> + susto en 0</td></tr>
+        <tr><td><code>mover()</code></td><td colspan="2">Idéntico en ambos: <code>posicion = calcularProximaPosicion(dir, lab)</code></td></tr>
+      </table></div>
+      <div class="callout warn">Los dos <code>elegirDireccion</code> <b>no</b> son polimorfismo: tienen distinta firma y no existen en <code>Personaje</code>. Son dos métodos distintos que comparten nombre.</div>
+    </div>
+
+    <div class="panel cmp">
+      <h3>Punto vs PuntoComun vs SuperPunto</h3>
+      <p>Una abstracta y dos concretas.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>Punto</th><th>PuntoComun</th><th>SuperPunto</th></tr>
+        <tr><td>Tipo</td><td><span class="b b-abs">abstracta</span></td><td><span class="b b-con">concreta</span></td><td><span class="b b-con">concreta</span></td></tr>
+        <tr><td>¿<code>new</code>?</td><td>No se puede</td><td>Sí</td><td>Sí</td></tr>
+        <tr><td><code>valor()</code></td><td>sólo la firma</td><td><b>10</b></td><td><b>50</b></td></tr>
+        <tr><td>Efecto extra</td><td>—</td><td>—</td><td>Asusta a los fantasmas 10 s</td></tr>
+        <tr><td>En el mapa</td><td>—</td><td><code>.</code></td><td><code>o</code> (las 4 esquinas)</td></tr>
+      </table></div>
+      <div class="callout">Polimorfismo real: <code>Partida.consumir(Punto p)</code> hace <code>puntaje += p.valor()</code> sin saber qué tipo de punto es; Java llama a la versión correcta. El efecto de “asustar” en cambio se decide con <code>instanceof SuperPunto</code> dentro de <code>Partida</code>.</div>
+    </div>
+
+    <div class="panel cmp">
+      <h3>JuegoConsola vs ControladorJuego vs Partida</h3>
+      <p>Las tres “manejan el juego”, pero en capas distintas.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>JuegoConsola</th><th>ControladorJuego</th><th>Partida</th></tr>
+        <tr><td>Capa</td><td>Vista</td><td>Controlador</td><td>Modelo</td></tr>
+        <tr><td>Lee teclado / imprime</td><td>Sí</td><td>No</td><td>No</td></tr>
+        <tr><td>Aplica reglas</td><td>No</td><td>No (delega)</td><td>Sí, todas</td></tr>
+        <tr><td>Conoce a</td><td>Controlador</td><td>Partida</td><td>Laberinto, PacMan, Fantasmas</td></tr>
+        <tr><td>Crea partidas</td><td>No</td><td>Sí (<code>nuevaPartida</code>)</td><td>—</td></tr>
+        <tr><td>Devuelve a la vista</td><td>—</td><td>Lo mismo que Partida</td><td>Copias (<code>char[][]</code>, arrays nuevos)</td></tr>
+      </table></div>
+    </div>
+
+    <div class="panel cmp">
+      <h3>VentanaPrincipal (Swing GUI) vs JuegoConsola (CLI)</h3>
+      <p>Dos vistas completas e independientes para el mismo modelo y controlador (MVC puro).</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>VentanaPrincipal</th><th>JuegoConsola</th></tr>
+        <tr><td>Tipo de vista</td><td>Gráfica (Java Swing / Graphics2D)</td><td>Texto en terminal (códigos ANSI)</td></tr>
+        <tr><td>Flujo de tiempo</td><td>Continuo mediante <code>javax.swing.Timer</code> (200 ms / tick = 5 FPS)</td><td>Por turnos (1 comando de teclado = 1 tick de 1/24 s)</td></tr>
+        <tr><td>Arranque</td><td>Inicia en espera (<code>esperandoInicio = true</code>) hasta que el jugador elige una dirección</td><td>Avanza inmediatamente con el primer comando</td></tr>
+        <tr><td>Orientación de Pac-Man</td><td>Boca dinámica en arco angular (30°, 120°, 210°, 300°) según <code>getDireccionPacMan()</code></td><td>Carácter fijo <code>P</code></td></tr>
+        <tr><td>Estados de los fantasmas</td><td>Color propio + ojos (<code>PERSIGUIENDO</code>), azul oscuro (<code>ASUSTADO</code>) o sólo ojos flotantes (<code>REGRESANDO</code>)</td><td>Caracteres <code>F</code> (rojo), <code>f</code> (azul), <code>r</code> (gris)</td></tr>
+        <tr><td>Superposiciones</td><td>Carteles semitransparentes en pantalla para Pausa, ¡Victoria! y Game Over</td><td>Mensajes impresos debajo del tablero</td></tr>
+      </table></div>
+    </div>
+
+    <div class="panel cmp">
+      <h3>Laberinto vs Celda vs Posicion</h3>
+      <p>Del todo a la parte más chica.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>Laberinto</th><th>Celda</th><th>Posicion</th></tr>
+        <tr><td>Representa</td><td>El tablero entero</td><td>Un casillero</td><td>Una coordenada (fila, columna)</td></tr>
+        <tr><td>Sabe</td><td>Qué es transitable, caminos, si quedan puntos</td><td>Si es pared y qué punto tiene</td><td>Sólo dos números</td></tr>
+        <tr><td>Cambia durante el juego</td><td>No (la matriz es <code>final</code>)</td><td>Sí: pierde su punto</td><td>Sí (atributos públicos)</td></tr>
+        <tr><td>Paquete</td><td><code>modelo</code></td><td><code>modelo</code></td><td><code>extra</code></td></tr>
+      </table></div>
+    </div>
+
+    <div class="panel cmp">
+      <h3><code>calcularProximaPosicion</code> vs <code>mover</code></h3>
+      <p>Consultar vs. hacer.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>calcularProximaPosicion</th><th>mover</th></tr>
+        <tr><td>Dónde está</td><td><code>Personaje</code> (concreto, compartido)</td><td>abstracto en <code>Personaje</code>, implementado en cada hijo</td></tr>
+        <tr><td>Cambia el objeto</td><td><b>No</b>: devuelve una <code>Posicion</code> nueva</td><td><b>Sí</b>: actualiza <code>posicion</code></td></tr>
+        <tr><td>Si hay pared</td><td>Devuelve la posición actual</td><td>El personaje se queda quieto</td></tr>
+      </table></div>
+      <div class="callout">Se separan para que <code>Partida</code> pueda <b>calcular todas las próximas posiciones, detectar colisiones y recién después mover</b>. Si moviera primero, perdería la posición anterior y no detectaría cuando PacMan y un fantasma se cruzan.</div>
+    </div>
+
+    <div class="panel cmp">
+      <h3>Métodos de estado del Fantasma</h3>
+      <p>Cuatro métodos que cambian <code>estado</code>.</p>
+      <div class="table-wrap"><table>
+        <tr><th>Método</th><th>Cuándo se llama</th><th>Qué hace</th></tr>
+        <tr><td><code>asustar(10)</code></td><td>PacMan comió un superpunto</td><td>→ <code>ASUSTADO</code> (salvo que esté <code>REGRESANDO</code>)</td></tr>
+        <tr><td><code>serComido()</code></td><td>Choque estando asustado</td><td>→ <code>REGRESANDO</code></td></tr>
+        <tr><td><code>actualizarEstado(t)</code></td><td>Al final de cada tick</td><td>Descuenta susto; vuelve a <code>PERSIGUIENDO</code> si se terminó o si llegó a casa</td></tr>
+        <tr><td><code>volverAlInicio()</code></td><td>PacMan perdió una vida</td><td>Teletransporta al inicio y → <code>PERSIGUIENDO</code></td></tr>
+      </table></div>
+    </div>
+
+    <div class="panel cmp">
+      <h3><code>detectarColision</code> vs <code>resolverColision</code></h3>
+      <p>Encontrar el problema vs. aplicar la consecuencia.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>detectarColision</th><th>resolverColision</th></tr>
+        <tr><td>Recibe</td><td>Próxima pos. de PacMan y de cada fantasma</td><td>Un <code>Fantasma</code></td></tr>
+        <tr><td>Devuelve</td><td><code>List&lt;Fantasma&gt;</code> tocados</td><td>nada (<code>void</code>)</td></tr>
+        <tr><td>Cambia algo</td><td>No</td><td>Sí: +200 y <code>serComido()</code>, o <code>perderVida()</code></td></tr>
+      </table></div>
+      <p class="small muted" style="margin-top:8px">Hay choque si <b>llegan a la misma celda</b> o si <b>intercambian celdas</b> (se cruzan en el pasillo).</p>
+    </div>
+
+    <div class="panel cmp">
+      <h3>Clase abstracta vs concreta vs enum vs clase de datos</h3>
+      <p>Los cuatro “tipos” que hay en el proyecto.</p>
+      <div class="table-wrap"><table>
+        <tr><th></th><th>Ejemplos</th><th>¿Se instancia?</th><th>Para qué</th></tr>
+        <tr><td><span class="b b-abs">abstracta</span></td><td>Personaje, Punto</td><td>No</td><td>Molde común; obliga a los hijos a implementar métodos <code>abstract</code></td></tr>
+        <tr><td><span class="b b-con">concreta</span></td><td>Partida, PacMan, Celda…</td><td>Sí, con <code>new</code></td><td>Objetos con comportamiento</td></tr>
+        <tr><td><span class="b b-enu">enum</span></td><td>Direccion, Estado*</td><td>No: valores fijos</td><td>Lista cerrada de opciones; evita usar <code>int</code> o <code>String</code> “mágicos”</td></tr>
+        <tr><td><span class="b b-dat">datos</span></td><td>Posicion</td><td>Sí</td><td>Agrupar valores (fila, columna) sin lógica</td></tr>
+      </table></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 7. TICK -->
+<section id="tick">
+  <h2>7. Un tick paso a paso: <code>Partida.actualizar()</code></h2>
+  <p class="lead">Cada vez que el jugador aprieta Enter (o W/A/S/D), la consola llama a <code>controlador.actualizar(1/24)</code>, que llama a <code>partida.actualizar(1/24)</code>. Ese método es el corazón del juego. Recorrelo:</p>
+  <div class="stepper">
+    <ol class="steps" id="stepList"></ol>
+    <div class="panel" id="stepView"></div>
+  </div>
+</section>
+
+<!-- 8. ESTADOS -->
+<section id="estados">
+  <h2>8. Máquinas de estado</h2>
+  <p class="lead">Los dos <code>enum</code> de estado definen qué puede pasar en cada momento.</p>
+  <div class="grid2">
+    <div class="panel">
+      <h3 style="margin-top:0">Fantasma · <code>EstadoFantasma</code></h3>
+      <svg class="diagram" viewBox="0 0 740 330" role="img" aria-label="Estados del fantasma">
+        <defs><marker id="mArr" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto"><path d="M1,1 L11,6 L1,11z" style="fill:var(--muted)"/></marker></defs>
+        <g class="state"><rect x="30" y="200" width="200" height="56" rx="28" style="stroke:#e0473a"/><text x="130" y="234" style="fill:#e0473a">PERSIGUIENDO</text></g>
+        <g class="state"><rect x="270" y="30" width="200" height="56" rx="28" style="stroke:#3a7be0"/><text x="370" y="64" style="fill:#3a7be0">ASUSTADO</text></g>
+        <g class="state"><rect x="510" y="200" width="200" height="56" rx="28" style="stroke:#8a8f9c"/><text x="610" y="234" style="fill:var(--muted)">REGRESANDO</text></g>
+        <path class="tr" d="M180,200 L320,88" marker-end="url(#mArr)"/>
+        <text class="tlbl" x="232" y="168" text-anchor="middle">asustar(10)</text>
+        <path class="tr" d="M272,58 C170,60 90,110 90,198" marker-end="url(#mArr)"/>
+        <text class="tlbl" x="60" y="96">susto ≤ 0</text>
+        <path class="tr" d="M420,88 L560,200" marker-end="url(#mArr)"/>
+        <text class="tlbl" x="510" y="136">serComido()</text>
+        <text class="note" x="510" y="152">+200 puntos</text>
+        <path class="tr" d="M510,236 L232,236" marker-end="url(#mArr)"/>
+        <text class="tlbl" x="370" y="226" text-anchor="middle">llegó a posicionInicial</text>
+        <text class="note" x="20" y="292">• volverAlInicio() (PacMan pierde una vida) → PERSIGUIENDO desde cualquier estado.</text>
+        <text class="note" x="20" y="314">• En REGRESANDO ignora asustar() y los choques con PacMan no tienen efecto.</text>
+      </svg>
+      <p class="small muted">Comportamiento en <code>elegirDireccion()</code>: <b>PERSIGUIENDO</b> → BFS hacia PacMan · <b>ASUSTADO</b> → dirección al azar · <b>REGRESANDO</b> → BFS hacia su posición inicial.</p>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">Partida · <code>EstadoPartida</code></h3>
+      <svg class="diagram" viewBox="0 0 740 330" role="img" aria-label="Estados de la partida">
+        <g class="state"><rect x="30" y="130" width="170" height="56" rx="28" style="stroke:#b88a00"/><text x="115" y="164" style="fill:#b88a00">PAUSADA</text></g>
+        <g class="state"><rect x="300" y="130" width="170" height="56" rx="28" style="stroke:var(--brand)"/><text x="385" y="164" style="fill:var(--brand)">EN_CURSO</text></g>
+        <g class="state"><rect x="560" y="40" width="160" height="56" rx="28" style="stroke:#2f9a63"/><text x="640" y="74" style="fill:#2f9a63">VICTORIA</text></g>
+        <g class="state"><rect x="560" y="220" width="160" height="56" rx="28" style="stroke:#e0473a"/><text x="640" y="254" style="fill:#e0473a">DERROTA</text></g>
+        <path class="tr" d="M300,146 L202,146" marker-end="url(#mArr)"/><text class="tlbl" x="251" y="138" text-anchor="middle">pausar()</text>
+        <path class="tr" d="M200,172 L298,172" marker-end="url(#mArr)"/><text class="tlbl" x="251" y="194" text-anchor="middle">reanudar()</text>
+        <path class="tr" d="M462,140 L566,84" marker-end="url(#mArr)"/><text class="tlbl" x="470" y="100">sin puntos</text>
+        <path class="tr" d="M462,178 L566,232" marker-end="url(#mArr)"/><text class="tlbl" x="470" y="230">vidas = 0</text>
+        <path class="tr" d="M600,40 C560,0 400,10 385,128" marker-end="url(#mArr)" style="stroke-dasharray:6 5"/>
+        <path class="tr" d="M600,276 C560,320 400,310 385,188" marker-end="url(#mArr)" style="stroke-dasharray:6 5"/>
+        <text class="note" x="250" y="22">nuevaPartida() → new Partida()</text>
+        <text class="note" x="20" y="300">Inicio: EN_CURSO. Sólo en EN_CURSO avanza actualizar().</text>
+        <text class="note" x="20" y="322">VICTORIA/DERROTA son finales: el controlador crea otra Partida.</text>
+      </svg>
+      <p class="small muted">Las flechas punteadas no cambian el estado de la misma partida: <code>ControladorJuego.nuevaPartida()</code> descarta la vieja y crea una nueva que empieza en <code>EN_CURSO</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9. REQUERIMIENTOS -->
+<section id="requerimientos">
+  <h2>9. Requerimientos → código</h2>
+  <p class="lead">Dónde se cumple cada uno de los 10 requerimientos del TPO y la entrega de interfaz gráfica (Fase C).</p>
+  <div class="panel table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Requerimiento</th><th>Lo resuelve</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Movimiento en 4 direcciones</td><td><code>Direccion</code>, <code>PacMan.elegirDireccion()</code>, <code>VentanaPrincipal.procesarEntrada()</code> (W/A/S/D o flechas), <code>JuegoConsola.procesar()</code></td></tr>
+        <tr><td>2</td><td>Paredes</td><td><code>Laberinto.esTransitable()</code> dentro de <code>Personaje.calcularProximaPosicion()</code>: si hay pared se queda quieto</td></tr>
+        <tr><td>3</td><td>Puntaje (10 / 50)</td><td><code>PuntoComun.valor()</code>, <code>SuperPunto.valor()</code>, <code>Celda.retirarPunto()</code>, <code>Partida.consumir()</code></td></tr>
+        <tr><td>4</td><td>Fantasmas persiguen</td><td><code>Fantasma.elegirDireccion()</code> + <code>Laberinto.caminoMasCorto()</code> (BFS)</td></tr>
+        <tr><td>5</td><td>Superpunto asusta</td><td><code>Partida.consumir()</code> → <code>Fantasma.asustar(10)</code>; azar con <code>direccionesDisponibles()</code></td></tr>
+        <tr><td>6</td><td>Comer fantasma (+200, regresa)</td><td><code>Partida.resolverColision()</code> → <code>Fantasma.serComido()</code>; <code>actualizarEstado()</code> al llegar</td></tr>
+        <tr><td>7</td><td>Muerte de PacMan</td><td><code>Partida.detectarColision()</code> + <code>perderVida()</code> + <code>volverAlInicio()</code> de todos</td></tr>
+        <tr><td>8</td><td>3 vidas → derrota</td><td><code>Partida.VIDAS_INICIALES</code>, <code>perderVida()</code> → <code>EstadoPartida.DERROTA</code></td></tr>
+        <tr><td>9</td><td>Victoria</td><td><code>Laberinto.quedanPuntos()</code>, <code>Partida.comprobarVictoria()</code> → <code>VICTORIA</code></td></tr>
+        <tr><td>10</td><td>Pausar, reanudar, reiniciar</td><td><code>Partida.pausar()/reanudar()</code>, <code>ControladorJuego.nuevaPartida()</code>, teclas P y N en ambas vistas, botón "Nueva Partida" en UI Swing</td></tr>
+        <tr><td>Fase C</td><td>Interfaz Gráfica Swing (GUI)</td><td><code>vista.VentanaPrincipal</code> (JFrame, bucle por Timer a 200 ms, HUD con puntaje/vidas/tiempo/estado, espera inicial <code>esperandoInicio</code>) y <code>vista.PanelLaberinto</code> (JPanel, renderizado 2D de celdas, boca de Pac-Man orientada por <code>Direccion</code>, fantasmas diferenciados por estado y banners traslúcidos)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 10. CONCEPTOS -->
+<section id="conceptos">
+  <h2>10. Conceptos de POO aplicados</h2>
+  <p class="lead">Dónde aparece en este código cada concepto visto en la materia.</p>
+  <div class="grid2">
+    <div class="panel concept"><h3>Abstracción</h3><p>Modelar sólo lo necesario. <code>Personaje</code> y <code>Punto</code> son <code>abstract</code>: describen “algo que se mueve” y “algo que vale puntos” sin poder crearse solas.</p><div class="where">Personaje.java, Punto.java</div></div>
+    <div class="panel concept"><h3>Herencia</h3><p><code>PacMan</code> y <code>Fantasma</code> reciben gratis <code>posicion</code>, <code>posicionInicial</code>, <code>direccion</code>, <code>calcularProximaPosicion()</code> y <code>getPosicion()</code>. Llaman al constructor padre con <code>super(posicionInicial)</code>.</p><div class="where">PacMan.java, Fantasma.java, PuntoComun.java, SuperPunto.java</div></div>
+    <div class="panel concept"><h3>Polimorfismo (sobrescritura)</h3><p>Mismo mensaje, distinto comportamiento: <code>valor()</code> devuelve 10 o 50; <code>volverAlInicio()</code> resetea cosas distintas. Se marca con <code>@Override</code>.</p><div class="where">Partida.consumir() usa <code>punto.valor()</code></div></div>
+    <div class="panel concept"><h3>Sobrecarga</h3><p>Mismo nombre, distintos parámetros. <code>Laberinto</code> tiene 3 constructores (vacío, <code>Celda[][]</code>, <code>String[]</code>); <code>Celda</code> 3; <code>Partida</code> y <code>ControladorJuego</code> 2 cada una. El vacío llama al completo con <code>this(...)</code>.</p><div class="where">Laberinto.java, Celda.java, Partida.java</div></div>
+    <div class="panel concept"><h3>Encapsulamiento</h3><p>Atributos <code>private</code>/<code>protected</code> y acceso por métodos. Además hay <b>copias defensivas</b>: <code>getPosicion()</code> devuelve una <code>Posicion</code> nueva y <code>getMapa()</code> devuelve <code>char[][]</code> en vez de las <code>Celda</code> reales, así la vista no puede romper el modelo.</p><div class="where">Personaje.getPosicion(), Partida.getMapa()</div></div>
+    <div class="panel concept"><h3>Composición</h3><p>Objetos formados por otros: una <code>Partida</code> tiene un <code>Laberinto</code>, que tiene <code>Celda</code>s, que tienen un <code>Punto</code>. Cada uno se ocupa de lo suyo.</p><div class="where">Ver sección 4</div></div>
+    <div class="panel concept"><h3>Inyección de dependencias</h3><p>Los constructores <code>Partida(Laberinto, Posicion)</code> y <code>ControladorJuego(Partida)</code> permiten a los tests armar escenarios chicos y controlados en vez del mapa completo.</p><div class="where">src/test/*.java</div></div>
+    <div class="panel concept"><h3>Método de fábrica</h3><p><code>Laberinto.crearDefault()</code> es un método <code>static</code> que construye el laberinto estándar. Se llama sobre la clase, no sobre un objeto.</p><div class="where">Laberinto.java:112</div></div>
+    <div class="panel concept"><h3>Enumeraciones</h3><p><code>Direccion</code>, <code>EstadoFantasma</code> y <code>EstadoPartida</code> limitan los valores posibles y permiten <code>switch</code> seguros.</p><div class="where">paquete extra</div></div>
+    <div class="panel concept"><h3>Separación de responsabilidades (MVC)</h3><p>La vista no conoce reglas, el modelo no conoce la vista. En la Fase C se incorporó la interfaz gráfica Swing (<code>VentanaPrincipal</code> y <code>PanelLaberinto</code>) reemplazando a <code>JuegoConsola</code> como cliente visual principal sin necesidad de modificar las reglas de negocio del <code>modelo</code>.</p><div class="where">vista / consola / controlador / modelo</div></div>
+  </div>
+</section>
+
+<!-- 11. OBSERVACIONES -->
+<section id="observaciones">
+  <h2>11. Puntos a revisar</h2>
+  <p class="lead">Cosas que aparecen al leer el código con lupa. No rompen el juego; son candidatas a pulir o a justificar si el docente pregunta.</p>
+  <div class="obs">
+    <details><summary>Arranque en espera de dirección (<code>esperandoInicio</code>) <span class="b b-enu">diseño GUI</span></summary><p>Al iniciar la partida o presionar "Nueva Partida" (N), la interfaz gráfica entra en un estado de espera: el temporizador corre y el HUD muestra <code>¡Listo! (Elija una dirección)</code>, pero no avanza ticks en el modelo hasta que el jugador presiona una tecla de dirección (W/A/S/D o flechas). Esto da tiempo de reacción al jugador antes de que los 4 fantasmas arranquen a perseguirlo.</p></details>
+    <details><summary>La leyenda dice <code>C</code> para PacMan, pero se dibuja <code>P</code> <span class="b b-dat">inconsistencia</span></summary><p><code>JuegoConsola.mostrar()</code> pone <code>'P'</code> en el mapa (<a href="../src/consola/JuegoConsola.java">JuegoConsola.java:129</a>) y la línea de ayuda dice <code>C: PacMan</code> (línea 136). El README también dice <code>C</code>. Unificar uno de los dos.</p></details>
+    <details><summary><code>Posicion</code> tiene atributos <code>public</code> <span class="b b-abs">diseño</span></summary><p><code>fila</code> y <code>columna</code> se pueden modificar desde cualquier lado. Por eso <code>Personaje</code> y <code>Laberinto</code> devuelven copias. Además el constructor llama <code>x, y</code> a lo que en realidad es <code>fila, columna</code> (<a href="../src/extra/Posicion.java">Posicion.java:8</a>), lo que puede confundir (x suele ser columna). Alternativa: atributos <code>private final</code> con getters.</p></details>
+    <details><summary>Fantasma hereda <code>direccion</code> pero nunca la usa <span class="b b-abs">diseño</span></summary><p>El atributo queda en <code>null</code> y <code>getDireccion()</code> devuelve <code>null</code> para fantasmas. Podría guardarse la dirección elegida o mover el atributo sólo a <code>PacMan</code>.</p></details>
+    <details><summary><code>mover()</code> es idéntico en PacMan y Fantasma <span class="b b-abs">diseño</span></summary><p>Ambos hacen <code>posicion = calcularProximaPosicion(dir, lab)</code>. Podría implementarse una sola vez en <code>Personaje</code> (dejando de ser abstracto). Además <code>PacMan.mover(dir, …)</code> recibe la dirección por parámetro aunque ya la tiene en su atributo.</p></details>
+    <details><summary>Rama de <code>resolverColision()</code> que no se usa desde <code>actualizar()</code> <span class="b b-dat">código muerto</span></summary><p><code>actualizar()</code> sólo llama a <code>resolverColision</code> para fantasmas <code>ASUSTADO</code>; el caso <code>PERSIGUIENDO</code> lo maneja aparte con <code>contactoPeligroso</code> para perder una sola vida aunque toquen varios (<a href="../src/modelo/Partida.java">Partida.java:122-133</a>). La rama <code>PERSIGUIENDO → perderVida()</code> de <code>resolverColision</code> (línea 195) sólo se usa si alguien la llama directamente (p. ej. tests).</p></details>
+    <details><summary>Chocar con un fantasma <code>REGRESANDO</code> no hace nada <span class="b b-dat">decisión de diseño</span></summary><p>El requerimiento 7 dice “si PacMan toca a un fantasma que <i>no está asustado</i>, pierde una vida”. Literalmente <code>REGRESANDO</code> no está asustado, pero el código lo ignora (como en el Pac-Man clásico, donde los “ojos” son inofensivos). En la interfaz gráfica (Fase C) esto se representa explícitamente: el fantasma pierde su cuerpo y se dibuja únicamente como ojos flotantes que regresan a su casa.</p></details>
+    <details><summary><code>new Random()</code> en cada llamada <span class="b b-dat">mejora</span></summary><p><code>Fantasma.elegirDireccion()</code> crea un <code>Random</code> nuevo cada vez (<a href="../src/modelo/Fantasma.java">Fantasma.java:46</a>). Funciona, pero un atributo <code>Random</code> (o uno inyectable con semilla) haría reproducibles los tests del modo asustado.</p></details>
+    <details><summary><code>instanceof SuperPunto</code> en <code>Partida</code> <span class="b b-abs">diseño</span></summary><p><code>consumir()</code>, <code>actualizar()</code> y <code>getMapa()</code> preguntan el tipo concreto. Una alternativa más polimórfica sería que <code>Punto</code> tenga, por ejemplo, <code>boolean asustaFantasmas()</code> (false en común, true en super) o un símbolo propio.</p></details>
+    <details><summary>Los 4 fantasmas son iguales <span class="b b-dat">limitación conocida</span></summary><p>Nacen en la misma celda (<code>laberinto.centro()</code>) y usan el mismo BFS, así que al perseguir se mueven superpuestos. Ya está anotado en el README.</p></details>
+    <details><summary>Restos de depuración / constructores sin uso <span class="b b-dat">limpieza</span></summary><p><code>Laberinto.main()</code> (<a href="../src/modelo/Laberinto.java">Laberinto.java:242</a>) sólo imprime el mapa. <code>Celda()</code> vacío (<a href="../src/modelo/Celda.java">Celda.java:11</a>) deja todos los atributos en <code>null</code>/<code>false</code>. Los números mágicos <code>200</code> y <code>4</code> fantasmas podrían ser constantes como <code>VIDAS_INICIALES</code>.</p></details>
+  </div>
+</section>
+
+<footer>Generado a partir del código fuente del repositorio. Actualizado con la implementación de la Fase C (interfaz gráfica Swing).</footer>
+</main>
+</div>
+
+<script>
+/* ---------------- LABERINTO ---------------- */
+const MAPA = [
+  "###############",
+  "#o...........o#",
+  "#.###.###.###.#",
+  "#.............#",
+  "#.###.#.#.###.#",
+  "#.....#.#.....#",
+  "###.#.#.#.#.###",
+  "#...#.....#...#",
+  "#.#.#.###.#.#.#",
+  "#...#.....#...#",
+  "###.#.#.#.#.###",
+  "#.....#.#.....#",
+  "#.###.#.#.###.#",
+  "#o...........o#",
+  "###############"
+];
+const PAC = [13,7], GHOST = [7,7];
+const DIRS = [["ARRIBA",-1,0],["ABAJO",1,0],["IZQUIERDA",0,-1],["DERECHA",0,1]];
+const transitable = (f,c) => f>=0 && f<MAPA.length && c>=0 && c<MAPA[0].length && MAPA[f][c] !== "#";
+
+function bfs(o, d){ // misma lógica y orden que Laberinto.caminoMasCorto
+  const key = (f,c)=>f+","+c, padre = {}, vis = new Set([key(...o)]), cola = [o];
+  while (cola.length){
+    const a = cola.shift();
+    if (a[0]===d[0] && a[1]===d[1]){
+      const camino=[]; let x=a;
+      while (x){ camino.push(x); x = padre[key(...x)]; }
+      return camino.reverse();
+    }
+    for (const [,df,dc] of DIRS){
+      const p=[a[0]+df,a[1]+dc];
+      if (!transitable(...p) || vis.has(key(...p))) continue;
+      vis.add(key(...p)); padre[key(...p)] = a; cola.push(p);
+    }
+  }
+  return [];
+}
+
+const mazeEl = document.getElementById("maze"), info = document.getElementById("cellInfo");
+const infoDefault = info.innerHTML;
+let comunes=0, supers=0;
+MAPA.forEach((row,f)=>[...row].forEach((ch,c)=>{
+  const el = document.createElement("div");
+  el.className = "cell " + (ch==="#" ? "wall" : "path");
+  el.dataset.f=f; el.dataset.c=c;
+  if (ch==="."){ el.innerHTML='<span class="dot"></span>'; comunes++; }
+  if (ch==="o"){ el.innerHTML='<span class="sdot"></span>'; supers++; }
+  if (f===PAC[0] && c===PAC[1]) el.classList.add("pac");
+  if (f===GHOST[0] && c===GHOST[1]) el.classList.add("ghost");
+  mazeEl.appendChild(el);
+}));
+document.getElementById("mazeStats").innerHTML =
+  `Mapa: ${comunes} puntos comunes + ${supers} superpuntos = <b>${comunes*10+supers*50}</b> puntos posibles por comida (sin contar fantasmas). Ojo: la celda inicial de PacMan (13,7) también tiene punto. Como <code>actualizar()</code> sólo come el punto de la celda <i>a la que entra</i>, ese se come recién cuando PacMan vuelve a pasar por ahí.`;
+
+function describe(f,c){
+  const ch = MAPA[f][c];
+  const tipo = ch==="#" ? "Pared — <code>esPared()</code> = true, no transitable"
+    : ch==="o" ? "Superpunto (<code>SuperPunto</code>, valor 50)"
+    : ch==="." ? "Punto común (<code>PuntoComun</code>, valor 10)" : "Vacía";
+  let extra = "";
+  if (ch!=="#"){
+    const ds = DIRS.filter(([,df,dc])=>transitable(f+df,c+dc)).map(d=>d[0]);
+    extra = `<br><code>direccionesDisponibles()</code> → [${ds.join(", ")}]`;
+  }
+  let quien = "";
+  if (f===PAC[0]&&c===PAC[1]) quien = "<br><b>Inicio de PacMan</b> (<code>Partida.INICIO_PACMAN</code>)";
+  if (f===GHOST[0]&&c===GHOST[1]) quien = "<br><b>Inicio de los 4 fantasmas</b> (<code>laberinto.centro()</code> = 15/2, 15/2)";
+  return `<h4>Celda (${f}, ${c})</h4><div class="small">${tipo}${extra}${quien}</div>`;
+}
+let selected = null;
+mazeEl.addEventListener("mouseover", e=>{
+  const el = e.target.closest(".cell"); if (!el || selected) return;
+  info.innerHTML = describe(+el.dataset.f, +el.dataset.c);
+});
+mazeEl.addEventListener("mouseleave", ()=>{ if(!selected) info.innerHTML = infoDefault; });
+mazeEl.addEventListener("click", e=>{
+  const el = e.target.closest(".cell"); if (!el) return;
+  mazeEl.querySelectorAll(".bfs,.bfs1,.sel").forEach(x=>x.classList.remove("bfs","bfs1","sel"));
+  const f=+el.dataset.f, c=+el.dataset.c;
+  if (!transitable(f,c) || (selected && selected[0]===f && selected[1]===c)){ selected=null; info.innerHTML = describe(f,c); return; }
+  selected=[f,c]; el.classList.add("sel");
+  const camino = bfs(GHOST,[f,c]);
+  camino.slice(1).forEach((p,i)=>{
+    const cell = mazeEl.children[p[0]*15+p[1]];
+    cell.classList.add(i===0 ? "bfs1" : "bfs");
+  });
+  let dir = "null (ya está ahí)";
+  if (camino.length>1){
+    const df = camino[1][0]-GHOST[0], dc = camino[1][1]-GHOST[1];
+    dir = DIRS.find(d=>d[1]===df&&d[2]===dc)[0];
+  }
+  info.innerHTML = describe(f,c) +
+    `<p class="small" style="margin-top:10px"><b>caminoMasCorto((7,7) → (${f},${c}))</b>: ${camino.length} posiciones, ${camino.length-1} pasos.<br>
+     Un fantasma PERSIGUIENDO con PacMan en esta celda devolvería <code>Direccion.${dir}</code>.</p>
+     <p class="small muted">Hacé clic de nuevo en la celda para limpiar.</p>`;
+});
+
+/* ---------------- CLASES ---------------- */
+const V = {"+":"pub","-":"pri","#":"pro"};
+const CLASES = [
+ {n:"VentanaPrincipal", pkg:"vista", k:"con", src:"src/vista/VentanaPrincipal.java",
+  d:"Ventana gráfica principal (Swing JFrame). Controla el bucle de animación en tiempo real con Timer a 200 ms (5 FPS), captura teclado (flechas y W/A/S/D, P de pausa, N de nueva partida), gestiona el estado de arranque en espera (esperandoInicio) y actualiza el HUD superior.",
+  a:[["-","final ControladorJuego controlador","Intermediario exclusivo con el modelo."],
+     ["-","final PanelLaberinto panelLaberinto","Panel donde se renderiza la grilla 2D."],
+     ["-","Timer temporizador","Bucle de ticks a 200 ms (5 FPS)."],
+     ["-","JLabel lblPuntaje, lblVidas, lblTiempo, lblEstado","Etiquetas del encabezado informativo (HUD)."],
+     ["-","boolean esperandoInicio","true al inicio o al reiniciar; no avanza el tick del juego hasta que el jugador elija una dirección."],
+     ["-","double tiempoTranscurrido","Tiempo acumulado de juego."],
+     ["-","static final double SEGUNDOS_POR_TICK","= 0.2 (200 ms)."]],
+  m:[["+","static void main(String[] args)","Punto de entrada gráfico: invoca la ventana en el Event Dispatch Thread (SwingUtilities.invokeLater)."],
+     ["+","VentanaPrincipal()","Configura la ventana, barra de botones, HUD, PanelLaberinto, KeyListener e inicializa el Timer."],
+     ["-","void iniciarJuego()","Arranca el temporizador Swing."],
+     ["-","void actualizarJuego()","Tick gráfico: si esperandoInicio es false, llama a controlador.actualizar(0.2). Refresca el panel y HUD."],
+     ["-","void actualizarInformacion()","Actualiza textos y colores de puntaje, vidas, tiempo y estado (¡Listo!, En curso, Pausa, etc.)."],
+     ["-","void reiniciarPartida()","Pide controlador.nuevaPartida(), resetea esperandoInicio a true y refresca la vista."],
+     ["-","void procesarEntrada(KeyEvent e)","Traduce flechas o W/A/S/D a moverPacMan y desactiva esperandoInicio; P conmuta pausa; N reinicia."]],
+  r:["ControladorJuego","PanelLaberinto","Direccion","EstadoPartida"]},
+
+ {n:"PanelLaberinto", pkg:"vista", k:"con", src:"src/vista/PanelLaberinto.java",
+  d:"Panel gráfico (Swing JPanel) que dibuja en 2D el laberinto y los personajes. Renderiza celdas, paredes con reborde, puntos comunes, superpuntos titilantes, Pac-Man con rotación angular de su boca según su dirección actual, fantasmas según su estado y carteles semitransparentes de estado.",
+  a:[["-","static final int TAMANO_CELDA","= 32 píxeles por casillero."],
+     ["-","final ControladorJuego controlador","Fuente de datos para consultar mapa, posiciones y estados."],
+     ["-","static final Color[] COLORES_FANTASMAS","Rojo (#E74C3C), Rosa (#FF69B4), Cian (#00CED1), Naranja (#FF8C00)."]],
+  m:[["+","PanelLaberinto(ControladorJuego controlador)","Constructor: define tamaño preferido (15×32 = 480×480 px) y fondo oscuro (#0B1030)."],
+     ["#","void paintComponent(Graphics g)","@Override: renderiza en orden capas de laberinto, puntos, Pac-Man, fantasmas y carteles."],
+     ["-","void dibujarLaberinto(Graphics g)","Pinta paredes azules (#1B2A7A con borde #3549B8), puntos normales (crema) y superpuntos."],
+     ["-","void dibujarPacMan(Graphics g)","Dibuja a Pac-Man en amarillo con boca abierta (300°) rotada hacia su Direccion (DERECHA 30°, ARRIBA 120°, IZQUIERDA 210°, ABAJO 300°)."],
+     ["-","void dibujarFantasmas(Graphics g)","PERSIGUIENDO: cuerpo de su color + ojos. ASUSTADO: cuerpo azul oscuro (#2C3E50) + ojos asustados. REGRESANDO: sin cuerpo, sólo ojos flotantes dirigiéndose a la base."],
+     ["-","void dibujarOjos(Graphics g, int x, int y, int tam)","Dibuja escleras blancas y pupilas azules de los fantasmas."],
+     ["-","void dibujarCartelEstado(Graphics g)","Superpone banner semitransparente con borde y texto centrado para PAUSADA (amarillo), VICTORIA (verde) o DERROTA (rojo)."]],
+  r:["ControladorJuego","Direccion","EstadoPartida","EstadoFantasma","Posicion"]},
+
+ {n:"JuegoConsola", pkg:"consola", k:"con", src:"src/consola/JuegoConsola.java",
+  d:"Vista de texto. Muestra el tablero, lee un comando por línea y lo traduce a llamadas al controlador. Cada comando de movimiento o Enter avanza exactamente un tick.",
+  a:[["-","static final double SEGUNDOS_POR_TICK","= 1.0/24.0. Tiempo simulado que pasa por cada comando."],
+     ["-","final ControladorJuego controlador","Único contacto con el juego."],
+     ["-","long ticks","Contador de ticks, sólo para mostrar el tiempo."],
+     ["-","String mensaje","Texto informativo debajo del tablero (+puntos, vida perdida, errores)."]],
+  m:[["+","static void main(String[] args)","Punto de entrada: <code>new JuegoConsola().ejecutar()</code>."],
+     ["-","void ejecutar()","Bucle: <code>mostrar()</code> → lee una línea → <code>procesar()</code>, hasta <code>q</code> o fin de entrada."],
+     ["-","void procesar(String comando)","<code>p</code> pausa/reanuda · <code>n</code> nueva partida (sólo si terminó) · <code>w/a/s/d</code> cambia dirección. Si la partida está EN_CURSO avanza un tick y arma el mensaje comparando vidas y puntaje antes/después."],
+     ["-","boolean finalizada()","true si el estado es VICTORIA o DERROTA."],
+     ["-","void mostrar()","Limpia la pantalla con códigos ANSI, pide <code>getMapa()</code> y encima dibuja fantasmas (<code>F</code>/<code>f</code>/<code>r</code>) y PacMan (<code>P</code>)."]],
+  r:["ControladorJuego","Direccion","EstadoPartida","EstadoFantasma","Posicion"]},
+
+ {n:"ControladorJuego", pkg:"controlador", k:"con", src:"src/controlador/ControladorJuego.java",
+  d:"Intermediario entre la vista y el modelo. No tiene lógica propia: cada método reenvía a Partida. Su única decisión es cuándo se permite crear una partida nueva.",
+  a:[["-","Partida partida","La partida actual. Se reemplaza en nuevaPartida()."]],
+  m:[["+","ControladorJuego()","Crea una <code>new Partida()</code> con el mapa por defecto."],
+     ["+","ControladorJuego(Partida partida)","Usa una partida ya armada (para tests)."],
+     ["+","void moverPacMan(Direccion d)","→ <code>partida.elegirDireccionPacman(d)</code>. Sólo cambia la dirección; no mueve hasta el próximo tick."],
+     ["+","Direccion getDireccionPacMan()","→ <code>partida.getDireccionPacMan()</code>. Permite a la vista orientar la boca de Pac-Man."],
+     ["+","void actualizar(double t)","→ <code>partida.actualizar(t)</code>."],
+     ["+","void pausar() / reanudar()","→ <code>partida.pausar()</code> / <code>reanudar()</code>."],
+     ["+","void nuevaPartida()","Si la partida está en VICTORIA o DERROTA, la reemplaza por una nueva. Si no, no hace nada."],
+     ["+","getPosicionPacMan(), getVidas(), getPuntaje(), getEstado(), getMapa(), getPosicionesFantasmas(), getEstadosFantasmas()","Consultas que devuelve tal cual lo que da Partida."]],
+  r:["Partida","VentanaPrincipal","PanelLaberinto","JuegoConsola","Direccion","EstadoPartida","EstadoFantasma","Posicion"]},
+
+ {n:"Partida", pkg:"modelo", k:"con", src:"src/modelo/Partida.java",
+  d:"El cerebro del juego. Guarda vidas, puntaje y estado, contiene el laberinto y los personajes, y aplica todas las reglas en cada tick.",
+  a:[["-","int vidas","Vidas restantes (empieza en 3)."],
+     ["-","int puntaje","Puntos acumulados."],
+     ["-","EstadoPartida estado","EN_CURSO, PAUSADA, VICTORIA o DERROTA."],
+     ["-","Laberinto laberinto","El tablero."],
+     ["-","PacMan pacMan","El jugador."],
+     ["-","Fantasma[] fantasmas","Array de 4 fantasmas."],
+     ["-","static final Posicion INICIO_PACMAN","(13, 7): fila de abajo, al centro."],
+     ["-","static final int VIDAS_INICIALES","3"],
+     ["-","static final double DURACION_SUSTO","10 segundos."]],
+  m:[["+","Partida()","Usa <code>Laberinto.crearDefault()</code> e <code>INICIO_PACMAN</code>."],
+     ["+","Partida(Laberinto lab, Posicion inicioPacMan)","3 vidas, 0 puntos, EN_CURSO. Crea a PacMan y 4 fantasmas en <code>lab.centro()</code>."],
+     ["+","void actualizar(double t)","Un tick completo del juego. Ver sección 7."],
+     ["+","void consumir(Punto p)","Suma <code>p.valor()</code>. Si es SuperPunto llama <code>asustar(10)</code> a cada fantasma. Ignora <code>null</code>."],
+     ["+","List&lt;Fantasma&gt; detectarColision(Posicion proxPac, List&lt;Posicion&gt; proxFant)","Devuelve los fantasmas que llegan a la misma celda que PacMan o que se cruzan con él."],
+     ["+","void resolverColision(Fantasma f)","ASUSTADO → +200 y <code>f.serComido()</code>. PERSIGUIENDO → <code>perderVida()</code>."],
+     ["+","boolean comprobarVictoria()","<code>!laberinto.quedanPuntos()</code>"],
+     ["+","void perderVida()","Resta una vida, devuelve a todos al inicio; con 0 vidas → DERROTA. Sólo actúa si está EN_CURSO."],
+     ["+","void pausar() / reanudar()","EN_CURSO ⇄ PAUSADA. En otros estados no hace nada."],
+     ["+","void elegirDireccionPacman(Direccion d)","→ <code>pacMan.elegirDireccion(d)</code>."],
+     ["+","Direccion getDireccionPacMan()","→ <code>this.pacMan.getDireccion()</code>."],
+     ["+","char[][] getMapa()","Matriz nueva de símbolos <code># . o</code> y espacio. No expone las Celda reales."],
+     ["+","getVidas(), getPuntaje(), getEstado(), getPosicionPacMan()","Consultas."],
+     ["+","Posicion[] getPosicionesFantasmas() / EstadoFantasma[] getEstadosFantasmas()","Arrays nuevos, uno por fantasma."]],
+  r:["Laberinto","PacMan","Fantasma","Punto","SuperPunto","Celda","ControladorJuego","EstadoPartida","EstadoFantasma"]},
+
+ {n:"Laberinto", pkg:"modelo", k:"con", src:"src/modelo/Laberinto.java",
+  d:"El tablero. Sabe qué celdas se pueden pisar, qué direcciones hay desde una celda, el camino más corto entre dos puntos y si quedan puntos por comer.",
+  a:[["-","static final String[] MAPA_POR_DEFECTO","15 strings de 15 caracteres: <code>#</code> pared, <code>.</code> punto, <code>o</code> superpunto, espacio vacío."],
+     ["-","final Celda[][] celdas","La grilla. <code>final</code>: no se reemplaza, pero sus celdas sí cambian."]],
+  m:[["+","Laberinto()","Construye desde MAPA_POR_DEFECTO."],
+     ["+","Laberinto(Celda[][] celdas)","Valida que no esté vacío, que sea rectangular y sin nulos."],
+     ["+","Laberinto(String[] mapa)","Convierte cada carácter en una Celda. Lanza <code>IllegalArgumentException</code> si hay símbolos inválidos."],
+     ["+","static Laberinto crearDefault()","Método de fábrica."],
+     ["+","boolean esTransitable(Posicion p)","Dentro del mapa y no es pared."],
+     ["+","List&lt;Direccion&gt; direccionesDisponibles(Posicion p)","Direcciones cuya celda vecina es transitable (lo usa el fantasma asustado)."],
+     ["+","List&lt;Posicion&gt; caminoMasCorto(Posicion o, Posicion d)","BFS. Devuelve la lista de posiciones desde origen hasta destino (ambos incluidos), o vacía si no hay camino."],
+     ["+","boolean quedanPuntos()","Recorre todas las celdas buscando alguna con punto."],
+     ["+","Posicion centro()","(filas/2, columnas/2) = (7, 7)."],
+     ["+","Celda obtenerCelda(Posicion p)","La celda, o <code>null</code> si está fuera del mapa."],
+     ["+","int getFilas() / getColumnas()","Dimensiones."],
+     ["+","void imprimirLaberinto() / static main()","Utilidades de depuración por consola."],
+     ["-","vecino(), reconstruirCamino(), mismaPosicion(), copiar()","Ayudantes internos del BFS."]],
+  r:["Celda","Posicion","Direccion","PuntoComun","SuperPunto","Partida","Personaje","Fantasma"]},
+
+ {n:"Celda", pkg:"modelo", k:"con", src:"src/modelo/Celda.java",
+  d:"Un casillero del laberinto. Es pared o no, y puede contener un punto que se retira cuando PacMan lo come.",
+  a:[["-","Posicion posicion","Su coordenada."],
+     ["-","boolean pared","true si es pared."],
+     ["-","Punto punto","El punto que tiene, o <code>null</code>. Siempre <code>null</code> en paredes."]],
+  m:[["+","Celda()","Constructor vacío (todo en null/false)."],
+     ["+","Celda(boolean esPared, boolean esSuperPunto, int x, int y)","Crea el punto según el booleano y delega en el otro constructor."],
+     ["+","Celda(boolean esPared, Punto punto, int x, int y)","Constructor principal."],
+     ["+","Punto retirarPunto()","Devuelve el punto y lo deja en <code>null</code>: así cada punto se come una sola vez."],
+     ["+","Punto tipoPunto()","Consulta el punto sin sacarlo."],
+     ["+","boolean esPared() / tienePunto()","Consultas."],
+     ["+","Posicion getPosicion()","Su coordenada."]],
+  r:["Punto","PuntoComun","SuperPunto","Posicion","Laberinto"]},
+
+ {n:"Punto", pkg:"modelo", k:"abs", src:"src/modelo/Punto.java",
+  d:"Lo que PacMan come. Clase abstracta: define que todo punto tiene un valor, pero no cuál.",
+  a:[],
+  m:[["+","abstract int valor()","Cada subclase dice cuánto vale."]],
+  r:["PuntoComun","SuperPunto","Celda","Partida"]},
+ {n:"PuntoComun", pkg:"modelo", k:"con", src:"src/modelo/PuntoComun.java",
+  d:"El punto normal de los pasillos.", a:[],
+  m:[["+","int valor()","@Override → 10"]], r:["Punto"]},
+ {n:"SuperPunto", pkg:"modelo", k:"con", src:"src/modelo/SuperPunto.java",
+  d:"Los 4 puntos grandes de las esquinas. Además de puntos, hace que Partida asuste a los fantasmas.", a:[],
+  m:[["+","int valor()","@Override → 50"]], r:["Punto","Partida","Fantasma"]},
+
+ {n:"Personaje", pkg:"modelo", k:"abs", src:"src/modelo/Personaje.java",
+  d:"Todo lo que se mueve por el laberinto. Aporta la posición, la posición inicial y el cálculo de un paso; deja a cada hijo cómo moverse y cómo reiniciarse.",
+  a:[["#","Posicion posicion","Dónde está ahora."],
+     ["#","Posicion posicionInicial","Dónde vuelve al reiniciar."],
+     ["#","Direccion direccion","Hacia dónde mira (lo usa PacMan)."]],
+  m:[["#","Personaje(Posicion inicial)","Guarda dos copias de la posición recibida (copia defensiva)."],
+     ["+","Posicion calcularProximaPosicion(Direccion d, Laberinto lab)","Suma ±1 a fila o columna. Si la celda no es transitable, devuelve la actual. <b>No mueve</b>."],
+     ["+","abstract void mover(Direccion d, Laberinto lab)","Cada hijo lo implementa."],
+     ["+","abstract void volverAlInicio()","Cada hijo lo implementa."],
+     ["+","Posicion getPosicion()","Copia de la posición actual."],
+     ["+","Direccion getDireccion()","Dirección actual."],
+     ["#","Posicion getPosicionInicial()","Copia de la inicial (sólo para hijos)."]],
+  r:["PacMan","Fantasma","Posicion","Direccion","Laberinto"]},
+
+ {n:"PacMan", pkg:"modelo", k:"con", src:"src/modelo/PacMan.java",
+  d:"El personaje del jugador. Recuerda la última dirección pedida y avanza en ella cada tick hasta chocar con una pared.",
+  a:[["","(heredados)","posicion, posicionInicial, direccion"]],
+  m:[["+","PacMan(Posicion inicial)","<code>super(inicial)</code> y dirección DERECHA."],
+     ["+","void elegirDireccion(Direccion d)","Guarda la dirección elegida por el jugador."],
+     ["+","void mover(Direccion d, Laberinto lab)","@Override: <code>posicion = calcularProximaPosicion(d, lab)</code>."],
+     ["+","void volverAlInicio()","@Override: posición inicial y DERECHA."]],
+  r:["Personaje","Partida","Direccion"]},
+
+ {n:"Fantasma", pkg:"modelo", k:"con", src:"src/modelo/Fantasma.java",
+  d:"Enemigo autónomo. Según su estado persigue a PacMan, huye al azar o vuelve a su casa.",
+  a:[["-","EstadoFantasma estado","PERSIGUIENDO, ASUSTADO o REGRESANDO."],
+     ["-","double tiempoSustoRestante","Segundos de susto que quedan."],
+     ["","(heredados)","posicion, posicionInicial, direccion (sin usar)"]],
+  m:[["+","Fantasma(Posicion inicial)","<code>super(inicial)</code>, estado PERSIGUIENDO."],
+     ["+","Direccion elegirDireccion(Laberinto lab, Posicion pacman)","ASUSTADO: una de <code>direccionesDisponibles()</code> al azar. PERSIGUIENDO: primer paso de <code>caminoMasCorto(posicion, pacman)</code>. REGRESANDO: primer paso hacia <code>posicionInicial</code>. Puede devolver <code>null</code> (quedarse quieto)."],
+     ["+","void mover(Direccion d, Laberinto lab)","@Override, igual que PacMan."],
+     ["+","void volverAlInicio()","@Override: posición inicial, PERSIGUIENDO, susto 0."],
+     ["+","void asustar(double duracion)","→ ASUSTADO por <code>duracion</code> segundos. Ignorado si está REGRESANDO. Si ya estaba asustado, renueva el tiempo."],
+     ["+","void serComido()","Sólo si está ASUSTADO → REGRESANDO."],
+     ["+","void actualizarEstado(double t)","ASUSTADO: descuenta <code>t</code>; al llegar a 0 → PERSIGUIENDO. REGRESANDO: si está en su inicio → PERSIGUIENDO."],
+     ["+","EstadoFantasma getEstado()","Consulta."]],
+  r:["Personaje","Partida","Laberinto","EstadoFantasma","Direccion","Posicion"]},
+
+ {n:"Posicion", pkg:"extra", k:"dat", src:"src/extra/Posicion.java",
+  d:"Par (fila, columna). Fila 0 es arriba, columna 0 es la izquierda.",
+  a:[["+","int fila",""],["+","int columna",""]],
+  m:[["+","Posicion(int x, int y)","x = fila, y = columna."],
+     ["+","int[] getPosicion()","{fila, columna}"],
+     ["+","void setPosicion(int x, int y)","Cambia ambos valores."]],
+  r:["Personaje","Celda","Laberinto","Partida"]},
+ {n:"Direccion", pkg:"extra", k:"enu", src:"src/extra/Direccion.java",
+  d:"Las 4 direcciones de movimiento. ARRIBA resta una fila, ABAJO suma; IZQUIERDA resta una columna, DERECHA suma.",
+  a:[["+","ARRIBA, ABAJO, IZQUIERDA, DERECHA","Constantes del enum. Este orden es también el orden en que el BFS explora vecinos."]], m:[],
+  r:["Personaje","PacMan","Fantasma","Laberinto","VentanaPrincipal","PanelLaberinto"]},
+ {n:"EstadoFantasma", pkg:"extra", k:"enu", src:"src/extra/EstadoFantasma.java",
+  d:"Modo de comportamiento de cada fantasma (ver sección 8).",
+  a:[["+","PERSIGUIENDO, ASUSTADO, REGRESANDO",""]], m:[], r:["Fantasma","Partida","PanelLaberinto"]},
+ {n:"EstadoPartida", pkg:"extra", k:"enu", src:"src/extra/EstadoPartida.java",
+  d:"Estado global de la partida (ver sección 8).",
+  a:[["+","EN_CURSO, PAUSADA, VICTORIA, DERROTA",""]], m:[], r:["Partida","ControladorJuego","VentanaPrincipal","PanelLaberinto","JuegoConsola"]}
+];
+const KIND = {abs:["abstracta","b-abs"],con:["clase","b-con"],enu:["enum","b-enu"],dat:["datos","b-dat"]};
+const visCell = v => v ? `<span class="vis vis-${V[v]}" title="${{pub:"public",pri:"private",pro:"protected"}[V[v]]}">${v}</span>` : "";
+const cardsEl = document.getElementById("cards");
+cardsEl.innerHTML = CLASES.map(c=>`
+  <article class="card" id="clase-${c.n}" data-pkg="${c.pkg}">
+    <div class="card-head">
+      <div><h3 class="${c.k==="abs"?"abs":""}">${c.n}</h3><p>${c.d}</p><div class="src">${c.src}</div></div>
+      <div class="tags"><span class="b ${KIND[c.k][1]}">${KIND[c.k][0]}</span><span class="b b-pkg">${c.pkg}</span></div>
+    </div>
+    <div class="card-body">
+      ${c.a.length?`<h4>${c.k==="enu"?"Valores":"Atributos"}</h4><div class="table-wrap"><table>${c.a.map(x=>`<tr><td>${visCell(x[0])}</td><td><code>${x[1]}</code></td><td class="muted">${x[2]}</td></tr>`).join("")}</table></div>`:""}
+      ${c.m.length?`<h4>Métodos</h4><div class="table-wrap"><table>${c.m.map(x=>`<tr><td>${visCell(x[0])}</td><td style="width:40%"><code style="white-space:normal">${x[1]}</code></td><td>${x[2]}</td></tr>`).join("")}</table></div>`:""}
+      <h4>Se relaciona con</h4><div class="rel-list">${c.r.map(r=>`<button data-go="${r}">${r}</button>`).join("")}</div>
+    </div>
+  </article>`).join("");
+
+const filtersEl = document.getElementById("filters");
+const PKGS = ["todas","vista","consola","controlador","modelo","extra"];
+filtersEl.innerHTML = PKGS.map((p,i)=>`<button class="${i===0?"on":""}" data-pkg="${p}">${p==="todas"?"Todas":p}</button>`).join("");
+filtersEl.addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  filtersEl.querySelectorAll("button").forEach(x=>x.classList.toggle("on", x===b));
+  cardsEl.querySelectorAll(".card").forEach(card=>card.hidden = b.dataset.pkg!=="todas" && card.dataset.pkg!==b.dataset.pkg);
+});
+
+function goTo(name){
+  const card = document.getElementById("clase-"+name); if(!card) return;
+  if (card.hidden){ filtersEl.querySelector('[data-pkg="todas"]').click(); }
+  card.scrollIntoView({behavior:"smooth",block:"start"});
+  card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+}
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-go]"); if (t) goTo(t.dataset.go);
+});
+
+/* ---------------- TICK ---------------- */
+const STEPS = [
+ ["¿Se puede jugar?","Partida",
+  "Si el estado no es <code>EN_CURSO</code> (pausada o terminada) el método termina sin hacer nada. Por eso la pausa “congela” todo.",
+  "if (this.estado != EstadoPartida.EN_CURSO) {\n    return;\n}"],
+ ["¿Ya ganó?","Partida → Laberinto",
+  "Si no quedan puntos, la partida pasa a <code>VICTORIA</code>.",
+  "if (comprobarVictoria()) {\n    this.estado = EstadoPartida.VICTORIA;\n    return;\n}"],
+ ["PacMan calcula su próxima celda","PacMan (heredado de Personaje)",
+  "Usa la última dirección elegida por el jugador. Todavía <b>no se mueve</b>: sólo calcula. Si hay pared, la “próxima” es la misma celda.",
+  "Direccion direccionPacMan = this.pacMan.getDireccion();\nPosicion proximaPosicionPacMan =\n    this.pacMan.calcularProximaPosicion(direccionPacMan, this.laberinto);"],
+ ["Come el punto de esa celda","Celda → Partida.consumir()",
+  "Retira el punto de la celda destino (queda <code>null</code>) y lo cobra. Si era un <code>SuperPunto</code>, <code>consumir</code> asusta a los 4 fantasmas por 10 s. Se recuerda si el susto se acaba de renovar.",
+  "Celda celdaDestino = this.laberinto.obtenerCelda(proximaPosicionPacMan);\nPunto puntoConsumido = celdaDestino.retirarPunto();\nconsumir(puntoConsumido);\nboolean sustoRenovado = puntoConsumido instanceof SuperPunto;"],
+ ["¿Era el último punto?","Partida",
+  "Si con ese punto se vació el laberinto, PacMan se mueve y se gana <b>antes</b> de mirar a los fantasmas: la victoria tiene prioridad sobre la muerte.",
+  "if (comprobarVictoria()) {\n    this.pacMan.mover(direccionPacMan, this.laberinto);\n    this.estado = EstadoPartida.VICTORIA;\n    return;\n}"],
+ ["Los fantasmas deciden","Fantasma → Laberinto",
+  "Cada fantasma elige su dirección según su estado, apuntando a la <b>próxima</b> posición de PacMan, y calcula su próxima celda.",
+  "for (int i = 0; i < this.fantasmas.length; i++) {\n    direccionesFantasmas[i] =\n        this.fantasmas[i].elegirDireccion(this.laberinto, proximaPosicionPacMan);\n    proximasPosicionesFantasmas.add(\n        this.fantasmas[i].calcularProximaPosicion(direccionesFantasmas[i], this.laberinto));\n}"],
+ ["Detectar choques","Partida.detectarColision()",
+  "Con las posiciones actuales y las próximas busca fantasmas que <b>llegan a la misma celda</b> que PacMan o que <b>intercambian</b> lugar con él. Se hace antes de mover para no perder las posiciones viejas.",
+  "List<Fantasma> fantasmasTocados = detectarColision(\n    proximaPosicionPacMan, proximasPosicionesFantasmas);"],
+ ["Mover a todos","PacMan, Fantasma",
+  "Ahora sí se actualizan las posiciones de los 5 personajes.",
+  "this.pacMan.mover(direccionPacMan, this.laberinto);\nfor (int i = 0; i < this.fantasmas.length; i++) {\n    fantasmas[i].mover(direccionesFantasmas[i], this.laberinto);\n}"],
+ ["Resolver choques","Partida.resolverColision() → Fantasma.serComido()",
+  "Primero se cobran <b>todos</b> los fantasmas asustados tocados (+200 c/u, pasan a REGRESANDO). Los que estaban PERSIGUIENDO sólo marcan <code>contactoPeligroso</code>. Los REGRESANDO se ignoran.",
+  "boolean contactoPeligroso = false;\nfor (Fantasma fantasma : fantasmasTocados) {\n    if (fantasma.getEstado() == EstadoFantasma.ASUSTADO) {\n        resolverColision(fantasma);\n    } else if (fantasma.getEstado() == EstadoFantasma.PERSIGUIENDO) {\n        contactoPeligroso = true;\n    }\n}"],
+ ["¿Perdió una vida?","Partida.perderVida()",
+  "Si tocó al menos un perseguidor, pierde <b>una sola</b> vida (aunque fueran varios), todos vuelven al inicio y, con 0 vidas, DERROTA. El tick termina acá.",
+  "if (contactoPeligroso) {\n    perderVida();\n    return;\n}"],
+ ["Pasa el tiempo","Fantasma.actualizarEstado()",
+  "Cada fantasma descuenta el tiempo de susto (o vuelve a PERSIGUIENDO si llegó a casa). Si en este tick se comió un superpunto se descuenta 0, para que el susto dure 10 s completos (240 ticks).",
+  "double tiempoADescontar = sustoRenovado ? 0 : tiempoTranscurrido;\nfor (Fantasma fantasma : this.fantasmas) {\n    fantasma.actualizarEstado(tiempoADescontar);\n}"]
+];
+const stepList = document.getElementById("stepList"), stepView = document.getElementById("stepView");
+stepList.innerHTML = STEPS.map((s,i)=>`<li><button data-i="${i}">${s[0]}</button></li>`).join("");
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+let cur = 0;
+function showStep(i){
+  cur = i; const s = STEPS[i];
+  stepList.querySelectorAll("button").forEach((b,j)=>b.classList.toggle("on", j===i));
+  stepView.innerHTML = `<h3>${i+1}. ${s[0]}</h3><div class="who">Quién actúa: <b>${s[1]}</b></div><p>${s[2]}</p><pre><code>${esc(s[3])}</code></pre>
+    <div class="step-nav"><button ${i===0?"disabled":""} data-step="-1">← Anterior</button><button ${i===STEPS.length-1?"disabled":""} data-step="1">Siguiente →</button><span class="small muted" style="align-self:center">${i+1} / ${STEPS.length}</span></div>`;
+}
+stepList.addEventListener("click", e=>{ const b=e.target.closest("button"); if(b) showStep(+b.dataset.i); });
+stepView.addEventListener("click", e=>{ const b=e.target.closest("[data-step]"); if(b) showStep(cur + +b.dataset.step); });
+showStep(0);
+
+/* ---------------- NAV ACTIVA ---------------- */
+const links = [...document.querySelectorAll("nav a")];
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(en=>{ if(en.isIntersecting){
+    links.forEach(a=>a.classList.toggle("active", a.getAttribute("href")==="#"+en.target.id));
+  }});
+},{rootMargin:"-30% 0px -65% 0px"});
+document.querySelectorAll("main section").forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
