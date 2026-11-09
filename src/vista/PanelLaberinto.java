@@ -1,6 +1,7 @@
 package vista;
 
 import controlador.ControladorJuego;
+import extra.EstadoFantasma;
 import extra.Posicion;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -79,6 +80,7 @@ public class PanelLaberinto extends JPanel {
 
     private void dibujarFantasmas(Graphics g) {
         Posicion[] posiciones = controlador.getPosicionesFantasmas();
+        EstadoFantasma[] estados = controlador.getEstadosFantasmas();
 
         Color[] colores = {
             Color.RED,
@@ -91,7 +93,13 @@ public class PanelLaberinto extends JPanel {
             int x = posiciones[i].columna * TAMANIO_CELDA;
             int y = posiciones[i].fila * TAMANIO_CELDA;
 
-            g.setColor(colores[i]);
+            Color colorFantasma = switch (estados[i]) {
+                case PERSIGUIENDO -> colores[i % colores.length];
+                case ASUSTADO -> Color.BLUE;
+                case REGRESANDO -> Color.GRAY;
+            };
+
+            g.setColor(colorFantasma);
 
             g.fillOval(
                 x + 2,

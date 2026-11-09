@@ -10,6 +10,17 @@ PacMan debe recorrer el laberinto y comer todos los puntos para ganar. Comienza 
 
 Requiere **JDK 17 o superior**, sin bibliotecas externas. Desde una terminal ubicada en `TPO-Pacman`:
 
+### Interfaz Gráfica (Swing)
+
+```sh
+javac --release 17 -encoding UTF-8 -d bin -sourcepath src src/vista/VentanaPrincipal.java
+java -cp bin vista.VentanaPrincipal
+```
+
+También se puede ejecutar el `main` de `src/vista/VentanaPrincipal.java` desde el IDE. Se controla con las flechas del teclado (o `W / A / S / D`), el botón o tecla `P` para pausar/reanudar, y el botón o tecla `N` para iniciar una nueva partida al finalizar.
+
+### Modo Consola
+
 ```sh
 javac --release 17 -encoding UTF-8 -d bin -sourcepath src src/consola/JuegoConsola.java
 java -cp bin consola.JuegoConsola
@@ -48,7 +59,8 @@ Muestra `[OK]` o `[FALLO]` por caso y un resumen final. No necesita JUnit ni int
 
 - `src/modelo`: personajes, laberinto y reglas de la partida.
 - `src/controlador`: coordinación del juego y acciones del jugador.
-- `src/consola`: entrada por teclado y presentación del tablero.
+- `src/vista`: interfaz gráfica en Swing (`VentanaPrincipal`, `PanelLaberinto`).
+- `src/consola`: entrada por teclado y presentación del tablero en terminal.
 - `src/extra`: posiciones, direcciones y estados.
 - `src/test/TestRequerimientos.java`: pruebas para la entrega.
 
