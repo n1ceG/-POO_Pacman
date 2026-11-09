@@ -69,6 +69,11 @@ public class ControladorJuego {
         return this.partida.getPosicionPacMan();
     }
 
+    public Direccion getDireccionPacMan()
+    {
+        return this.partida.getDireccionPacMan();
+    }
+
     public int getVidas()
     {
         return this.partida.getVidas();
