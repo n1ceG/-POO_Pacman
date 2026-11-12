@@ -2,10 +2,10 @@ package test;
 
 import consola.JuegoConsola;
 import controlador.ControladorJuego;
+import dto.Posicion;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import dto.Posicion;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

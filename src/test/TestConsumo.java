@@ -1,10 +1,10 @@
 package test;
 
-import extra.Direccion;
 import dto.Posicion;
+import extra.Direccion;
+import extra.EstadoPartida;
 import modelo.Laberinto;
 import modelo.Partida;
-import extra.EstadoPartida;
 
 public class TestConsumo {
 

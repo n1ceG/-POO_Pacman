@@ -1,8 +1,8 @@
 package test;
 
+import dto.Posicion;
 import extra.Direccion;
 import extra.EstadoPartida;
-import dto.Posicion;
 import modelo.Laberinto;
 import modelo.Partida;
 

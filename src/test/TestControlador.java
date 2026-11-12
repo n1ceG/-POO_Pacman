@@ -9,12 +9,12 @@ public class TestControlador {
 package test;
 
 import controlador.ControladorJuego;
+import dto.Posicion;
 import extra.Direccion;
 import extra.EstadoPartida;
-import dto.Posicion;
 import modelo.Laberinto;
-import modelo.Partida;
 import modelo.PacMan;
+import modelo.Partida;
 
 public class TestControlador {
 

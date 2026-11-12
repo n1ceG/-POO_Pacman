@@ -1,7 +1,7 @@
 package test;
 
-import extra.EstadoFantasma;
 import dto.Posicion;
+import extra.EstadoFantasma;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;

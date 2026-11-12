@@ -1,9 +1,9 @@
 package modelo;
 
+import dto.Posicion;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import dto.Posicion;
 import java.util.ArrayList;
 import java.util.List;
 

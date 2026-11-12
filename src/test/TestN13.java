@@ -1,8 +1,8 @@
 package test;
 
 import controlador.ControladorJuego;
-import extra.EstadoFantasma;
 import dto.Posicion;
+import extra.EstadoFantasma;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;

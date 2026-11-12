@@ -1,9 +1,9 @@
 package test;
 
+import dto.Posicion;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;

@@ -1,7 +1,7 @@
 package modelo;
 
-import extra.Direccion;
 import dto.Posicion;
+import extra.Direccion;
 
 public abstract class Personaje {
 
