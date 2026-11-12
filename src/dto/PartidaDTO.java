@@ -3,10 +3,6 @@ package dto;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Objeto de transferencia de datos (DTO) que empaqueta el estado global
- * de la partida para desacoplar completamente la vista del modelo.
- */
 public class PartidaDTO {
 
     private final int puntaje;
