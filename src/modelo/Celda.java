@@ -23,11 +23,10 @@ public class Celda {
         this.fueComido = false;
     }
 
-    // Devuelve el valor una sola vez. Una pared o celda vacia entrega cero.
     public int retirarPunto() {
         int retirado = getValor();
         if (retirado > 0) {
-            this.fueComido = true;
+            this.fueComido = true; 
         }
         return retirado;
     }

@@ -1,6 +1,5 @@
 package dto;
 
-/** DTO de coordenadas. No contiene reglas ni referencias a objetos del juego. */
 public class Posicion {
 
     public int fila;
