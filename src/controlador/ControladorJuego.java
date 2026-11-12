@@ -1,11 +1,11 @@
 package controlador;
 
-import controlador.dto.FantasmaDTO;
-import controlador.dto.PartidaDTO;
+import dto.FantasmaDTO;
+import dto.PartidaDTO;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.util.ArrayList;
 import java.util.List;
 import modelo.Partida;
@@ -19,12 +19,7 @@ public class ControladorJuego {
 
     public ControladorJuego()
     {
-        this(new Partida());
-    }
-
-    public ControladorJuego(Partida partida)
-    {
-        this.partida = partida;
+        this.partida = new Partida();
     }
 
     public void moverPacMan(Direccion direccion)

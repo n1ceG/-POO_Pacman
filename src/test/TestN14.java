@@ -4,13 +4,12 @@ import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;
 import modelo.Laberinto;
 import modelo.Partida;
-import modelo.PuntoComun;
 
 public class TestN14 {
     private static int pruebas;
@@ -45,7 +44,7 @@ public class TestN14 {
 
     private static void persiguiendoPierdeVida() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         Fantasma[] fantasmas = fantasmas(partida);
 
         partida.elegirDireccionPacman(Direccion.ARRIBA);
@@ -72,7 +71,7 @@ public class TestN14 {
 
     private static void persiguiendoHastaDerrota() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         Fantasma fantasma = fantasmas(partida)[0];
 
         for (int perdida = 1; perdida <= 2; perdida++) {
@@ -92,10 +91,10 @@ public class TestN14 {
 
     private static void regresandoInofensivo() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         Fantasma fantasma = fantasmas(partida)[0];
 
-        partida.consumir(new PuntoComun());
+        partida.consumir(10);
         int puntaje = controlador.getPuntaje();
         fantasma.asustar(10);
         fantasma.serComido();

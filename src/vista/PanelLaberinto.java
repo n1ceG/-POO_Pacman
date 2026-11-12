@@ -1,8 +1,8 @@
 package vista;
 
 import controlador.ControladorJuego;
-import controlador.dto.FantasmaDTO;
-import controlador.dto.PartidaDTO;
+import dto.FantasmaDTO;
+import dto.PartidaDTO;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

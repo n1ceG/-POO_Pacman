@@ -3,7 +3,7 @@ package test;
 import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import modelo.Laberinto;
 import modelo.Partida;
 
@@ -52,13 +52,13 @@ public class TestTurnosControlador {
         derrota.perderVida();
         derrota.perderVida();
         derrota.perderVida();
-        comprobarFinal(new ControladorJuego(derrota), EstadoPartida.DERROTA);
+        comprobarFinal(SoportePruebas.controlador(derrota), EstadoPartida.DERROTA);
 
         Laberinto vacio = new Laberinto(new String[] {
             "###########", "#         #", "#         #", "#         #",
             "#         #", "#         #", "###########"
         });
-        controlador = new ControladorJuego(new Partida(vacio, new Posicion(1, 1)));
+        controlador = SoportePruebas.controlador(new Partida(vacio, new Posicion(1, 1)));
         controlador.avanzarTurno();
         verificar(controlador.getTicks() == 1, "Cuenta el turno que termina la partida");
         comprobarFinal(controlador, EstadoPartida.VICTORIA);

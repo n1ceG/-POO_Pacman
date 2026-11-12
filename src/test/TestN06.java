@@ -1,7 +1,7 @@
 package test;
 
 import extra.EstadoFantasma;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;

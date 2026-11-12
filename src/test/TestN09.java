@@ -5,8 +5,6 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;
 import modelo.Partida;
-import modelo.PuntoComun;
-import modelo.SuperPunto;
 
 
 public class TestN09 {
@@ -30,7 +28,7 @@ public class TestN09 {
 
     private static void activarSusto() {
         Partida partida = new Partida();
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
 
         verificar("Puntaje tras un superpunto", 50, partida.getPuntaje());
         comprobarTodos("Tras consumir un superpunto", partida, EstadoFantasma.ASUSTADO, 10);
@@ -38,14 +36,14 @@ public class TestN09 {
 
     private static void reiniciarSusto() {
         Partida partida = new Partida();
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
 
         for (Fantasma fantasma : fantasmas(partida)) {
             fantasma.actualizarEstado(4);
         }
         comprobarTodos("Cuatro segundos despues", partida, EstadoFantasma.ASUSTADO, 6);
 
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
 
         verificar("El segundo superpunto suma otros 50", 100, partida.getPuntaje());
         comprobarTodos("Tras el segundo superpunto", partida, EstadoFantasma.ASUSTADO, 10);
@@ -59,7 +57,7 @@ public class TestN09 {
         enRegreso.serComido();
         comprobar("Antes del superpunto", enRegreso, EstadoFantasma.REGRESANDO, 0);
 
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
 
         comprobar("El fantasma en regreso no cambia", enRegreso, EstadoFantasma.REGRESANDO, 0);
         for (int i = 0; i < fantasmas.length; i++) {
@@ -72,7 +70,7 @@ public class TestN09 {
 
     private static void puntoComunNoActiva() {
         Partida partida = new Partida();
-        partida.consumir(new PuntoComun());
+        partida.consumir(10);
 
         verificar("Puntaje tras un punto comun", 10, partida.getPuntaje());
         comprobarTodos("Tras consumir un punto comun", partida,
@@ -81,12 +79,12 @@ public class TestN09 {
 
     private static void puntoComunNoRenueva() {
         Partida partida = new Partida();
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
 
         for (Fantasma fantasma : fantasmas(partida)) {
             fantasma.actualizarEstado(4);
         }
-        partida.consumir(new PuntoComun());
+        partida.consumir(10);
 
         verificar("El punto comun suma 10", 60, partida.getPuntaje());
         comprobarTodos("El susto conserva sus 6 segundos", partida,
@@ -95,7 +93,7 @@ public class TestN09 {
 
     private static void vencimiento() {
         Partida partida = new Partida();
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
 
         for (Fantasma fantasma : fantasmas(partida)) {
             fantasma.actualizarEstado(10);

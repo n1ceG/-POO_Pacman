@@ -1,7 +1,7 @@
 package modelo;
 
 import extra.Direccion;
-import extra.Posicion;
+import dto.Posicion;
 
 public class PacMan extends Personaje {
 

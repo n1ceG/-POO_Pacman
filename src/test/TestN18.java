@@ -4,7 +4,7 @@ import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Celda;
@@ -41,7 +41,7 @@ public class TestN18 {
 
     private static void victoria() {
         Partida anterior = new Partida();
-        ControladorJuego c = new ControladorJuego(anterior);
+        ControladorJuego c = SoportePruebas.controlador(anterior);
         Laberinto mapaAnterior = mapa(anterior);
         // Preparar un ultimo punto real; actualizar debe consumirlo y ganar.
         vaciarExcepto(mapaAnterior, new Posicion(13, 8));
@@ -66,7 +66,7 @@ public class TestN18 {
             "#####", "#...#", "#...#", "#...#", "#####"
         });
         Partida anterior = new Partida(mapa, new Posicion(2, 2));
-        ControladorJuego c = new ControladorJuego(anterior);
+        ControladorJuego c = SoportePruebas.controlador(anterior);
         // PacMan y fantasmas empiezan en el centro. Quieto, pierde una vida
         // por actualizacion por contacto con perseguidores, hasta DERROTA.
         for (int perdida = 1; perdida <= 3; perdida++) {
@@ -88,7 +88,7 @@ public class TestN18 {
 
     private static void sinFinal() {
         Partida original = new Partida();
-        ControladorJuego c = new ControladorJuego(original);
+        ControladorJuego c = SoportePruebas.controlador(original);
         c.actualizar(0.25);
         for (boolean pausada : new boolean[] {false, true}) {
             if (pausada) {
@@ -192,7 +192,7 @@ public class TestN18 {
             for (int col = 0; col < mapa.getColumnas(); col++) {
                 Celda celda = mapa.obtenerCelda(new Posicion(f, col));
                 resultado.append(celda.esPared() ? "#" :
-                    celda.tienePunto() ? celda.tipoPunto().getClass().getSimpleName() : " ");
+                    celda.tienePunto() ? celda.getValor() : " ");
                 resultado.append('|');
             }
             resultado.append('\n');

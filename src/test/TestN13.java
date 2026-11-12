@@ -2,13 +2,12 @@ package test;
 
 import controlador.ControladorJuego;
 import extra.EstadoFantasma;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;
 import modelo.Laberinto;
 import modelo.Partida;
-import modelo.PuntoComun;
 
 /**
  * Pruebas de N13 preparadas con asistencia de IA.
@@ -49,9 +48,9 @@ public class TestN13 {
     private static void comerAsustado() {
         for (boolean conPuntajePrevio : new boolean[] {false, true}) {
             Partida partida = nuevaPartida();
-            ControladorJuego controlador = new ControladorJuego(partida);
+            ControladorJuego controlador = SoportePruebas.controlador(partida);
             if (conPuntajePrevio) {
-                partida.consumir(new PuntoComun());
+                partida.consumir(10);
             }
             int anterior = controlador.getPuntaje();
             int vidas = controlador.getVidas();
@@ -71,7 +70,7 @@ public class TestN13 {
 
     private static void contactoRepetido() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         int vidas = controlador.getVidas();
         Fantasma fantasma = fantasmas(partida)[0];
         fantasma.asustar(10);
@@ -87,7 +86,7 @@ public class TestN13 {
 
     private static void yaRegresando() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         int vidas = controlador.getVidas();
         Fantasma fantasma = fantasmas(partida)[1];
         fantasma.asustar(10);
@@ -102,7 +101,7 @@ public class TestN13 {
 
     private static void variosFantasmas() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         int vidas = controlador.getVidas();
         Fantasma[] fantasmas = fantasmas(partida);
         for (Fantasma fantasma : fantasmas) {
@@ -122,7 +121,7 @@ public class TestN13 {
 
     private static void nuevoSusto() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         int vidas = controlador.getVidas();
         Fantasma fantasma = fantasmas(partida)[0];
         fantasma.asustar(10);
@@ -142,8 +141,8 @@ public class TestN13 {
 
     private static void perseguidorSinPremio() {
         Partida partida = nuevaPartida();
-        ControladorJuego controlador = new ControladorJuego(partida);
-        partida.consumir(new PuntoComun());
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
+        partida.consumir(10);
         int anterior = controlador.getPuntaje();
 
         partida.resolverColision(fantasmas(partida)[0]);

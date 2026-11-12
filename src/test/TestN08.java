@@ -2,7 +2,7 @@ package test;
 
 import extra.Direccion;
 import extra.EstadoFantasma;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;
@@ -87,7 +87,9 @@ public class TestN08 {
             }
 
             Posicion anterior = fantasma.getPosicion();
-            fantasma.mover(direccion, mapa);
+            if (mapa.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+                fantasma.mover(direccion);
+            }
             Posicion actual = fantasma.getPosicion();
 
             verificar("Paso " + (pasos + 1) + " avanza una celda",
@@ -132,7 +134,9 @@ public class TestN08 {
             if (direccion == null) {
                 break;
             }
-            fantasma.mover(direccion, mapa);
+            if (mapa.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+                fantasma.mover(direccion);
+            }
             fantasma.actualizarEstado(1);
             pasos++;
         }
@@ -161,7 +165,9 @@ public class TestN08 {
             if (direccion == null) {
                 break;
             }
-            fantasma.mover(direccion, mapa);
+            if (mapa.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+                fantasma.mover(direccion);
+            }
             fantasma.actualizarEstado(0);
             pasos++;
         }
@@ -173,7 +179,9 @@ public class TestN08 {
 
     private static void mover(Fantasma fantasma, Laberinto mapa, Direccion direccion, int veces) {
         for (int i = 0; i < veces; i++) {
-            fantasma.mover(direccion, mapa);
+            if (mapa.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+                fantasma.mover(direccion);
+            }
         }
     }
 

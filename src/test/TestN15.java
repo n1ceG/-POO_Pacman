@@ -3,7 +3,7 @@ package test;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;

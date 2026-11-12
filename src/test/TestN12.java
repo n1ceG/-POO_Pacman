@@ -3,15 +3,13 @@ package test;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;
 import modelo.Laberinto;
 import modelo.PacMan;
 import modelo.Partida;
-import modelo.Punto;
-import modelo.SuperPunto;
 
 public class TestN12 {
     private static int pruebas;
@@ -47,7 +45,7 @@ public class TestN12 {
         Partida partida = new Partida(mapa, inicioPacMan);
         Fantasma[] fantasmas = fantasmas(partida);
 
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
         partida.elegirDireccionPacman(Direccion.DERECHA);
         partida.actualizar(1);
 
@@ -78,9 +76,9 @@ public class TestN12 {
         Laberinto mapa = mapa();
         Partida partida = new Partida(mapa, new Posicion(2, 1));
 
-        Punto comun = mapa.obtenerCelda(new Posicion(1, 1)).retirarPunto();
+        int comun = mapa.obtenerCelda(new Posicion(1, 1)).retirarPunto();
         partida.consumir(comun);
-        partida.consumir(new SuperPunto());
+        partida.consumir(50);
         int puntaje = partida.getPuntaje();
         verificar("Puntaje antes de la perdida", 60, puntaje);
 

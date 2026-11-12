@@ -1,7 +1,7 @@
 package modelo;
 
 import extra.Direccion;
-import extra.Posicion;
+import dto.Posicion;
 
 public abstract class Personaje {
 
@@ -33,15 +33,10 @@ public abstract class Personaje {
         return new Posicion(fila, columna);
     }
 
-    /**
-     * Mueve el personaje en la direccion indicada solo si la celda adyacente es accesible.
-     * Desacopla el personaje de la clase Laberinto.
-     */
-    public void mover(Direccion direccion, boolean puedeAvanzar) {
+    /** Ejecuta un movimiento cuya transitabilidad ya verifico Partida. */
+    public void mover(Direccion direccion) {
         if (direccion != null) {
             this.direccion = direccion;
-        }
-        if (puedeAvanzar && direccion != null) {
             this.posicion = calcularProximaPosicion(direccion);
         }
     }
@@ -53,27 +48,6 @@ public abstract class Personaje {
         if (nuevaPosicion != null) {
             this.posicion = new Posicion(nuevaPosicion.fila, nuevaPosicion.columna);
         }
-    }
-
-    /**
-     * Metodo sobrecargado por compatibilidad: delega la consulta de transitabilidad
-     * de la celda adyacente al laberinto y ejecuta mover(direccion, puedeAvanzar).
-     */
-    public void mover(Direccion direccion, Laberinto laberinto) {
-        Posicion candidata = calcularProximaPosicion(direccion);
-        boolean puedeAvanzar = laberinto != null && laberinto.esTransitable(candidata);
-        mover(direccion, puedeAvanzar);
-    }
-
-    /**
-     * Metodo sobrecargado por compatibilidad con firmas previas.
-     */
-    public Posicion calcularProximaPosicion(Direccion direccion, Laberinto laberinto) {
-        Posicion candidata = calcularProximaPosicion(direccion);
-        if (laberinto != null && laberinto.esTransitable(candidata)) {
-            return candidata;
-        }
-        return new Posicion(this.posicion.fila, this.posicion.columna);
     }
 
     public abstract void volverAlInicio();

@@ -1,4 +1,4 @@
-package controlador.dto;
+package dto;
 
 /**
  * Objeto de transferencia de datos (DTO) que representa el estado visual

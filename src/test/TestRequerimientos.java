@@ -5,7 +5,7 @@ import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -21,8 +21,6 @@ import modelo.Laberinto;
 import modelo.PacMan;
 import modelo.Partida;
 import modelo.Personaje;
-import modelo.PuntoComun;
-import modelo.SuperPunto;
 
 /**
  * Pruebas de los 10 puntos de "Requerimientos TPO PacMan 1.md".
@@ -41,9 +39,10 @@ import modelo.SuperPunto;
  * niveles jugables: algunos tienen un punto de reserva en otra habitacion
  * para evitar una victoria que interrumpa el comportamiento bajo prueba.
  *
- * La unica lectura por reflection obtiene los cuatro fantasmas de una Partida
- * para preparar contactos exactos. No escribe atributos privados: los mueve
- * por caminos transitables y cambia sus estados mediante sus metodos publicos.
+ * Reflection obtiene los cuatro fantasmas para preparar contactos exactos.
+ * SoportePruebas inyecta la partida del escenario en el controlador, sin
+ * exponer entidades del modelo en su API publica. Los personajes se preparan
+ * por caminos transitables y sus estados cambian mediante metodos publicos.
  * La aleatoriedad se verifica por movimientos legales; los contactos con
  * asustados usan un extremo de pasillo con una unica salida.
  */
@@ -166,12 +165,16 @@ public class TestRequerimientos {
                 PacMan p = new PacMan(new Posicion(2, 3));
                 Posicion pared = vecino(p.getPosicion(), d);
                 Celda[][] celdas = celdas(BASE);
-                celdas[pared.fila][pared.columna] = new Celda(true, null, pared.fila, pared.columna);
+                celdas[pared.fila][pared.columna] = new Celda(true, 0, pared.fila, pared.columna);
                 Laberinto mapa = new Laberinto(celdas);
-                p.mover(d, mapa);
+                if (mapa.esTransitable(p.calcularProximaPosicion(d))) {
+                    p.mover(d);
+                }
                 posicion("PacMan permanece", 2, 3, p.getPosicion());
                 Fantasma f = new Fantasma(new Posicion(2, 3));
-                f.mover(d, mapa);
+                if (mapa.esTransitable(f.calcularProximaPosicion(d))) {
+                    f.mover(d);
+                }
                 posicion("Fantasma permanece", 2, 3, f.getPosicion());
                 e.c.avanzarTurno(Direccion.ARRIBA);
                 e.c.avanzarTurno();
@@ -186,7 +189,9 @@ public class TestRequerimientos {
                     case ABAJO, DERECHA -> new Posicion(1, 1);
                 };
                 PacMan p = new PacMan(borde);
-                p.mover(d, mapa);
+                if (mapa.esTransitable(p.calcularProximaPosicion(d))) {
+                    p.mover(d);
+                }
                 posicion("Limite " + d, borde, p.getPosicion());
             }
             igual("Celda fuera de rango", null, mapa.obtenerCelda(new Posicion(-1, 0)));
@@ -223,8 +228,8 @@ public class TestRequerimientos {
                     igual("Superpunto en esquina " + f + "," + col, 'o', mapa[f][col]);
                 }
             }
-            igual("Valor comun", 10, new PuntoComun().valor());
-            igual("Valor superpunto", 50, new SuperPunto().valor());
+            igual("Valor comun", 10, new Celda(false, 10, 1, 1).getValor());
+            igual("Valor superpunto", 50, new Celda(false, 50, 1, 1).getValor());
         });
         caso("Llegar consume un punto comun y suma 10 una sola vez", () -> {
             Escenario e = escenario(2, 3, true, 2, 4, 10);
@@ -251,8 +256,8 @@ public class TestRequerimientos {
             e.c.avanzarTurno();
             e.c.avanzarTurno();
             igual("10 + 50 + vacia", 60, e.c.getPuntaje());
-            e.p.consumir(null);
-            igual("Consumo nulo no suma", 60, e.c.getPuntaje());
+            e.p.consumir(0);
+            igual("Consumo de valor cero no suma", 60, e.c.getPuntaje());
         });
         caso("Estar en la celda tambien permite consumir sin desplazarse", () -> {
             Escenario e = escenario(2, 3, true, 2, 3, 10);
@@ -261,13 +266,13 @@ public class TestRequerimientos {
             posicion("Sigue en la celda", 2, 3, e.c.getPosicionPacMan());
         });
         caso("Celda entrega y retira su punto; una pared no contiene puntos", () -> {
-            PuntoComun punto = new PuntoComun();
+            int punto = 10;
             Celda celda = new Celda(false, punto, 1, 1);
-            igual("Tipo inicial", punto, celda.tipoPunto());
-            igual("Entrega el mismo punto", punto, celda.retirarPunto());
+            igual("Valor inicial", punto, celda.getValor());
+            igual("Entrega el valor", punto, celda.retirarPunto());
             comprobar(!celda.tienePunto(), "Queda vacia");
-            igual("Segunda extraccion", null, celda.retirarPunto());
-            comprobar(!new Celda(true, new SuperPunto(), 1, 1).tienePunto(),
+            igual("Segunda extraccion", 0, celda.retirarPunto());
+            comprobar(!new Celda(true, 50, 1, 1).tienePunto(),
                 "Pared sin punto");
         });
         caso("El mapa y las posiciones consultadas no permiten modificar el juego", () -> {
@@ -334,7 +339,9 @@ public class TestRequerimientos {
             Fantasma f = new Fantasma(new Posicion(5, 4));
             igual("Otra habitacion", null, f.elegirDireccion(mapa, new Posicion(2, 3)));
             igual("Misma celda", null, f.elegirDireccion(mapa, f.getPosicion()));
-            f.mover(null, mapa);
+            if (mapa.esTransitable(f.calcularProximaPosicion(null))) {
+                f.mover(null);
+            }
             posicion("Quieto", 5, 4, f.getPosicion());
         });
     }
@@ -393,7 +400,9 @@ public class TestRequerimientos {
                 List<Direccion> disponibles = mapa.direccionesDisponibles(antes);
                 Direccion d = f.elegirDireccion(mapa, new Posicion(1, 1));
                 comprobar(disponibles.contains(d), "Eleccion entre las direcciones disponibles");
-                f.mover(d, mapa);
+                if (mapa.esTransitable(f.calcularProximaPosicion(d))) {
+                    f.mover(d);
+                }
                 igual("Un paso", 1, distancia(antes, f.getPosicion()));
                 comprobar(mapa.esTransitable(f.getPosicion()), "No atraviesa paredes");
             }
@@ -404,7 +413,9 @@ public class TestRequerimientos {
             f.asustar(10);
             Direccion d = f.elegirDireccion(mapa, new Posicion(1, 1));
             igual("Sin direccion posible", null, d);
-            f.mover(d, mapa);
+            if (mapa.esTransitable(f.calcularProximaPosicion(d))) {
+                f.mover(d);
+            }
             posicion("No se desplaza", 1, 1, f.getPosicion());
         });
         caso("Superpunto se aplica antes del contacto del mismo tick", () -> {
@@ -719,7 +730,7 @@ public class TestRequerimientos {
             Escenario e = ganada();
             comprobar(e.c.nuevaPartida(), "Reinicio aceptado");
             String nueva = foto(e.c);
-            e.p.consumir(new SuperPunto());
+            e.p.consumir(50);
             for (Fantasma f : e.f) f.asustar(99);
             e.mapa.obtenerCelda(new Posicion(2, 5)).retirarPunto();
             igual("Modificar partida anterior no afecta nueva", nueva, foto(e.c));
@@ -747,7 +758,7 @@ public class TestRequerimientos {
         Escenario(Laberinto mapa, Posicion inicio) {
             this.mapa = mapa;
             p = new Partida(mapa, inicio);
-            c = new ControladorJuego(p);
+            c = SoportePruebas.controlador(p);
             try {
                 Field campo = Partida.class.getDeclaredField("fantasmas");
                 campo.setAccessible(true);
@@ -770,7 +781,7 @@ public class TestRequerimientos {
     private static Escenario crear(String[] plano, int fila, int columna,
             boolean reserva, int... puntos) {
         Celda[][] celdas = celdas(plano);
-        if (reserva) celdas[9][1] = new Celda(false, new PuntoComun(), 9, 1);
+        if (reserva) celdas[9][1] = new Celda(false, 10, 9, 1);
         if (puntos.length % 3 != 0) throw new IllegalArgumentException("Se requieren ternas");
         for (int i = 0; i < puntos.length; i += 3) {
             int f = puntos[i];
@@ -780,7 +791,7 @@ public class TestRequerimientos {
                 throw new IllegalArgumentException("Valor de punto invalido");
             }
             celdas[f][c] = new Celda(false,
-                puntos[i + 2] == 50 ? new SuperPunto() : new PuntoComun(), f, c);
+                puntos[i + 2] == 50 ? 50 : 10, f, c);
         }
         return new Escenario(new Laberinto(celdas), new Posicion(fila, columna));
     }
@@ -789,7 +800,7 @@ public class TestRequerimientos {
         Celda[][] celdas = new Celda[plano.length][plano[0].length()];
         for (int f = 0; f < plano.length; f++) {
             for (int c = 0; c < plano[f].length(); c++) {
-                celdas[f][c] = new Celda(plano[f].charAt(c) == '#', null, f, c);
+                celdas[f][c] = new Celda(plano[f].charAt(c) == '#', 0, f, c);
             }
         }
         return celdas;
@@ -818,7 +829,9 @@ public class TestRequerimientos {
             Direccion direccion = siguiente.fila < antes.fila ? Direccion.ARRIBA
                 : siguiente.fila > antes.fila ? Direccion.ABAJO
                 : siguiente.columna < antes.columna ? Direccion.IZQUIERDA : Direccion.DERECHA;
-            personaje.mover(direccion, mapa);
+            if (mapa.esTransitable(personaje.calcularProximaPosicion(direccion))) {
+                personaje.mover(direccion);
+            }
         }
         posicion("Preparacion del personaje", destino, personaje.getPosicion());
     }
@@ -842,10 +855,10 @@ public class TestRequerimientos {
     }
 
     private static void reiniciarYComprobar(Escenario e) {
-        String anterior = foto(new ControladorJuego(e.p));
+        String anterior = foto(SoportePruebas.controlador(e.p));
         comprobar(e.c.nuevaPartida(), "Reinicio aceptado");
         igual("Igual a una partida recien creada", foto(new ControladorJuego()), foto(e.c));
-        igual("Partida anterior conservada", anterior, foto(new ControladorJuego(e.p)));
+        igual("Partida anterior conservada", anterior, foto(SoportePruebas.controlador(e.p)));
         comprobar(!e.c.nuevaPartida(), "Segundo reinicio rechazado mientras esta en curso");
         e.c.avanzarTurno();
         posicion("Nueva partida puede jugarse hacia la derecha", 13, 8, e.c.getPosicionPacMan());

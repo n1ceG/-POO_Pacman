@@ -1,4 +1,4 @@
-package controlador.dto;
+package dto;
 
 import java.util.Collections;
 import java.util.List;

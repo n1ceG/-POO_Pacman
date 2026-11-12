@@ -4,7 +4,7 @@ import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
@@ -12,7 +12,6 @@ import modelo.Fantasma;
 import modelo.Laberinto;
 import modelo.PacMan;
 import modelo.Partida;
-import modelo.Punto;
 
 /**
  * Pruebas de N17 preparadas con asistencia de IA. Sin JUnit ni -ea.
@@ -98,7 +97,7 @@ public class TestN17 {
         verificar("Reanudacion", EstadoPartida.EN_CURSO, e.controlador.getEstado());
         conservar("Antes del primer paso reanudado", antes, e);
         int puntajePrevio = e.controlador.getPuntaje();
-        int valorSiguiente = e.mapa.obtenerCelda(new Posicion(3, 2)).tipoPunto().valor();
+        int valorSiguiente = e.mapa.obtenerCelda(new Posicion(3, 2)).getValor();
         e.controlador.actualizar(0.5);
         verificar("Continua desde donde estaba y en la misma direccion", "(3,2)",
             posicion(e.controlador.getPosicionPacMan()));
@@ -182,11 +181,11 @@ public class TestN17 {
             direcciones.append(fantasmas[i].getDireccion()).append(' ');
             tiempos[i] = tiempo(fantasmas[i]);
         }
-        Punto[] puntos = new Punto[e.mapa.getFilas() * e.mapa.getColumnas()];
+        int[] puntos = new int[e.mapa.getFilas() * e.mapa.getColumnas()];
         int indice = 0;
         for (int fila = 0; fila < e.mapa.getFilas(); fila++) {
             for (int columna = 0; columna < e.mapa.getColumnas(); columna++) {
-                puntos[indice++] = e.mapa.obtenerCelda(new Posicion(fila, columna)).tipoPunto();
+                puntos[indice++] = e.mapa.obtenerCelda(new Posicion(fila, columna)).getValor();
             }
         }
         return new Captura(e.controlador.getVidas(), e.controlador.getPuntaje(),
@@ -213,7 +212,7 @@ public class TestN17 {
 
     private record Captura(int vidas, int puntaje, String posicionPacman, Direccion direccion,
             String posicionesFantasmas, String direccionesFantasmas, EstadoFantasma[] estados,
-            double[] tiempos, Punto[] puntos, PacMan pacman, Fantasma[] fantasmas, Object mapa) {}
+            double[] tiempos, int[] puntos, PacMan pacman, Fantasma[] fantasmas, Object mapa) {}
 
     private static class Escenario {
         final Laberinto mapa;
@@ -230,7 +229,7 @@ public class TestN17 {
             }
             mapa = new Laberinto(filas);
             partida = new Partida(mapa, new Posicion(1, 1));
-            controlador = new ControladorJuego(partida);
+            controlador = SoportePruebas.controlador(partida);
         }
     }
 

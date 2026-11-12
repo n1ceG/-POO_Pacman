@@ -4,7 +4,7 @@ import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.util.Locale;
 import java.util.Scanner;
 

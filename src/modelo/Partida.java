@@ -3,7 +3,7 @@ package modelo;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,17 +69,19 @@ public class Partida {
             proximaPosicionPacMan
         );
 
-        Punto puntoConsumido = null;
+        int valorConsumido = 0;
 
         if (celdaDestino != null) {
-            puntoConsumido = celdaDestino.retirarPunto();
-            consumir(puntoConsumido);
+            valorConsumido = celdaDestino.retirarPunto();
+            consumir(valorConsumido);
         }
 
-        boolean sustoRenovado = puntoConsumido != null && puntoConsumido.asustaFantasmas();
+        boolean sustoRenovado = valorConsumido == 50;
 
         if (comprobarVictoria()) {
-            this.pacMan.mover(direccionPacMan, puedeAvanzarPacMan);
+            if (puedeAvanzarPacMan) {
+                this.pacMan.mover(direccionPacMan);
+            }
             this.estado = EstadoPartida.VICTORIA;
             return;
         }
@@ -116,14 +118,14 @@ public class Partida {
             proximaPosicionPacMan,
             proximasPosicionesFantasmas
         );
-
-        this.pacMan.mover(direccionPacMan, puedeAvanzarPacMan);
+        if (puedeAvanzarPacMan) {
+            this.pacMan.mover(direccionPacMan);
+        }
 
         for (int i = 0; i < this.fantasmas.length; i++) {
-            this.fantasmas[i].mover(
-                direccionesFantasmas[i],
-                puedenAvanzarFantasmas[i]
-            );
+            if (puedenAvanzarFantasmas[i]) {
+                this.fantasmas[i].mover(direccionesFantasmas[i]);
+            }
         }
 
         // Cobrar todos los asustados antes de resolver la perdida de vida.
@@ -149,14 +151,14 @@ public class Partida {
         }
     }
     
-    public void consumir(Punto punto)
+    public void consumir(int valor)
     {
-        if (punto == null) {
+        if (valor == 0) {
             return;
         }
-        this.puntaje += punto.valor();
+        this.puntaje += valor;
         
-        if (punto.asustaFantasmas()) {
+        if (valor == 50) {
             for (Fantasma fantasma : fantasmas) {
                 fantasma.asustar(DURACION_SUSTO);
             }
@@ -258,18 +260,9 @@ public class Partida {
         return this.pacMan.getDireccion();
     }
 
-    // Copia para la vista: no expone celdas ni puntos mutables del modelo.
     public char[][] getMapa()
     {
-        char[][] mapa = new char[this.laberinto.getFilas()][this.laberinto.getColumnas()];
-        for (int fila = 0; fila < mapa.length; fila++) {
-            for (int columna = 0; columna < mapa[fila].length; columna++) {
-                Celda celda = this.laberinto.obtenerCelda(new Posicion(fila, columna));
-                mapa[fila][columna] = celda.esPared() ? '#'
-                    : celda.tienePunto() ? celda.tipoPunto().getSimbolo() : ' ';
-            }
-        }
-        return mapa;
+        return this.laberinto.getMapa();
     }
 
     public int getVidas()

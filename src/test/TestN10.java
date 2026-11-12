@@ -4,7 +4,7 @@ import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;
@@ -48,7 +48,7 @@ public class TestN10 {
         for (double segundos : new double[] {0, 0.25, 5, 1000}) {
             Laberinto mapa = sala();
             Partida partida = new Partida(mapa, new Posicion(2, 7));
-            ControladorJuego controlador = new ControladorJuego(partida);
+            ControladorJuego controlador = SoportePruebas.controlador(partida);
             controlador.moverPacMan(Direccion.ARRIBA);
             Posicion[] anteriores = controlador.getPosicionesFantasmas();
             verificar("Hay cuatro fantasmas", 4, anteriores.length);
@@ -71,15 +71,23 @@ public class TestN10 {
     private static void estadosMezclados() {
         Laberinto mapa = sala();
         Partida partida = new Partida(mapa, new Posicion(2, 7));
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         Fantasma[] fantasmas = fantasmas(partida);
-        fantasmas[1].mover(Direccion.ARRIBA, mapa);
+        if (mapa.esTransitable(fantasmas[1].calcularProximaPosicion(Direccion.ARRIBA))) {
+            fantasmas[1].mover(Direccion.ARRIBA);
+        }
         fantasmas[1].asustar(10);
-        fantasmas[2].mover(Direccion.IZQUIERDA, mapa);
-        fantasmas[2].mover(Direccion.IZQUIERDA, mapa);
+        if (mapa.esTransitable(fantasmas[2].calcularProximaPosicion(Direccion.IZQUIERDA))) {
+            fantasmas[2].mover(Direccion.IZQUIERDA);
+        }
+        if (mapa.esTransitable(fantasmas[2].calcularProximaPosicion(Direccion.IZQUIERDA))) {
+            fantasmas[2].mover(Direccion.IZQUIERDA);
+        }
         fantasmas[2].asustar(10);
         fantasmas[2].serComido();
-        fantasmas[3].mover(Direccion.DERECHA, mapa);
+        if (mapa.esTransitable(fantasmas[3].calcularProximaPosicion(Direccion.DERECHA))) {
+            fantasmas[3].mover(Direccion.DERECHA);
+        }
         fantasmas[3].asustar(10);
         fantasmas[3].serComido();
 
@@ -122,7 +130,7 @@ public class TestN10 {
         Posicion[] inicios = {new Posicion(1, 1)};
         for (int m = 0; m < mapas.length; m++) {
             Partida partida = new Partida(mapas[m], inicios[m]);
-            ControladorJuego controlador = new ControladorJuego(partida);
+            ControladorJuego controlador = SoportePruebas.controlador(partida);
             // PacMan queda separado del pasillo de fantasmas y no puede provocar
             // una colision o consumir los puntos durante esta prueba de movimiento.
             controlador.moverPacMan(Direccion.IZQUIERDA);
@@ -150,7 +158,7 @@ public class TestN10 {
             "#######", "#..####", "### ###", "#######", "#######"
         });
         Partida partida = new Partida(mapa, new Posicion(1, 1));
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         controlador.moverPacMan(Direccion.ARRIBA);
         Fantasma[] fantasmas = fantasmas(partida);
         fantasmas[1].asustar(10);
@@ -168,7 +176,7 @@ public class TestN10 {
 
     private static void decisionUnica() {
         Partida partida = new Partida(sala(), new Posicion(1, 1));
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         controlador.moverPacMan(Direccion.ARRIBA);
         FantasmaContador[] contadores = instalarContadores(partida);
         for (int tick = 1; tick <= 3; tick++) {
@@ -191,7 +199,7 @@ public class TestN10 {
             Partida partida = new Partida(sala(), new Posicion(1, 1));
             FantasmaContador[] contadores = instalarContadores(partida);
             campo(partida, "estado", estado);
-            ControladorJuego controlador = new ControladorJuego(partida);
+            ControladorJuego controlador = SoportePruebas.controlador(partida);
             controlador.actualizar(20);
             verificar("Conserva estado " + estado, estado, controlador.getEstado());
             for (FantasmaContador fantasma : contadores) {
@@ -208,7 +216,7 @@ public class TestN10 {
         });
         Partida partida = new Partida(mapa, new Posicion(1, 1));
         FantasmaContador[] contadores = instalarContadores(partida);
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         controlador.actualizar(1);
         verificar("Consumir el ultimo punto declara victoria", EstadoPartida.VICTORIA,
             controlador.getEstado());
@@ -249,10 +257,10 @@ public class TestN10 {
         }
 
         @Override
-        public void mover(Direccion direccion, Laberinto laberinto) {
+        public void mover(Direccion direccion) {
             movimientos++;
             aplicada = direccion;
-            super.mover(direccion, laberinto);
+            super.mover(direccion);
         }
     }
 

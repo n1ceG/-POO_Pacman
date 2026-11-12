@@ -1,64 +1,50 @@
 package modelo;
 
-import extra.Posicion;
+import dto.Posicion;
 
 public class Celda {
 
-    private Posicion posicion;
-    private boolean pared;
-    private Punto punto;
+    private final Posicion posicion;
+    private final boolean pared;
+    private final int valor;
+    private boolean fueComido;
 
-    public Celda() {
+    public Celda(boolean esPared, boolean esSuperPunto, int fila, int columna) {
+        this(esPared, esSuperPunto ? 50 : 10, fila, columna);
     }
 
-    public Celda
-    (
-        boolean esPared, 
-        boolean esSuperPunto, 
-        int x, 
-        int y
-    ){
-        this(
-            esPared,
-            esPared ? null : (esSuperPunto ? new SuperPunto() : new PuntoComun()),
-            x,
-            y
-        );
-    }
-
-    public Celda
-    (
-        boolean esPared,
-        Punto punto,
-        int x,
-        int y
-    ){
-        this.posicion = new Posicion(x, y);
+    public Celda(boolean esPared, int valor, int fila, int columna) {
+        if (valor != 0 && valor != 10 && valor != 50) {
+            throw new IllegalArgumentException("El valor debe ser 0, 10 o 50");
+        }
+        this.posicion = new Posicion(fila, columna);
         this.pared = esPared;
-        this.punto = esPared ? null : punto;
+        this.valor = esPared ? 0 : valor;
+        this.fueComido = false;
     }
 
-    public Punto retirarPunto()
-    {
-        Punto puntoRetirado = this.punto;
-        this.punto = null;
-        return puntoRetirado;
+    // Devuelve el valor una sola vez. Una pared o celda vacia entrega cero.
+    public int retirarPunto() {
+        int retirado = getValor();
+        if (retirado > 0) {
+            this.fueComido = true;
+        }
+        return retirado;
     }
 
-    public Posicion getPosicion(){
-        return this.posicion;
+    public Posicion getPosicion() {
+        return new Posicion(posicion.fila, posicion.columna);
     }
 
-    public Punto tipoPunto(){
-        return this.punto;
+    public int getValor() {
+        return fueComido ? 0 : valor;
     }
 
-    public boolean esPared(){
-        return this.pared;
+    public boolean esPared() {
+        return pared;
     }
 
-    public boolean tienePunto(){
-        return this.punto != null;
+    public boolean tienePunto() {
+        return getValor() > 0;
     }
-
 }

@@ -11,7 +11,7 @@ package test;
 import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import modelo.Laberinto;
 import modelo.Partida;
 import modelo.PacMan;
@@ -63,7 +63,7 @@ public class TestControlador {
             "#.#",
             "###"
         });
-        controlador = new ControladorJuego(
+        controlador = SoportePruebas.controlador(
             new Partida(mapaConBorde, new Posicion(0, 1))
         );
         controlador.moverPacMan(Direccion.ARRIBA);
@@ -71,7 +71,7 @@ public class TestControlador {
         verificar("ARRIBA fuera de la matriz, se queda", 0, 1, controlador);
 
         System.out.println("\n-- Giro alineado con la celda --");
-        controlador = new ControladorJuego(
+        controlador = SoportePruebas.controlador(
             new Partida(Laberinto.crearDefault(), new Posicion(13, 6))
         );
         controlador.moverPacMan(Direccion.ARRIBA);
@@ -90,7 +90,7 @@ public class TestControlador {
         verificar("Partida nueva está EN_CURSO",
             controlador.getEstado() == EstadoPartida.EN_CURSO);
 
-        controlador = new ControladorJuego(
+        controlador = SoportePruebas.controlador(
             new Partida(Laberinto.crearDefault(), new Posicion(3, 5))
         );
         verificar("Constructor con laberinto también inicia 3/0/EN_CURSO",
@@ -117,7 +117,9 @@ public class TestControlador {
         );
 
         pacMan.elegirDireccion(Direccion.IZQUIERDA);
-        pacMan.mover(pacMan.getDireccion(), laberinto);
+        if (laberinto.esTransitable(pacMan.calcularProximaPosicion(pacMan.getDireccion()))) {
+            pacMan.mover(pacMan.getDireccion());
+        }
 
         verificar(
             "Antes del regreso, PacMan se desplazo a la izquierda",
@@ -140,7 +142,7 @@ public class TestControlador {
         
         System.out.println("\n-- N21: Inicio frente a una pared --");
 
-        controlador = new ControladorJuego(
+        controlador = SoportePruebas.controlador(
             new Partida(laberinto, new Posicion(1,13))
         );
 
@@ -157,7 +159,7 @@ public class TestControlador {
         probarConsumoPuntoComun();
         probarConsumoSuperPunto();
         probarAcumulacionPuntos();
-        probarConsumirNulo();
+        probarConsumoVacio();
 
         System.out.println("\nResultado: " + aprobadas + "/" + pruebas + " pruebas OK");
 
@@ -176,7 +178,7 @@ public class TestControlador {
             "# .#",
             "####"
         });
-        ControladorJuego controlador = new ControladorJuego(
+        ControladorJuego controlador = SoportePruebas.controlador(
             new Partida(mapa, new Posicion(1, 1))
         );
 
@@ -213,7 +215,7 @@ public class TestControlador {
             "# o#",
             "####"
         });
-        ControladorJuego controlador = new ControladorJuego(
+        ControladorJuego controlador = SoportePruebas.controlador(
             new Partida(mapa, new Posicion(1, 1))
         );
 
@@ -253,7 +255,7 @@ public class TestControlador {
             "#     #",
             "#######"
         });
-        ControladorJuego controlador = new ControladorJuego(
+        ControladorJuego controlador = SoportePruebas.controlador(
             new Partida(mapa, new Posicion(1, 1))
         );
 
@@ -268,9 +270,9 @@ public class TestControlador {
         );
     }
 
-    private static void probarConsumirNulo()
+    private static void probarConsumoVacio()
     {
-        System.out.println("\n-- Consumir nulo --");
+        System.out.println("\n-- Consumir cero --");
         Partida partida = new Partida(
             new Laberinto(new String[] {
                 "###",
@@ -280,9 +282,9 @@ public class TestControlador {
             new Posicion(1, 1)
         );
 
-        partida.consumir(null);
+        partida.consumir(0);
         verificar(
-            "consumir(null) no modifica el puntaje",
+            "consumir(0) no modifica el puntaje",
             partida.getPuntaje() == 0
         );
     }
@@ -293,7 +295,7 @@ public class TestControlador {
         int columnaEsperada
     )
     {
-        ControladorJuego controlador = new ControladorJuego(
+        ControladorJuego controlador = SoportePruebas.controlador(
             new Partida(Laberinto.crearDefault(), new Posicion(3, 5))
         );
         controlador.moverPacMan(direccion);

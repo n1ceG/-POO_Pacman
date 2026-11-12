@@ -61,7 +61,22 @@ Muestra `[OK]` o `[FALLO]` por caso y un resumen final. No necesita JUnit ni int
 - `src/controlador`: coordinación del juego y acciones del jugador.
 - `src/vista`: interfaz gráfica en Swing (`VentanaPrincipal`, `PanelLaberinto`).
 - `src/consola`: entrada por teclado y presentación del tablero en terminal.
-- `src/extra`: posiciones, direcciones y estados.
+- `src/dto`: datos de posición, fantasmas y partida para consultar desde las interfaces.
+- `src/extra`: direcciones y estados.
 - `src/test/TestRequerimientos.java`: pruebas para la entrega.
 
 La consigna y los diagramas se incluyen en el proyecto. El historial de desarrollo y la procedencia de los aportes asistidos por IA se conservan en `docs/README-desarrollo.md`.
+
+## Correcciones del 12/11/2026
+
+Las correcciones comunicadas por Juan y su implementación están explicadas en
+[docs/correcciones-profe-2026-11-12.md](docs/correcciones-profe-2026-11-12.md).
+Las clases de puntos fueron reemplazadas por valores en `Celda`; los DTO están en `src/dto`.
+Los diagramas y documentos anteriores conservan el diseño histórico y requieren actualización.
+
+Pruebas específicas de las correcciones:
+
+```sh
+javac --release 17 -encoding UTF-8 -d bin -sourcepath src src/test/TestCorrecciones.java
+java -cp bin test.TestCorrecciones
+```

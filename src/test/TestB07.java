@@ -4,7 +4,7 @@ import controlador.ControladorJuego;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import modelo.Fantasma;
@@ -60,7 +60,7 @@ public class TestB07 {
 
     private static void integracion() {
         Partida partida = new Partida(mapaIntegracion(), new Posicion(2, 5));
-        ControladorJuego controlador = new ControladorJuego(partida);
+        ControladorJuego controlador = SoportePruebas.controlador(partida);
         Fantasma[] fantasmas = leerFantasmas(partida);
         verificar("Cuatro fantasmas en el mapa pequeno", 4, fantasmas.length);
         for (int i = 0; i < fantasmas.length; i++) {
@@ -81,7 +81,7 @@ public class TestB07 {
         // Antes de mover Pac-Man (2,1), iria a la izquierda desde (2,2).
         // Despues de subir Pac-Man a (1,1), el empate se resuelve hacia arriba.
         Partida cambioObjetivo = new Partida(sala(), new Posicion(2, 1));
-        ControladorJuego otroControlador = new ControladorJuego(cambioObjetivo);
+        ControladorJuego otroControlador = SoportePruebas.controlador(cambioObjetivo);
         otroControlador.moverPacMan(Direccion.ARRIBA);
         otroControlador.actualizar(1);
         posicion("Pac-Man en su nueva posicion", 1, 1, otroControlador.getPosicionPacMan());
@@ -107,7 +107,9 @@ public class TestB07 {
             Direccion elegida = fantasma.elegirDireccion(mapa, destino);
             verificar("Elegir " + esperadas[i], esperadas[i], elegida);
             posicion("Elegir no mueve al fantasma", 2, 2, fantasma);
-            fantasma.mover(elegida, mapa);
+            if (mapa.esTransitable(fantasma.calcularProximaPosicion(elegida))) {
+                fantasma.mover(elegida);
+            }
             posicion("Mover " + esperadas[i], destino.fila, destino.columna, fantasma);
         }
     }
@@ -122,19 +124,29 @@ public class TestB07 {
         Laberinto cerrado = mapa("###", "#.#", "###");
         Fantasma fantasma = new Fantasma(new Posicion(1, 1));
         for (Direccion direccion : Direccion.values()) {
-            fantasma.mover(direccion, cerrado);
+            if (cerrado.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+                fantasma.mover(direccion);
+            }
             posicion("Pared hacia " + direccion, 1, 1, fantasma);
         }
         Laberinto abierto = mapa("..", "..");
         fantasma = new Fantasma(new Posicion(0, 0));
-        fantasma.mover(Direccion.ARRIBA, abierto);
+        if (abierto.esTransitable(fantasma.calcularProximaPosicion(Direccion.ARRIBA))) {
+            fantasma.mover(Direccion.ARRIBA);
+        }
         posicion("Borde superior", 0, 0, fantasma);
-        fantasma.mover(Direccion.IZQUIERDA, abierto);
+        if (abierto.esTransitable(fantasma.calcularProximaPosicion(Direccion.IZQUIERDA))) {
+            fantasma.mover(Direccion.IZQUIERDA);
+        }
         posicion("Borde izquierdo", 0, 0, fantasma);
         fantasma = new Fantasma(new Posicion(1, 1));
-        fantasma.mover(Direccion.ABAJO, abierto);
+        if (abierto.esTransitable(fantasma.calcularProximaPosicion(Direccion.ABAJO))) {
+            fantasma.mover(Direccion.ABAJO);
+        }
         posicion("Borde inferior", 1, 1, fantasma);
-        fantasma.mover(Direccion.DERECHA, abierto);
+        if (abierto.esTransitable(fantasma.calcularProximaPosicion(Direccion.DERECHA))) {
+            fantasma.mover(Direccion.DERECHA);
+        }
         posicion("Borde derecho", 1, 1, fantasma);
     }
 
@@ -153,11 +165,15 @@ public class TestB07 {
     private static void callejon() {
         Laberinto mapa = mapa("#####", "#...#", "#####");
         Fantasma fantasma = new Fantasma(new Posicion(1, 2));
-        fantasma.mover(Direccion.IZQUIERDA, mapa);
+        if (mapa.esTransitable(fantasma.calcularProximaPosicion(Direccion.IZQUIERDA))) {
+            fantasma.mover(Direccion.IZQUIERDA);
+        }
         posicion("Entro al extremo cerrado", 1, 1, fantasma);
         Direccion salida = fantasma.elegirDireccion(mapa, new Posicion(1, 3));
         verificar("Invierte el movimiento para salir", Direccion.DERECHA, salida);
-        fantasma.mover(salida, mapa);
+        if (mapa.esTransitable(fantasma.calcularProximaPosicion(salida))) {
+            fantasma.mover(salida);
+        }
         posicion("Salio del callejon", 1, 2, fantasma);
     }
 
@@ -186,11 +202,15 @@ public class TestB07 {
         Fantasma fantasma = new Fantasma(new Posicion(1, 1));
         Direccion direccion = fantasma.elegirDireccion(separado, new Posicion(1, 3));
         verificar("Destino inaccesible devuelve null", null, direccion);
-        fantasma.mover(direccion, separado);
+        if (separado.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+            fantasma.mover(direccion);
+        }
         posicion("Sin camino permanece quieto", 1, 1, fantasma);
         direccion = fantasma.elegirDireccion(separado, new Posicion(1, 1));
         verificar("En el objetivo devuelve null", null, direccion);
-        fantasma.mover(direccion, separado);
+        if (separado.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+            fantasma.mover(direccion);
+        }
         posicion("En el objetivo permanece quieto", 1, 1, fantasma);
     }
 
@@ -199,7 +219,7 @@ public class TestB07 {
                 EstadoPartida.PAUSADA, EstadoPartida.VICTORIA, EstadoPartida.DERROTA}) {
             Partida partida = new Partida(mapaIntegracion(), new Posicion(2, 5));
             fijarEstadoParaPrueba(partida, estado);
-            new ControladorJuego(partida).actualizar(1);
+            SoportePruebas.controlador(partida).actualizar(1);
             Fantasma[] fantasmas = leerFantasmas(partida);
             verificar("Conserva cuatro fantasmas en " + estado, 4, fantasmas.length);
             for (int i = 0; i < fantasmas.length; i++) {
@@ -216,7 +236,9 @@ public class TestB07 {
         for (int i = 0; i < esperado.length; i++) {
             Posicion anterior = fantasma.getPosicion();
             Direccion direccion = fantasma.elegirDireccion(mapa, destino);
-            fantasma.mover(direccion, mapa);
+            if (mapa.esTransitable(fantasma.calcularProximaPosicion(direccion))) {
+                fantasma.mover(direccion);
+            }
             Posicion actual = fantasma.getPosicion();
             posicion("Paso " + (i + 1), esperado[i][0], esperado[i][1], actual);
             int distancia = Math.abs(actual.fila - anterior.fila) + Math.abs(actual.columna - anterior.columna);

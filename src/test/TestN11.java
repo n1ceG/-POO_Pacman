@@ -1,7 +1,7 @@
 package test;
 
 import extra.EstadoFantasma;
-import extra.Posicion;
+import dto.Posicion;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import java.util.Objects;
 import modelo.Fantasma;
 import modelo.Laberinto;
 import modelo.Partida;
-import modelo.PuntoComun;
 
 /**
  * Pruebas de N11 creadas con asistencia de IA a pedido de Juan.
@@ -143,7 +142,7 @@ public class TestN11 {
         e.fantasmas[2].asustar(10);
         e.fantasmas[2].serComido();
         // Puntaje distinto de cero para detectar un eventual reinicio indebido.
-        e.partida.consumir(new PuntoComun());
+        e.partida.consumir(10);
         verificar("Preparacion: perseguidor", EstadoFantasma.PERSIGUIENDO,
             e.fantasmas[0].getEstado());
         verificar("Preparacion: asustado", EstadoFantasma.ASUSTADO,

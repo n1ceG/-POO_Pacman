@@ -1,7 +1,7 @@
 package modelo;
 
 import extra.Direccion;
-import extra.Posicion;
+import dto.Posicion;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,20 +85,20 @@ public class Laberinto {
                 char simbolo = mapa[fila].charAt(columna);
                 Celda celda;
                 switch (simbolo) {
-                    case '#' -> celda = new Celda(true, null, fila, columna);
+                    case '#' -> celda = new Celda(true, 0, fila, columna);
                     case '.' -> celda = new Celda(
                         false,
-                        new PuntoComun(),
+                        10,
                         fila,
                         columna
                     );
                     case 'o' -> celda = new Celda(
                         false,
-                        new SuperPunto(),
+                        50,
                         fila,
                         columna
                     );
-                    case ' ' -> celda = new Celda(false, null, fila, columna);
+                    case ' ' -> celda = new Celda(false, 0, fila, columna);
                     default -> throw new IllegalArgumentException(
                         "Símbolo no válido '" + simbolo + "' en fila " +
                         fila + ", columna " + columna
@@ -222,16 +222,24 @@ public class Laberinto {
         return celdas[0].length;
     }
 
+    // Crea una copia de simbolos; nunca entrega la matriz interna de celdas.
+    public char[][] getMapa() {
+        char[][] mapa = new char[getFilas()][getColumnas()];
+        for (int fila = 0; fila < mapa.length; fila++) {
+            for (int columna = 0; columna < mapa[fila].length; columna++) {
+                Celda celda = celdas[fila][columna];
+                mapa[fila][columna] = celda.esPared() ? '#'
+                    : celda.getValor() == 50 ? 'o'
+                    : celda.getValor() == 10 ? '.' : ' ';
+            }
+        }
+        return mapa;
+    }
+
     public void imprimirLaberinto() {
-        for (Celda[] fila : celdas) {
-            for (Celda celda : fila) {
-                if (celda.esPared()) {
-                    System.out.print("# ");
-                } else if (celda.tienePunto()) {
-                    System.out.print(celda.tipoPunto().getSimbolo() + " ");
-                } else {
-                    System.out.print("  ");
-                }
+        for (char[] fila : getMapa()) {
+            for (char simbolo : fila) {
+                System.out.print(simbolo + " ");
             }
             System.out.println();
         }

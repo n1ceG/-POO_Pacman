@@ -2,7 +2,7 @@ package test;
 
 import controlador.ControladorJuego;
 import extra.EstadoFantasma;
-import extra.Posicion;
+import dto.Posicion;
 import modelo.Fantasma;
 
 /** Pruebas de contratos para la consola, creadas con asistencia de IA. */

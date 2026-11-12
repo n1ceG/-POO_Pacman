@@ -1,7 +1,7 @@
 package vista;
 
 import controlador.ControladorJuego;
-import controlador.dto.PartidaDTO;
+import dto.PartidaDTO;
 import extra.Direccion;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
