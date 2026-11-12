@@ -2,7 +2,7 @@ package modelo;
 
 public class SuperPunto extends Punto {
 
-    private int valor = 50;
+    private final int valor = 50;
 
     @Override
     public int valor() {

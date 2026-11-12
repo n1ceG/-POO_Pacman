@@ -2,7 +2,7 @@ package modelo;
 
 public class PuntoComun extends Punto {
 
-    private int valor = 10;
+    private final int valor = 10;
 
     @Override
     public int valor() {
