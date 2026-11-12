@@ -2,9 +2,11 @@ package modelo;
 
 public class PuntoComun extends Punto {
 
+    private int valor = 10;
+
     @Override
     public int valor() {
-        return 10;
+        return this.valor;
     }
 
     @Override
