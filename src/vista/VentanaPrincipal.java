@@ -20,7 +20,6 @@ public class VentanaPrincipal extends JFrame {
 
     private static final int INTERVALO_MS = 200;
 
-    private final ControladorJuego controlador;
     private PanelLaberinto tablero;
     private Timer temporizador;
     private JLabel etiquetaPuntaje;
@@ -31,8 +30,6 @@ public class VentanaPrincipal extends JFrame {
     private boolean esperandoInicio = true;
 
     public VentanaPrincipal() {
-        controlador = new ControladorJuego();
-
         configurarVentana();
         crearPaneles();
         configurarTeclado();
@@ -51,7 +48,7 @@ public class VentanaPrincipal extends JFrame {
 
     private void crearPaneles() {
         JPanel informacion = new JPanel();
-        tablero = new PanelLaberinto(controlador);
+        tablero = new PanelLaberinto();
         JPanel controles = new JPanel();
 
         informacion.setPreferredSize(new Dimension(0, 60));
@@ -69,7 +66,7 @@ public class VentanaPrincipal extends JFrame {
 
         botonPausa = new JButton("Pausar");
         botonPausa.addActionListener(e -> {
-            controlador.alternarPausa();
+            ControladorJuego.getInstance().alternarPausa();
             actualizarInformacion();
             tablero.repaint();
         });
@@ -78,7 +75,7 @@ public class VentanaPrincipal extends JFrame {
 
         botonReiniciar = new JButton("Nueva Partida");
         botonReiniciar.addActionListener(e -> {
-            if (controlador.nuevaPartida()) {
+            if (ControladorJuego.getInstance().nuevaPartida()) {
                 esperandoInicio = true;
                 actualizarInformacion();
                 tablero.repaint();
@@ -108,13 +105,13 @@ public class VentanaPrincipal extends JFrame {
         asociarTeclaDireccion("D", Direccion.DERECHA);
 
         asociarAccion("P", () -> {
-            controlador.alternarPausa();
+            ControladorJuego.getInstance().alternarPausa();
             actualizarInformacion();
             tablero.repaint();
         });
 
         asociarAccion("N", () -> {
-            if (controlador.nuevaPartida()) {
+            if (ControladorJuego.getInstance().nuevaPartida()) {
                 esperandoInicio = true;
                 actualizarInformacion();
                 tablero.repaint();
@@ -125,7 +122,7 @@ public class VentanaPrincipal extends JFrame {
     private void asociarTeclaDireccion(String tecla, Direccion direccion) {
         asociarAccion(tecla, () -> {
             esperandoInicio = false;
-            controlador.moverPacMan(direccion);
+            ControladorJuego.getInstance().moverPacMan(direccion);
         });
     }
 
@@ -144,7 +141,7 @@ public class VentanaPrincipal extends JFrame {
     private void iniciarTemporizador() {
         temporizador = new Timer(INTERVALO_MS, e -> {
             if (!esperandoInicio) {
-                controlador.actualizar(INTERVALO_MS / 1000.0);
+                ControladorJuego.getInstance().actualizar(INTERVALO_MS / 1000.0);
             }
             actualizarInformacion();
             tablero.repaint();
@@ -154,7 +151,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void actualizarInformacion() {
-        PartidaDTO partida = controlador.getPartidaDTO();
+        PartidaDTO partida = ControladorJuego.getInstance().getPartidaDTO();
         etiquetaPuntaje.setText("Puntaje: " + partida.getPuntaje());
         etiquetaVidas.setText("Vidas: " + partida.getVidas());
 

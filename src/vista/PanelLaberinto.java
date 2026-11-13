@@ -15,14 +15,10 @@ public class PanelLaberinto extends JPanel {
 
     private static final int TAMANIO_CELDA = 30;
 
-    private final ControladorJuego controlador;
-
-    public PanelLaberinto(ControladorJuego controlador) {
-        this.controlador = controlador;
-
+    public PanelLaberinto() {
         setBackground(Color.BLACK);
 
-        char[][] mapa = controlador.getMapa();
+        char[][] mapa = ControladorJuego.getInstance().getMapa();
 
         int ancho = mapa[0].length * TAMANIO_CELDA;
         int alto = mapa.length * TAMANIO_CELDA;
@@ -34,7 +30,7 @@ public class PanelLaberinto extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        char[][] mapa = controlador.getMapa();
+        char[][] mapa = ControladorJuego.getInstance().getMapa();
 
         for (int fila = 0; fila < mapa.length; fila++) {
             for (int columna = 0; columna < mapa[fila].length; columna++) {
@@ -61,7 +57,7 @@ public class PanelLaberinto extends JPanel {
             }
         }
 
-        PartidaDTO partida = controlador.getPartidaDTO();
+        PartidaDTO partida = ControladorJuego.getInstance().getPartidaDTO();
         dibujarFantasmas(g, partida.getFantasmas());
         dibujarPacMan(g, partida);
         dibujarCartelEstado(g, partida);

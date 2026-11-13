@@ -13,14 +13,23 @@ import modelo.Partida;
 
 public class ControladorJuego {
 
+    private static ControladorJuego instancia;
     private static final double SEGUNDOS_POR_TICK = 1.0 / 24.0;
     private Partida partida;
     private long ticks;
     private double tiempoSimulado;
 
-    public ControladorJuego()
+    private ControladorJuego()
     {
         this.partida = new Partida();
+    }
+
+    public static synchronized ControladorJuego getInstance()
+    {
+        if (instancia == null) {
+            instancia = new ControladorJuego();
+        }
+        return instancia;
     }
 
     public void moverPacMan(Direccion direccion)
