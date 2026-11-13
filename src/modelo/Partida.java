@@ -14,6 +14,8 @@ public class Partida {
     private Laberinto laberinto;
     private PacMan pacMan;
     private Fantasma[] fantasmas;
+    private String nombreJugador;
+    private boolean puntajeRegistrado;
 
     private static final Posicion INICIO_PACMAN = new Posicion(13, 7);
     private static final int VIDAS_INICIALES = 3;
@@ -24,11 +26,21 @@ public class Partida {
         this(Laberinto.crearDefault(), INICIO_PACMAN);
     }
 
+    public Partida(String nombreJugador)
+    {
+        this(Laberinto.crearDefault(), INICIO_PACMAN);
+        this.nombreJugador = (nombreJugador == null || nombreJugador.isBlank())
+            ? "Jugador"
+            : nombreJugador.trim();
+    }
+
     public Partida(Laberinto laberinto, Posicion inicioPacMan)
     {
         this.vidas = VIDAS_INICIALES;
         this.puntaje = 0;
         this.estado = EstadoPartida.EN_CURSO;
+        this.nombreJugador = "Jugador";
+        this.puntajeRegistrado = false;
         this.laberinto = laberinto;
         this.pacMan = new PacMan(inicioPacMan);
         this.fantasmas = new Fantasma[4];
@@ -295,6 +307,21 @@ public class Partida {
             estadosFantasmas[i] = this.fantasmas[i].getEstado();
         }
         return estadosFantasmas;
+    }
+
+    public String getNombreJugador()
+    {
+        return this.nombreJugador;
+    }
+
+    public boolean isPuntajeRegistrado()
+    {
+        return this.puntajeRegistrado;
+    }
+
+    public void marcarPuntajeRegistrado()
+    {
+        this.puntajeRegistrado = true;
     }
 
 }

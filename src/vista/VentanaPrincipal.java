@@ -2,19 +2,29 @@ package vista;
 
 import controlador.ControladorJuego;
 import dto.PartidaDTO;
+import dto.RankingDTO;
 import extra.Direccion;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -27,7 +37,13 @@ public class VentanaPrincipal extends JFrame {
     private JLabel etiquetaEstado;
     private JButton botonPausa;
     private JButton botonReiniciar;
+    private CardLayout cardLayout;
+    private JPanel contenedor;
+    private DefaultTableModel modeloTablaRanking;
+    private JLabel etiquetaJugador;
+    private JTextField campoNombre;
     private boolean esperandoInicio = true;
+    private boolean enJuego = false;
 
     public VentanaPrincipal() {
         configurarVentana();
@@ -43,10 +59,60 @@ public class VentanaPrincipal extends JFrame {
     private void configurarVentana() {
         setTitle("Pac-Man");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
     }
 
     private void crearPaneles() {
+        cardLayout = new CardLayout();
+        contenedor = new JPanel(cardLayout);
+
+        contenedor.add(crearPanelInicio(), "INICIO");
+        contenedor.add(crearPanelJuego(), "JUEGO");
+        contenedor.add(crearPanelRanking(), "RANKING");
+
+        setContentPane(contenedor);
+        cardLayout.show(contenedor, "INICIO");
+    }
+
+    private JPanel crearPanelInicio() {
+        JPanel panelInicio = new JPanel(new BorderLayout(10, 10));
+
+        JPanel centro = new JPanel(new FlowLayout());
+        centro.add(new JLabel("Nombre del jugador:"));
+        campoNombre = new JTextField(15);
+        centro.add(campoNombre);
+
+        JPanel sur = new JPanel(new FlowLayout());
+        JButton botonIniciar = new JButton("Iniciar Partida");
+        sur.add(botonIniciar);
+
+        botonIniciar.addActionListener(e -> iniciarJuegoConNombre());
+        campoNombre.addActionListener(e -> iniciarJuegoConNombre());
+
+        panelInicio.add(centro, BorderLayout.CENTER);
+        panelInicio.add(sur, BorderLayout.SOUTH);
+        return panelInicio;
+    }
+
+    private void iniciarJuegoConNombre() {
+        String nombre = campoNombre.getText().trim();
+        if (nombre.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingresá tu nombre.");
+            campoNombre.requestFocus();
+            return;
+        }
+
+        ControladorJuego.getInstance().iniciarPartida(nombre);
+        esperandoInicio = true;
+        enJuego = true;
+        actualizarInformacion();
+        tablero.repaint();
+        cardLayout.show(contenedor, "JUEGO");
+        tablero.requestFocusInWindow();
+        temporizador.start();
+    }
+
+    private JPanel crearPanelJuego() {
+        JPanel panelJuego = new JPanel(new BorderLayout());
         JPanel informacion = new JPanel();
         tablero = new PanelLaberinto();
         JPanel controles = new JPanel();
@@ -54,10 +120,13 @@ public class VentanaPrincipal extends JFrame {
         informacion.setPreferredSize(new Dimension(0, 60));
         controles.setPreferredSize(new Dimension(0, 60));
 
+        etiquetaJugador = new JLabel();
         etiquetaPuntaje = new JLabel();
         etiquetaVidas = new JLabel();
         etiquetaEstado = new JLabel();
 
+        informacion.add(etiquetaJugador);
+        informacion.add(new JLabel("   |   "));
         informacion.add(etiquetaPuntaje);
         informacion.add(new JLabel("   |   "));
         informacion.add(etiquetaVidas);
@@ -86,11 +155,66 @@ public class VentanaPrincipal extends JFrame {
         controles.add(botonPausa);
         controles.add(botonReiniciar);
 
-        add(informacion, BorderLayout.NORTH);
-        add(tablero, BorderLayout.CENTER);
-        add(controles, BorderLayout.SOUTH);
+        panelJuego.add(informacion, BorderLayout.NORTH);
+        panelJuego.add(tablero, BorderLayout.CENTER);
+        panelJuego.add(controles, BorderLayout.SOUTH);
 
         actualizarInformacion();
+        return panelJuego;
+    }
+
+    private JPanel crearPanelRanking() {
+        JPanel panelRanking = new JPanel(new BorderLayout(10, 10));
+
+        JLabel titulo = new JLabel("Tabla de Rankings", SwingConstants.CENTER);
+        panelRanking.add(titulo, BorderLayout.NORTH);
+
+        String[] columnas = {"Puesto", "Jugador", "Puntaje"};
+        modeloTablaRanking = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        JTable tabla = new JTable(modeloTablaRanking);
+        panelRanking.add(new JScrollPane(tabla), BorderLayout.CENTER);
+
+        JPanel botones = new JPanel(new FlowLayout());
+        JButton botonJugarDeNuevo = new JButton("Jugar de nuevo");
+        JButton botonCambiarJugador = new JButton("Cambiar jugador");
+
+        botonJugarDeNuevo.addActionListener(e -> {
+            ControladorJuego.getInstance().nuevaPartida();
+            esperandoInicio = true;
+            enJuego = true;
+            actualizarInformacion();
+            tablero.repaint();
+            cardLayout.show(contenedor, "JUEGO");
+            tablero.requestFocusInWindow();
+            temporizador.start();
+        });
+
+        botonCambiarJugador.addActionListener(e -> {
+            enJuego = false;
+            campoNombre.setText("");
+            cardLayout.show(contenedor, "INICIO");
+            campoNombre.requestFocusInWindow();
+        });
+
+        botones.add(botonJugarDeNuevo);
+        botones.add(botonCambiarJugador);
+        panelRanking.add(botones, BorderLayout.SOUTH);
+        return panelRanking;
+    }
+
+    private void cargarTablaRanking() {
+        modeloTablaRanking.setRowCount(0);
+        List<RankingDTO> ranking = ControladorJuego.getInstance().getRanking();
+        for (int i = 0; i < ranking.size(); i++) {
+            RankingDTO item = ranking.get(i);
+            modeloTablaRanking.addRow(new Object[] {i + 1, item.getNombre(), item.getPuntaje()});
+        }
     }
 
     private void configurarTeclado() {
@@ -133,6 +257,9 @@ public class VentanaPrincipal extends JFrame {
         tablero.getActionMap().put(tecla, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (!enJuego) {
+                    return;
+                }
                 accion.run();
             }
         });
@@ -145,13 +272,19 @@ public class VentanaPrincipal extends JFrame {
             }
             actualizarInformacion();
             tablero.repaint();
-        });
 
-        temporizador.start();
+            if (ControladorJuego.getInstance().getPartidaDTO().esDerrota()) {
+                temporizador.stop();
+                enJuego = false;
+                cargarTablaRanking();
+                cardLayout.show(contenedor, "RANKING");
+            }
+        });
     }
 
     private void actualizarInformacion() {
         PartidaDTO partida = ControladorJuego.getInstance().getPartidaDTO();
+        etiquetaJugador.setText("Jugador: " + partida.getNombreJugador());
         etiquetaPuntaje.setText("Puntaje: " + partida.getPuntaje());
         etiquetaVidas.setText("Vidas: " + partida.getVidas());
 

@@ -3,28 +3,33 @@ package controlador;
 import dto.FantasmaDTO;
 import dto.PartidaDTO;
 import dto.PosicionDTO;
-import modelo.Posicion;
+import dto.RankingDTO;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
 import java.util.ArrayList;
 import java.util.List;
+import modelo.EntradaRanking;
 import modelo.Partida;
+import modelo.Posicion;
+import modelo.Ranking;
 
 public class ControladorJuego {
 
     private static ControladorJuego instancia;
     private static final double SEGUNDOS_POR_TICK = 1.0 / 24.0;
     private Partida partida;
+    private final Ranking ranking;
     private long ticks;
     private double tiempoSimulado;
 
     private ControladorJuego()
     {
         this.partida = new Partida();
+        this.ranking = new Ranking();
     }
 
-    public static synchronized ControladorJuego getInstance()
+    public static ControladorJuego getInstance()
     {
         if (instancia == null) {
             instancia = new ControladorJuego();
@@ -61,6 +66,15 @@ public class ControladorJuego {
         this.partida.actualizar(tiempoTranscurrido);
         this.ticks++;
         this.tiempoSimulado += tiempoTranscurrido;
+
+        EstadoPartida estadoActual = this.partida.getEstado();
+        if (
+            (estadoActual == EstadoPartida.DERROTA || estadoActual == EstadoPartida.VICTORIA)
+            && !this.partida.isPuntajeRegistrado()
+        ) {
+            this.ranking.agregar(this.partida.getNombreJugador(), this.partida.getPuntaje());
+            this.partida.marcarPuntajeRegistrado();
+        }
     }
 
     public long getTicks()
@@ -123,6 +137,13 @@ public class ControladorJuego {
         }
     }
 
+    public void iniciarPartida(String nombreJugador)
+    {
+        this.partida = new Partida(nombreJugador);
+        this.ticks = 0;
+        this.tiempoSimulado = 0;
+    }
+
     public boolean nuevaPartida()
     {
         EstadoPartida estadoActual = this.partida.getEstado();
@@ -131,7 +152,7 @@ public class ControladorJuego {
             estadoActual == EstadoPartida.VICTORIA
             || estadoActual == EstadoPartida.DERROTA
         ) {
-            this.partida = new Partida();
+            this.partida = new Partida(this.partida.getNombreJugador());
             this.ticks = 0;
             this.tiempoSimulado = 0;
             return true;
@@ -176,6 +197,7 @@ public class ControladorJuego {
         Direccion dirPac = this.partida.getDireccionPacMan();
 
         return new PartidaDTO(
+            this.partida.getNombreJugador(),
             this.partida.getPuntaje(),
             this.partida.getVidas(),
             this.partida.getEstado().name(),
@@ -184,6 +206,16 @@ public class ControladorJuego {
             dirPac != null ? dirPac.name() : "DERECHA",
             getFantasmasDTO()
         );
+    }
+
+    public List<RankingDTO> getRanking()
+    {
+        List<EntradaRanking> entradas = this.ranking.getEntradas();
+        List<RankingDTO> resultado = new ArrayList<>(entradas.size());
+        for (EntradaRanking entrada : entradas) {
+            resultado.add(new RankingDTO(entrada.getNombre(), entrada.getPuntaje()));
+        }
+        return resultado;
     }
 
     public String getEstadoTexto()

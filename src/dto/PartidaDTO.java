@@ -5,6 +5,7 @@ import java.util.List;
 
 public class PartidaDTO {
 
+    private final String nombreJugador;
     private final int puntaje;
     private final int vidas;
     private final String estado;
@@ -14,6 +15,7 @@ public class PartidaDTO {
     private final List<FantasmaDTO> fantasmas;
 
     public PartidaDTO(
+        String nombreJugador,
         int puntaje,
         int vidas,
         String estado,
@@ -22,6 +24,7 @@ public class PartidaDTO {
         String pacManDireccion,
         List<FantasmaDTO> fantasmas
     ) {
+        this.nombreJugador = nombreJugador;
         this.puntaje = puntaje;
         this.vidas = vidas;
         this.estado = estado;
@@ -31,6 +34,10 @@ public class PartidaDTO {
         this.fantasmas = fantasmas != null
             ? Collections.unmodifiableList(fantasmas)
             : Collections.emptyList();
+    }
+
+    public String getNombreJugador() {
+        return nombreJugador;
     }
 
     public int getPuntaje() {
