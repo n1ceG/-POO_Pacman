@@ -2,7 +2,8 @@ package controlador;
 
 import dto.FantasmaDTO;
 import dto.PartidaDTO;
-import dto.Posicion;
+import dto.PosicionDTO;
+import modelo.Posicion;
 import extra.Direccion;
 import extra.EstadoFantasma;
 import extra.EstadoPartida;
@@ -63,9 +64,10 @@ public class ControladorJuego {
         return this.tiempoSimulado;
     }
 
-    public Posicion getPosicionPacMan()
+    public PosicionDTO getPosicionPacMan()
     {
-        return this.partida.getPosicionPacMan();
+        Posicion posicion = this.partida.getPosicionPacMan();
+        return new PosicionDTO(posicion.fila, posicion.columna);
     }
 
     public Direccion getDireccionPacMan()
@@ -128,9 +130,14 @@ public class ControladorJuego {
         return false;
     }
     
-    public Posicion[] getPosicionesFantasmas()
+    public PosicionDTO[] getPosicionesFantasmas()
     {
-        return this.partida.getPosicionesFantasmas();
+        Posicion[] posiciones = this.partida.getPosicionesFantasmas();
+        PosicionDTO[] posicionesDTO = new PosicionDTO[posiciones.length];
+        for (int i = 0; i < posiciones.length; i++) {
+            posicionesDTO[i] = new PosicionDTO(posiciones[i].fila, posiciones[i].columna);
+        }
+        return posicionesDTO;
     }
 
     public EstadoFantasma[] getEstadosFantasmas()

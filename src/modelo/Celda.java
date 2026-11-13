@@ -1,6 +1,5 @@
 package modelo;
 
-import dto.Posicion;
 
 public class Celda {
 
@@ -38,6 +37,7 @@ public class Celda {
     public int getValor() {
         return fueComido ? 0 : valor;
     }
+
 
     public boolean esPared() {
         return pared;

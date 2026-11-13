@@ -1,4 +1,4 @@
-package dto;
+package modelo;
 
 public class Posicion {
 

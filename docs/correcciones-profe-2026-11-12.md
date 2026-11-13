@@ -12,7 +12,7 @@ El trabajo estaba incompleto: `Celda` referenciaba atributos inexistentes y ten�
 
 | Observación | Implementación y responsabilidad |
 | --- | --- |
-| Posición debe ser un DTO | `dto.Posicion` transporta fila y columna, sin reglas de movimiento ni referencias a entidades. Ya era esencialmente un contenedor de datos; se formalizó esa función y se reunieron los tres DTO en el paquete `dto`. |
+| Separar posición del modelo y datos para la vista | `modelo.Posicion` se usa dentro del juego. El controlador convierte sus coordenadas en un nuevo `dto.PosicionDTO` antes de devolverlas a las interfaces. La primera implementación, que solo movía `Posicion` al paquete `dto`, era incorrecta y fue reemplazada. |
 | El controlador no devuelve objetos de negocio | Sus consultas entregan valores, enums compartidos, DTO o matrices de caracteres. No entrega `Partida`, `PacMan`, `Fantasma`, `Laberinto` ni `Celda`. Se conservó la eliminación del constructor público que recibía una `Partida`. |
 | Sacar las clases de puntos | Se eliminaron `Punto`, `PuntoComun` y `SuperPunto`. `Celda` conserva un valor y el indicador `fueComido`. |
 | Usar `if (valor == 50)` al consumir | `Partida.consumir(int valor)` suma el valor y asusta a los fantasmas cuando vale 50. El valor 0 no produce efectos. |
@@ -23,11 +23,11 @@ El trabajo estaba incompleto: `Celda` referenciaba atributos inexistentes y ten�
 
 ### Datos para las interfaces
 
-Un DTO transporta información; no ejecuta las reglas del juego. `Posicion` conserva su nombre, aunque esté en `dto`: el sufijo `DTO` no es obligatorio.
+`modelo.Posicion` representa las coordenadas internas de personajes y celdas. `Personaje`, `Celda`, `Partida` y `Laberinto` usan esa clase; el modelo no importa clases del paquete `dto`.
 
-`Personaje.getPosicion()` y `Celda.getPosicion()` devuelven un **nuevo** objeto de coordenadas. El controlador entrega esas copias. Aunque una interfaz cambie una coordenada del DTO, no modifica al personaje ni a la celda. Los estados y direcciones son enums compartidos, sin entidades mutables del juego.
+`dto.PosicionDTO` es una clase distinta, con fila y columna privadas y finales y sus getters. No contiene referencias a posiciones del modelo. El controlador crea nuevas instancias al atender `getPosicionPacMan()` y `getPosicionesFantasmas()`. Modificar el array devuelto no cambia el juego y un DTO consultado antes de un movimiento conserva sus coordenadas anteriores.
 
-`PartidaDTO` y `FantasmaDTO` siguen siendo las representaciones utilizadas por Swing. Las interfaces no importan clases de `modelo`.
+`PartidaDTO` y `FantasmaDTO` continúan representando los datos que usa Swing. Sus coordenadas ya eran valores numéricos; no fue necesario cambiar la interfaz gráfica.
 
 ### Puntos y consumo
 
@@ -55,7 +55,21 @@ Este es el contrato de movimiento; `Partida.actualizar()` conserva además las p
 
 El susto conserva diez segundos completos después del turno de consumo. Con Swing, los 50 intervalos posteriores de 200 ms suman diez segundos; en consola son 240 turnos de 1/24 s.
 
-## Validación y límites
+## Verificación de la separación de posiciones
+
+Se compiló todo el código Java actual, incluido Swing, para Java 17. La verificación específica realizó **43 comprobaciones** de tipos de retorno, aislamiento de copias, coordenadas iniciales, movimiento, puntaje y pausa. Se conserva en `tests/VerificarPosiciones.java`, creada con asistencia de IA.
+
+```powershell
+javac --release 17 -encoding UTF-8 -d bin -sourcepath src tests/VerificarPosiciones.java
+java -cp bin VerificarPosiciones
+```
+
+Esta verificación cubre la separación de posiciones; no certifica la resolución de los otros problemas identificados durante la revisión.
+
+## Validación histórica y límites
+
+Los siguientes resultados y comandos corresponden a la versión anterior del proyecto, que incluía consola y `src/test`. Esos archivos ya no están en la versión actual.
+
 
 - Compilación de **todos** los archivos Java con `--release 17 -encoding UTF-8`, incluidos Swing, consola y pruebas.
 - `TestRequerimientos`: **64/64 casos**, **982 comprobaciones** aprobadas.

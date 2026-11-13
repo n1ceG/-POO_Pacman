@@ -57,7 +57,7 @@ Muestra `[OK]` o `[FALLO]` por caso y un resumen final. No necesita JUnit ni int
 
 ## Organización
 
-- `src/modelo`: personajes, laberinto y reglas de la partida.
+- `src/modelo`: personajes, laberinto, posiciones internas y reglas de la partida.
 - `src/controlador`: coordinación del juego y acciones del jugador.
 - `src/vista`: interfaz gráfica en Swing (`VentanaPrincipal`, `PanelLaberinto`).
 - `src/consola`: entrada por teclado y presentación del tablero en terminal.
@@ -79,4 +79,17 @@ Pruebas específicas de las correcciones:
 ```sh
 javac --release 17 -encoding UTF-8 -d bin -sourcepath src src/test/TestCorrecciones.java
 java -cp bin test.TestCorrecciones
+```
+
+## Posiciones del modelo y DTO
+
+`modelo.Posicion` se usa dentro del juego. `dto.PosicionDTO` transporta una copia
+de las coordenadas hacia las interfaces, mediante getters `getFila()` y `getColumna()`.
+El controlador realiza la conversión en `getPosicionPacMan()` y `getPosicionesFantasmas()`.
+
+Verificación específica de esta separación:
+
+```sh
+javac --release 17 -encoding UTF-8 -d bin -sourcepath src tests/VerificarPosiciones.java
+java -cp bin VerificarPosiciones
 ```

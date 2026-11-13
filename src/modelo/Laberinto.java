@@ -1,6 +1,5 @@
 package modelo;
 
-import dto.Posicion;
 import extra.Direccion;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
